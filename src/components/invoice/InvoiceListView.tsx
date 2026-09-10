@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Icon } from '../ui/Icon';
+import { toast } from 'sonner';
 
 // Types for Invoice List
 interface InvoiceRowData {
@@ -74,8 +75,8 @@ interface InvoiceListViewProps {
 }
 
 export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
-  // Mode switcher: 'list' (Node 1010:8649) vs 'generate' (Node 1010:9338)
-  const [viewMode, setViewMode] = useState<'list' | 'generate'>('list');
+  // Mode switcher: 'list' (Node 1010:8649) vs 'generate' (Node 1010:9338) vs 'preview' (Node 1018:10225)
+  const [viewMode, setViewMode] = useState<'list' | 'generate' | 'preview'>('list');
 
   // List View States
   const [invoices, setInvoices] = useState<InvoiceRowData[]>(figmaMockInvoices);
@@ -86,6 +87,11 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceRowData | null>(null);
+
+  // Preview Mode State (Figma Node 1018:10225)
+  const [activePreviewInvoice, setActivePreviewInvoice] = useState<InvoiceRowData | null>(figmaMockInvoices[0]);
+  const [showSuccessToast, setShowSuccessToast] = useState<boolean>(false);
+  const [toastInvoiceNum, setToastInvoiceNum] = useState<string>('INV-0001');
 
   // Generate View States (Figma Node 1010:9338)
   const [genClient, setGenClient] = useState<string>('Derby County Football Club');
@@ -182,11 +188,43 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
     };
 
     setInvoices([newInv, ...invoices]);
-    setIsConfirmationOpen(true);
+    setActivePreviewInvoice(newInv);
+    setViewMode('preview');
+    setToastInvoiceNum(invNum);
+    setShowSuccessToast(true);
+
+    toast.success(`Invoice ${invNum} generated successfully!`, {
+      description: `Previewing generated invoice for ${newInv.client}.`,
+    });
+
+    setTimeout(() => {
+      setShowSuccessToast(false);
+    }, 4000);
   };
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto bg-[#FFFFFF] dark:bg-[#090d16] text-[#241F20] dark:text-slate-100 p-6 space-y-4 font-sans relative">
+      {/* FLOATING SUCCESS TOAST POPUP (TOP RIGHT CORNER) */}
+      {showSuccessToast && (
+        <div className="fixed top-6 right-6 z-[100] bg-[#241F20] text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-slate-700 animate-in slide-in-from-top-4 duration-200">
+          <div className="w-8 h-8 rounded-full bg-[#27AE60]/20 text-[#27AE60] flex items-center justify-center font-bold text-sm">
+            <Icon name="CheckCircle" size={18} />
+          </div>
+          <div>
+            <div className="text-xs font-bold">Invoice Generated Successfully!</div>
+            <div className="text-[11px] text-slate-300">
+              <span className="font-semibold text-white">{toastInvoiceNum}</span> created for {genClient}.
+            </div>
+          </div>
+          <button
+            onClick={() => setShowSuccessToast(false)}
+            className="text-slate-400 hover:text-white text-xs ml-2 cursor-pointer p-1"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* HEADER & BREADCRUMB NAVIGATION */}
       <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
         <div className="flex items-center gap-2">
@@ -198,7 +236,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                 : 'text-[#A6A6A6] hover:text-[#241F20]'
             }`}
           >
-            Invoice
+            Invoice List
           </button>
 
           {viewMode === 'generate' && (
@@ -206,6 +244,15 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
               <Icon name="ChevronRight" size={16} className="text-[#A6A6A6]" />
               <span className="text-sm font-semibold text-[#A6A6A6]">
                 Generate Invoice
+              </span>
+            </>
+          )}
+
+          {viewMode === 'preview' && (
+            <>
+              <Icon name="ChevronRight" size={16} className="text-[#A6A6A6]" />
+              <span className="text-sm font-semibold text-[#A6A6A6]">
+                {activePreviewInvoice ? activePreviewInvoice.invoiceNumber : 'INV-0001'}
               </span>
             </>
           )}
@@ -223,7 +270,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
         ) : (
           <button
             onClick={() => setViewMode('list')}
-            className="px-3.5 py-1.5 rounded-md border border-[#EDEDED] dark:border-slate-800 text-xs font-semibold text-[#241F20] dark:text-slate-300 hover:bg-slate-50 cursor-pointer"
+            className="px-3.5 py-1.5 rounded-md border border-[#EDEDED] dark:border-slate-800 text-xs font-semibold text-[#241F20] dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer"
           >
             Back to Invoice List
           </button>
@@ -864,6 +911,212 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                     <Icon name="FileText" size={14} />
                     <span>Generate Invoice</span>
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* SCREEN 3: INVOICE PREVIEW LIGHT MODE (FIGMA NODE 1018:10225) */}
+      {/* ========================================================================= */}
+      {viewMode === 'preview' && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start pt-1">
+          {/* LEFT SIDEBAR: INVOICE LIST (Node 1018:10393, width 246px) */}
+          <div className="lg:col-span-3 space-y-3">
+            <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[8px] overflow-hidden shadow-2xs">
+              <div className="p-3 border-b border-[#EDEDED] dark:border-slate-800 bg-[#FCFCFC] dark:bg-slate-900/50">
+                <h3 className="text-xs font-bold text-[#241F20] dark:text-white">
+                  All Invoices ({invoices.length})
+                </h3>
+              </div>
+
+              <div className="divide-y divide-[#EDEDED] dark:divide-slate-800 max-h-[680px] overflow-y-auto">
+                {invoices.map((inv) => {
+                  const isSelected = activePreviewInvoice?.id === inv.id || (!activePreviewInvoice && inv.invoiceNumber === 'INV-001');
+
+                  return (
+                    <div
+                      key={inv.id}
+                      onClick={() => setActivePreviewInvoice(inv)}
+                      className={`p-3.5 cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-900/80 ${
+                        isSelected ? 'bg-slate-50/90 dark:bg-slate-800/60 border-l-4 border-l-[#27AE60]' : ''
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-xs font-semibold text-[#241F20] dark:text-white mb-1">
+                        <span className="font-bold truncate max-w-[140px]">{inv.client}</span>
+                        <span className="text-[11px] font-bold">{inv.itemCount.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-[#A6A6A6]">
+                        <span>{inv.invoiceNumber}</span>
+                        <span
+                          className={`font-semibold ${
+                            inv.status === 'Paid'
+                              ? 'text-[#27AE60]'
+                              : inv.status === 'Invoiced'
+                              ? 'text-[#FFAE4C]'
+                              : 'text-[#E84040]'
+                          }`}
+                        >
+                          {inv.status === 'Invoiced' ? 'Unpaid' : inv.status}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-[#A6A6A6] mt-1">
+                        {inv.dateRange}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT MAIN PANEL: INVOICE DOCUMENT SHEET (Node 1018:10317) */}
+          <div className="lg:col-span-9 bg-[#EDEDED]/60 dark:bg-slate-900/50 border border-[#EDEDED] dark:border-slate-800 rounded-[8px] p-6 shadow-2xs space-y-4 relative">
+            {/* Top Controls Bar */}
+            <div className="flex items-center justify-between bg-white dark:bg-[#0d131f] p-4 rounded-[8px] border border-[#EDEDED] dark:border-slate-800 shadow-2xs">
+              <div>
+                <span className="text-[10px] text-[#A6A6A6] font-semibold block">Invoice Number</span>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-sm font-bold text-[#241F20] dark:text-white">
+                    {activePreviewInvoice?.invoiceNumber || 'INV-0001'}
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold text-[#FFAE4C] bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
+                    Unpaid
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    toast.success('Downloading Invoice PDF...', {
+                      description: `Invoice ${activePreviewInvoice?.invoiceNumber || 'INV-0001'} ready.`,
+                    });
+                  }}
+                  className="px-3.5 py-1.5 rounded-[6px] border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#241F20] dark:text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                >
+                  <Icon name="Download" size={14} />
+                  <span>Download</span>
+                </button>
+
+                <button
+                  onClick={() => setViewMode('list')}
+                  className="text-[#A6A6A6] hover:text-[#241F20] dark:hover:text-white text-base font-bold transition-colors cursor-pointer p-1"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* WHITE PAPER DOCUMENT SHEET */}
+            <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[8px] p-8 shadow-sm space-y-6 max-w-3xl mx-auto text-xs">
+              {/* Document Header Row */}
+              <div className="flex items-center justify-between text-xs pb-3 border-b border-[#EDEDED] dark:border-slate-800">
+                <div>
+                  <span className="text-[#A6A6A6]">Invoice Number: </span>
+                  <span className="font-bold text-[#241F20] dark:text-white ml-1">
+                    {activePreviewInvoice?.invoiceNumber || 'INV-001'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[#A6A6A6]">Invoice Range: </span>
+                  <span className="font-bold text-[#241F20] dark:text-white ml-1">
+                    {activePreviewInvoice?.dateRange || genDateRange || '1st - 31st Aug, 2025'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Addresses Grid */}
+              <div className="grid grid-cols-2 gap-8 text-xs pt-1">
+                {/* Billed to */}
+                <div className="space-y-1">
+                  <span className="text-[#A6A6A6] text-[10px] font-semibold block mb-1">Billed to:</span>
+                  <div className="font-bold text-[#241F20] dark:text-white text-sm">
+                    {activePreviewInvoice?.client || genClient || 'Derby County Football Club'}
+                  </div>
+                  <div className="text-[#241F20] dark:text-slate-300 font-semibold">{genLocation || 'Pride Park Stadium'}</div>
+                  <div className="text-[#241F20] dark:text-slate-300 font-semibold">Pride Park</div>
+                  <div className="text-[#241F20] dark:text-slate-300 font-semibold">Derby</div>
+                  <div className="text-[#241F20] dark:text-slate-300 font-semibold">DE24 8XL</div>
+                </div>
+
+                {/* Billed by */}
+                <div className="space-y-1">
+                  <span className="text-[#A6A6A6] text-[10px] font-semibold block mb-1">Billed by:</span>
+                  <div className="font-bold text-[#241F20] dark:text-white text-sm">Circulayo Limited</div>
+                  <div className="text-[#241F20] dark:text-slate-300 font-semibold">1 St James Court</div>
+                  <div className="text-[#241F20] dark:text-slate-300 font-semibold">Friar Gate</div>
+                  <div className="text-[#241F20] dark:text-slate-300 font-semibold">Derby</div>
+                  <div className="text-[#241F20] dark:text-slate-300 font-semibold">DE1 1BT</div>
+                </div>
+              </div>
+
+              {/* Dates Row */}
+              <div className="flex items-center justify-between text-xs pt-2 pb-3 border-b border-[#EDEDED] dark:border-slate-800">
+                <div>
+                  <span className="text-[#A6A6A6]">Date Issued: </span>
+                  <span className="font-bold text-[#241F20] dark:text-white ml-1">30th Aug, 2025</span>
+                </div>
+                <div>
+                  <span className="text-[#A6A6A6]">Due Date: </span>
+                  <span className="font-bold text-[#241F20] dark:text-white ml-1">{dueDate || '5th Sep, 2025'}</span>
+                </div>
+              </div>
+
+              {/* Invoice Details Section */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold text-[#241F20] dark:text-white">
+                  Invoice Details
+                </h4>
+
+                <div className="border border-[#EDEDED] dark:border-slate-800 rounded-[6px] overflow-hidden">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-[#FBFBFB] dark:bg-slate-900/80 border-b border-[#EDEDED] dark:border-slate-800 text-[#241F20] dark:text-slate-300 font-semibold h-[36px]">
+                        <th className="py-2 px-4">Item</th>
+                        <th className="py-2 px-4">Service</th>
+                        <th className="py-2 px-4 text-center">Quantity</th>
+                        <th className="py-2 px-4 text-center">Unit Cost (£)</th>
+                        <th className="py-2 px-4 text-right">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#EDEDED] dark:divide-slate-800">
+                      {summaryItems.map((row) => (
+                        <tr key={row.id} className="h-[38px]">
+                          <td className="py-2 px-4 font-semibold text-[#241F20] dark:text-white">{row.item}</td>
+                          <td className="py-2 px-4 text-[#241F20] dark:text-slate-300 font-semibold">{row.service}</td>
+                          <td className="py-2 px-4 text-center text-[#A6A6A6] font-semibold">{row.quantity.toLocaleString()}</td>
+                          <td className="py-2 px-4 text-center text-[#A6A6A6] font-semibold">{row.unitCost}</td>
+                          <td className="py-2 px-4 text-right text-[#A6A6A6] font-semibold">£{(row.quantity * row.unitCost).toFixed(1)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Document Footer: Payment Details Left & Subtotal Right */}
+              <div className="pt-4 border-t border-[#EDEDED] dark:border-slate-800 grid grid-cols-2 gap-6 items-end bg-[#FBFBFB] dark:bg-slate-900/40 p-4 rounded-[6px]">
+                {/* Payment Info */}
+                <div className="space-y-1 text-xs">
+                  <div className="font-semibold text-[#241F20] dark:text-white">Please make payments to:</div>
+                  <div className="font-semibold text-[#241F20] dark:text-slate-300">Circulayo Limited</div>
+                  <div className="font-semibold text-[#241F20] dark:text-slate-300">Barclays Bank</div>
+                  <div className="font-semibold text-[#241F20] dark:text-slate-300">Account number: 83168891</div>
+                </div>
+
+                {/* Subtotal & Tax */}
+                <div className="space-y-2 text-xs text-right">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-[#241F20] dark:text-white">Subtotal</span>
+                    <span className="font-semibold text-[#241F20] dark:text-white">£{subtotal.toFixed(1)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-[#241F20] dark:text-white">Tax({taxRatePercent}%)</span>
+                    <span className="font-semibold text-[#241F20] dark:text-white">£{taxAmount.toFixed(0)}</span>
+                  </div>
                 </div>
               </div>
             </div>
