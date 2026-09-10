@@ -36,6 +36,71 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
   const [newEventSite, setNewEventSite] = useState('');
   const [newEventPeriod, setNewEventPeriod] = useState('');
 
+  // Date Range Picker Modal State (for Event Period popout)
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [selectedPreset, setSelectedPreset] = useState<string>('Custom');
+  const [pickerStartDate, setPickerStartDate] = useState<string>('12/09/2026');
+  const [pickerEndDate, setPickerEndDate] = useState<string>('28/09/2026');
+  const [pickerMonth1, setPickerMonth1] = useState<Date>(new Date(2026, 8, 1)); // Sept 2026
+  const [pickerMonth2, setPickerMonth2] = useState<Date>(new Date(2026, 9, 1)); // Oct 2026
+
+  const handlePresetSelect = (preset: string) => {
+    setSelectedPreset(preset);
+    const now = new Date(2026, 8, 8); // Sept 8, 2026
+    const fmt = (d: Date) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+    
+    if (preset === 'Today') {
+      setPickerStartDate(fmt(now));
+      setPickerEndDate(fmt(now));
+    } else if (preset === 'Yesterday') {
+      const y = new Date(now);
+      y.setDate(y.getDate() - 1);
+      setPickerStartDate(fmt(y));
+      setPickerEndDate(fmt(y));
+    } else if (preset === 'Last 7 days') {
+      const d = new Date(now);
+      d.setDate(d.getDate() - 7);
+      setPickerStartDate(fmt(d));
+      setPickerEndDate(fmt(now));
+    } else if (preset === 'Last 30 days') {
+      const d = new Date(now);
+      d.setDate(d.getDate() - 30);
+      setPickerStartDate(fmt(d));
+      setPickerEndDate(fmt(now));
+    } else if (preset === 'Last 90 days') {
+      const d = new Date(now);
+      d.setDate(d.getDate() - 90);
+      setPickerStartDate(fmt(d));
+      setPickerEndDate(fmt(now));
+    } else if (preset === 'Last 12 months') {
+      const d = new Date(now);
+      d.setFullYear(d.getFullYear() - 1);
+      setPickerStartDate(fmt(d));
+      setPickerEndDate(fmt(now));
+    } else if (preset === 'Last week') {
+      setPickerStartDate('31/08/2026');
+      setPickerEndDate('06/09/2026');
+    } else if (preset === 'Last month') {
+      setPickerStartDate('01/08/2026');
+      setPickerEndDate('31/08/2026');
+    }
+  };
+
+  const handlePickerDayClick = (day: number, monthObj: Date) => {
+    setSelectedPreset('Custom');
+    const dayStr = String(day).padStart(2, '0');
+    const monthStr = String(monthObj.getMonth() + 1).padStart(2, '0');
+    const yearStr = monthObj.getFullYear();
+    const formatted = `${dayStr}/${monthStr}/${yearStr}`;
+
+    if (!pickerStartDate || (pickerStartDate && pickerEndDate)) {
+      setPickerStartDate(formatted);
+      setPickerEndDate('');
+    } else {
+      setPickerEndDate(formatted);
+    }
+  };
+
   // Purely Event, Festival & Celebration Data
   const [events, setEvents] = useState<CalendarEvent[]>([
     {
@@ -915,14 +980,18 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
                 <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                   EVENT PERIOD*
                 </label>
-                <div className="relative">
-                  <Icon name="Calendar" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <div
+                  onClick={() => setIsDatePickerOpen(true)}
+                  className="relative cursor-pointer group"
+                >
+                  <Icon name="Calendar" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-blue-500 transition-colors pointer-events-none" />
                   <input
                     type="text"
                     value={newEventPeriod}
-                    onChange={(e) => setNewEventPeriod(e.target.value)}
+                    onClick={() => setIsDatePickerOpen(true)}
+                    readOnly
                     placeholder="Select event date range"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 transition-all"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 transition-all cursor-pointer"
                     required
                   />
                 </div>
@@ -945,6 +1014,230 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: DATE RANGE PICKER POPOUT (MATCHING SCREENSHOT) */}
+      {isDatePickerOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-[70] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#0d131f] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-4xl w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            {/* Body layout: Left Presets Sidebar | Right Custom Range Calendar */}
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Left Sidebar: Preset Periods */}
+              <div className="w-full md:w-48 space-y-3">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Preset Periods
+                </h4>
+                <div className="flex flex-col gap-1.5 max-h-[340px] overflow-y-auto pr-1">
+                  {[
+                    'Today',
+                    'Yesterday',
+                    'Last 7 days',
+                    'Last 30 days',
+                    'Last 90 days',
+                    'Last 12 months',
+                    'Last week',
+                    'Last month',
+                    'Custom',
+                  ].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => handlePresetSelect(preset)}
+                      className={`w-full text-left px-3.5 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                        selectedPreset === preset
+                          ? 'border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-2xs'
+                          : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Vertical Divider */}
+              <div className="hidden md:block w-px bg-slate-200 dark:bg-slate-800 self-stretch" />
+
+              {/* Right Panel: Custom Range & Dual Month Calendar */}
+              <div className="flex-1 space-y-4">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Custom Range
+                </h4>
+
+                {/* Input Fields Row */}
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      placeholder="Start date (DD/MM/YYYY)"
+                      value={pickerStartDate}
+                      onChange={(e) => {
+                        setPickerStartDate(e.target.value);
+                        setSelectedPreset('Custom');
+                      }}
+                      className="w-full px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <span className="text-slate-400 font-bold">→</span>
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      placeholder="End date (DD/MM/YYYY)"
+                      value={pickerEndDate}
+                      onChange={(e) => {
+                        setPickerEndDate(e.target.value);
+                        setSelectedPreset('Custom');
+                      }}
+                      className="w-full px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Dual Month Calendar View */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+                  {/* Month 1: September 2026 */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between px-1">
+                      <button
+                        type="button"
+                        onClick={() => setPickerMonth1(new Date(pickerMonth1.getFullYear(), pickerMonth1.getMonth() - 1, 1))}
+                        className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-sm font-bold cursor-pointer"
+                      >
+                        ‹
+                      </button>
+                      <span className="text-xs font-bold text-slate-800 dark:text-white">
+                        {pickerMonth1.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setPickerMonth1(new Date(pickerMonth1.getFullYear(), pickerMonth1.getMonth() + 1, 1))}
+                        className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-sm font-bold cursor-pointer"
+                      >
+                        ›
+                      </button>
+                    </div>
+
+                    {/* Days Header */}
+                    <div className="grid grid-cols-7 text-center text-[11px] font-semibold text-slate-400">
+                      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                    </div>
+
+                    {/* Month 1 Grid */}
+                    <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium">
+                      {Array.from({ length: new Date(pickerMonth1.getFullYear(), pickerMonth1.getMonth(), 1).getDay() }).map((_, i) => (
+                        <div key={`empty-m1-${i}`} />
+                      ))}
+
+                      {Array.from({ length: new Date(pickerMonth1.getFullYear(), pickerMonth1.getMonth() + 1, 0).getDate() }).map((_, i) => {
+                        const dayNum = i + 1;
+                        const dayStr = `${String(dayNum).padStart(2, '0')}/${String(pickerMonth1.getMonth() + 1).padStart(2, '0')}/${pickerMonth1.getFullYear()}`;
+                        const isStart = pickerStartDate === dayStr;
+                        const isEnd = pickerEndDate === dayStr;
+
+                        return (
+                          <button
+                            key={`m1-day-${dayNum}`}
+                            type="button"
+                            onClick={() => handlePickerDayClick(dayNum, pickerMonth1)}
+                            className={`h-7 w-7 mx-auto rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer ${
+                              isStart || isEnd
+                                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold'
+                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                            }`}
+                          >
+                            {dayNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Month 2: October 2026 */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between px-1">
+                      <button
+                        type="button"
+                        onClick={() => setPickerMonth2(new Date(pickerMonth2.getFullYear(), pickerMonth2.getMonth() - 1, 1))}
+                        className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-sm font-bold cursor-pointer"
+                      >
+                        ‹
+                      </button>
+                      <span className="text-xs font-bold text-slate-800 dark:text-white">
+                        {pickerMonth2.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setPickerMonth2(new Date(pickerMonth2.getFullYear(), pickerMonth2.getMonth() + 1, 1))}
+                        className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-sm font-bold cursor-pointer"
+                      >
+                        ›
+                      </button>
+                    </div>
+
+                    {/* Days Header */}
+                    <div className="grid grid-cols-7 text-center text-[11px] font-semibold text-slate-400">
+                      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                    </div>
+
+                    {/* Month 2 Grid */}
+                    <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium">
+                      {Array.from({ length: new Date(pickerMonth2.getFullYear(), pickerMonth2.getMonth(), 1).getDay() }).map((_, i) => (
+                        <div key={`empty-m2-${i}`} />
+                      ))}
+
+                      {Array.from({ length: new Date(pickerMonth2.getFullYear(), pickerMonth2.getMonth() + 1, 0).getDate() }).map((_, i) => {
+                        const dayNum = i + 1;
+                        const dayStr = `${String(dayNum).padStart(2, '0')}/${String(pickerMonth2.getMonth() + 1).padStart(2, '0')}/${pickerMonth2.getFullYear()}`;
+                        const isStart = pickerStartDate === dayStr;
+                        const isEnd = pickerEndDate === dayStr;
+
+                        return (
+                          <button
+                            key={`m2-day-${dayNum}`}
+                            type="button"
+                            onClick={() => handlePickerDayClick(dayNum, pickerMonth2)}
+                            className={`h-7 w-7 mx-auto rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer ${
+                              isStart || isEnd
+                                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold'
+                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                            }`}
+                          >
+                            {dayNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Actions Bar */}
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800 mt-2">
+              <button
+                type="button"
+                onClick={() => setIsDatePickerOpen(false)}
+                className="px-6 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (pickerStartDate && pickerEndDate) {
+                    setNewEventPeriod(`${pickerStartDate} - ${pickerEndDate}`);
+                  } else if (pickerStartDate) {
+                    setNewEventPeriod(pickerStartDate);
+                  }
+                  setIsDatePickerOpen(false);
+                }}
+                className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold cursor-pointer shadow-xs transition-colors"
+              >
+                Apply
+              </button>
+            </div>
           </div>
         </div>
       )}
