@@ -100,7 +100,14 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
     lost: false,
   });
   const [dueDate, setDueDate] = useState<string>('2025-09-09');
-  const [summaryItems] = useState<ItemSummaryRow[]>(initialSummaryItems);
+  const [summaryItems, setSummaryItems] = useState<ItemSummaryRow[]>(initialSummaryItems);
+  const [taxRatePercent, setTaxRatePercent] = useState<number>(20);
+
+  const handleUnitCostChange = (id: string, newCost: number) => {
+    setSummaryItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, unitCost: newCost } : item))
+    );
+  };
 
   const updateCustomRangeString = (startStr: string, endStr: string) => {
     if (!startStr || !endStr) return;
@@ -140,7 +147,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
 
   // Calculate Generate View Summary Totals
   const subtotal = summaryItems.reduce((acc, row) => acc + row.quantity * row.unitCost, 0);
-  const taxAmount = 124.00;
+  const taxAmount = (subtotal * taxRatePercent) / 100;
   const grandTotal = subtotal + taxAmount;
 
   const getStatusStyle = (status: InvoiceRowData['status']) => {
@@ -750,11 +757,21 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                         <td className="py-2.5 px-4 text-center font-semibold text-[#241F20] dark:text-white">
                           {row.quantity.toLocaleString()}
                         </td>
-                        <td className="py-2.5 px-4 text-center font-semibold text-[#241F20] dark:text-white">
-                          {row.unitCost}
+                        <td className="py-2 px-4 text-center font-semibold text-[#241F20] dark:text-white">
+                          <div className="inline-flex items-center gap-1 justify-center">
+                            <span className="text-[#9D9D9D]">£</span>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={row.unitCost}
+                              onChange={(e) => handleUnitCostChange(row.id, parseFloat(e.target.value) || 0)}
+                              className="w-16 px-1.5 py-0.5 border border-[#EDEDED] dark:border-slate-800 rounded-[4px] text-center text-xs font-semibold focus:outline-none focus:border-[#27AE60] bg-white dark:bg-slate-900 text-[#241F20] dark:text-white"
+                            />
+                          </div>
                         </td>
                         <td className="py-2.5 px-4 text-right font-bold text-[#241F20] dark:text-white">
-                          £{(row.quantity * row.unitCost).toFixed(1)}
+                          £{(row.quantity * row.unitCost).toFixed(2)}
                         </td>
                       </tr>
                     ))}
@@ -805,14 +822,26 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-[#9D9D9D]">Subtotal</span>
                     <span className="text-[#9D9D9D] font-semibold">
-                      £620.0
+                      £{subtotal.toFixed(2)}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-[#9D9D9D]">Tax (20%)</span>
+                    <div className="flex items-center gap-1 text-[#9D9D9D]">
+                      <span>Tax (</span>
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="0"
+                        max="100"
+                        value={taxRatePercent}
+                        onChange={(e) => setTaxRatePercent(parseFloat(e.target.value) || 0)}
+                        className="w-12 px-1 py-0.5 border border-[#EDEDED] dark:border-slate-800 rounded text-center text-xs font-semibold text-[#241F20] dark:text-white bg-white dark:bg-slate-900 focus:outline-none focus:border-[#27AE60]"
+                      />
+                      <span>%)</span>
+                    </div>
                     <span className="text-[#9D9D9D] font-semibold">
-                      124
+                      £{taxAmount.toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -822,7 +851,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                     Grand Total
                   </span>
                   <span className="font-bold text-[#241F20] dark:text-white">
-                    £744.0
+                    £{grandTotal.toFixed(2)}
                   </span>
                 </div>
 
