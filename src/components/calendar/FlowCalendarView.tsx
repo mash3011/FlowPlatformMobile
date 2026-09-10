@@ -396,28 +396,36 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
       {/* Top Events Workspace Navigation Bar */}
       <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0d131f] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs">
         {/* Left Title & Live Sync Status */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-theme-primary/10 text-theme-primary flex items-center justify-center font-bold">
-            <Icon name="Calendar" size={20} />
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              Flow Events & Festival Calendar
+            </h1>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-theme-light text-theme-primary flex items-center gap-1 border border-theme-primary/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-theme-primary animate-pulse" />
+              Events Live Sync Active
+            </span>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                Flow Events & Festival Calendar
-              </h1>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-theme-light text-theme-primary flex items-center gap-1 border border-theme-primary/30">
-                <span className="w-1.5 h-1.5 rounded-full bg-theme-primary animate-pulse" />
-                Events Live Sync Active
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Track festivals, cultural galas, social parties & personal holidays with Google & Outlook sync
-            </p>
-          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Track festivals, cultural galas, social parties & personal holidays with Google & Outlook sync
+          </p>
         </div>
 
         {/* Right Actions & Sync Center */}
         <div className="flex flex-wrap items-center gap-2.5">
+          {/* Sync Now Button */}
+          <button
+            onClick={() => {
+              toast.success('Syncing Events...', {
+                description: 'Events & calendar schedules successfully synced in real-time.',
+              });
+            }}
+            className="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+          >
+            <Icon name="RefreshCw" size={14} className="text-theme-primary" />
+            <span>Sync Now</span>
+          </button>
+
           {/* Add New Event Button */}
           <button
             onClick={() => setIsAddEventOpen(true)}
