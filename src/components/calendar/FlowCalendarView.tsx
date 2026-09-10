@@ -13,6 +13,9 @@ export interface CalendarEvent {
   status: 'Scheduled' | 'Confirmed' | 'Completed' | 'Pending';
   description?: string;
   location?: string;
+  client?: string;
+  site?: string;
+  eventPeriod?: string;
 }
 
 interface FlowCalendarViewProps {
@@ -26,14 +29,12 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
-  // New event form state
+  // New event form state (matching design spec in uploaded modal image)
   const [newEventTitle, setNewEventTitle] = useState('');
-  const [newEventCategory, setNewEventCategory] = useState<'festival' | 'gala' | 'party' | 'holiday' | 'reminder'>('festival');
-  const [newEventDate, setNewEventDate] = useState('2026-09-12');
-  const [newEventTime, setNewEventTime] = useState('06:00 PM');
-  const [newEventOrganizer, setNewEventOrganizer] = useState('Culture & Wellbeing Team');
-  const [newEventAttendees, setNewEventAttendees] = useState('150');
-  const [newEventNotes, setNewEventNotes] = useState('');
+  const [newEventDescription, setNewEventDescription] = useState('');
+  const [newEventClient, setNewEventClient] = useState('');
+  const [newEventSite, setNewEventSite] = useState('');
+  const [newEventPeriod, setNewEventPeriod] = useState('');
 
   // Purely Event, Festival & Celebration Data
   const [events, setEvents] = useState<CalendarEvent[]>([
@@ -295,23 +296,29 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
     const created: CalendarEvent = {
       id: `evt-${Date.now()}`,
       title: newEventTitle,
-      category: newEventCategory,
-      date: newEventDate,
-      time: newEventTime,
-      organizer: newEventOrganizer,
-      attendeesCount: parseInt(newEventAttendees) || 0,
+      category: 'festival',
+      date: newEventPeriod || '2026-09-12',
+      time: '09:00 AM',
+      organizer: newEventClient || 'Derby County Football Club',
+      attendeesCount: 150,
       status: 'Scheduled',
-      description: newEventNotes || 'User added event.',
-      location: 'Event Venue',
+      description: newEventDescription || 'Event details including schedule and location.',
+      location: newEventSite || 'Pride Park Stadium',
+      client: newEventClient,
+      site: newEventSite,
+      eventPeriod: newEventPeriod,
     };
 
     setEvents((prev) => [...prev, created]);
     setIsAddEventOpen(false);
     setNewEventTitle('');
-    setNewEventNotes('');
+    setNewEventDescription('');
+    setNewEventClient('');
+    setNewEventSite('');
+    setNewEventPeriod('');
 
-    toast.success('Event Added & Synced!', {
-      description: `"${created.title}" scheduled for ${created.date}`,
+    toast.success('Event Added!', {
+      description: `"${created.title}" successfully added for ${created.client || 'client'}.`,
     });
   };
 
@@ -453,7 +460,7 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
                     <div
                       key={dayNum}
                       onClick={() => {
-                        setNewEventDate(dateString);
+                        setNewEventPeriod(dateString);
                         setIsAddEventOpen(true);
                       }}
                       className={`p-2 min-h-[120px] flex flex-col justify-between hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors cursor-pointer group ${
@@ -617,7 +624,7 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
                       <div
                         key={dateStr}
                         onClick={() => {
-                          setNewEventDate(dateStr);
+                          setNewEventPeriod(dateStr);
                           setIsAddEventOpen(true);
                         }}
                         className="p-2 space-y-2 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
@@ -684,7 +691,7 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
                   </div>
                   <button
                     onClick={() => {
-                      setNewEventDate(dateStr);
+                      setNewEventPeriod(dateStr);
                       setIsAddEventOpen(true);
                     }}
                     className="px-3.5 py-1.5 rounded-xl bg-theme-primary text-white text-xs font-bold hover:bg-theme-primary-hover transition-all shadow-2xs self-start sm:self-auto cursor-pointer"
@@ -770,7 +777,7 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
                       </p>
                       <button
                         onClick={() => {
-                          setNewEventDate(dateStr);
+                          setNewEventPeriod(dateStr);
                           setIsAddEventOpen(true);
                         }}
                         className="px-4 py-1.5 rounded-xl bg-theme-primary text-white text-xs font-bold hover:bg-theme-primary-hover transition-all shadow-2xs cursor-pointer"
@@ -786,108 +793,155 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
         </div>
       </div>
 
-      {/* MODAL 1: ADD NEW EVENT */}
+      {/* MODAL 1: ADD EVENT MODAL (MATCHING EXACT DESIGN SPECIFICATION) */}
       {isAddEventOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0d131f] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-5 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b pb-3 border-slate-200 dark:border-slate-800">
-              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <Icon name="Plus" size={16} className="text-theme-primary" />
-                <span>Schedule New Event</span>
-              </h3>
+        <div className="fixed inset-0 bg-[rgba(15,15,15,0.4)] backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#0d131f] border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl max-w-lg w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-150">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Add Event
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Add event details including schedule and location.
+                </p>
+              </div>
               <button
+                type="button"
                 onClick={() => setIsAddEventOpen(false)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-medium cursor-pointer p-1"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleCreateEvent} className="space-y-3 text-xs">
+            {/* Form Body */}
+            <form onSubmit={handleCreateEvent} className="space-y-4 text-xs">
+              {/* EVENT NAME* */}
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Event Name</label>
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  EVENT NAME*
+                </label>
                 <input
                   type="text"
                   value={newEventTitle}
                   onChange={(e) => setNewEventTitle(e.target.value)}
-                  placeholder="e.g. Annual Harvest Festival & Gala"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-theme-primary"
+                  placeholder="Enter event name"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 transition-all"
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              {/* DESCRIPTION* */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  DESCRIPTION*
+                </label>
+                <textarea
+                  value={newEventDescription}
+                  onChange={(e) => setNewEventDescription(e.target.value.slice(0, 100))}
+                  placeholder="Enter description"
+                  maxLength={100}
+                  rows={4}
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 transition-all resize-none"
+                  required
+                />
+                <div className="text-right text-[11px] text-slate-400 mt-1 font-medium">
+                  {newEventDescription.length}/100 Characters
+                </div>
+              </div>
+
+              {/* CLIENT* & SITE(S)* */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* CLIENT* */}
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Category</label>
-                  <select
-                    value={newEventCategory}
-                    onChange={(e: any) => setNewEventCategory(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none"
-                  >
-                    <option value="festival">Festivals & Cultural</option>
-                    <option value="gala">Gala / Ceremony</option>
-                    <option value="party">Party / Social</option>
-                    <option value="holiday">Holiday / Observance</option>
-                    <option value="reminder">Event Reminder</option>
-                  </select>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                    CLIENT*
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={newEventClient}
+                      onChange={(e) => setNewEventClient(e.target.value)}
+                      className="w-full appearance-none pl-3.5 pr-8 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 cursor-pointer"
+                      required
+                    >
+                      <option value="" disabled>Select client</option>
+                      <option value="Derby County Football Club">Derby County Football Club</option>
+                      <option value="Derby LIVE">Derby LIVE</option>
+                      <option value="Electric Daisy">Electric Daisy</option>
+                    </select>
+                    <Icon name="ChevronDown" size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  </div>
                 </div>
 
+                {/* SITE(S)* */}
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Organizer / Host</label>
+                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                    SITE(S)*
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <select
+                        value={newEventSite}
+                        onChange={(e) => setNewEventSite(e.target.value)}
+                        className="w-full appearance-none pl-3.5 pr-8 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 cursor-pointer"
+                        required
+                      >
+                        <option value="" disabled>Select sites</option>
+                        <option value="Pride Park Stadium">Pride Park Stadium</option>
+                        <option value="Derby Arena">Derby Arena</option>
+                        <option value="Central Plaza">Central Plaza</option>
+                      </select>
+                      <Icon name="ChevronDown" size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    </div>
+
+                    <button
+                      type="button"
+                      title="Add new site"
+                      className="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
+                    >
+                      <div className="relative flex items-center justify-center">
+                        <Icon name="MapPin" size={15} />
+                        <span className="text-[10px] font-extrabold text-slate-700 dark:text-slate-200 ml-0.5">+</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* EVENT PERIOD* */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  EVENT PERIOD*
+                </label>
+                <div className="relative">
+                  <Icon name="Calendar" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                   <input
                     type="text"
-                    value={newEventOrganizer}
-                    onChange={(e) => setNewEventOrganizer(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none"
+                    value={newEventPeriod}
+                    onChange={(e) => setNewEventPeriod(e.target.value)}
+                    placeholder="Select event date range"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 transition-all"
+                    required
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Date</label>
-                  <input
-                    type="date"
-                    value={newEventDate}
-                    onChange={(e) => setNewEventDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Expected Guests</label>
-                  <input
-                    type="number"
-                    value={newEventAttendees}
-                    onChange={(e) => setNewEventAttendees(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Notes & Description</label>
-                <textarea
-                  value={newEventNotes}
-                  onChange={(e) => setNewEventNotes(e.target.value)}
-                  placeholder="Optional event details..."
-                  rows={2}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none"
-                />
-              </div>
-
-              <div className="pt-2 flex justify-end gap-2">
+              {/* FOOTER ACTION BUTTONS */}
+              <div className="pt-5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-center gap-3">
                 <button
                   type="button"
                   onClick={() => setIsAddEventOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-semibold"
+                  className="w-36 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-theme-primary text-white font-bold hover:bg-theme-primary-hover shadow-xs cursor-pointer"
+                  className="w-36 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
                 >
-                  Save & Sync Event
+                  Add Event
                 </button>
               </div>
             </form>
