@@ -1157,7 +1157,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
           />
 
           {/* Drawer Panel */}
-          <div className="relative w-screen max-w-2xl bg-[#EDEDED]/40 dark:bg-slate-950 border-l border-[#EDEDED] dark:border-slate-800 shadow-2xl flex flex-col h-full z-10 animate-in slide-in-from-right duration-250">
+          <div className="relative w-screen max-w-2xl bg-[#EDEDED] dark:bg-[#0d131f] border-l border-[#EDEDED] dark:border-slate-800 shadow-2xl flex flex-col h-full z-10 animate-in slide-in-from-right duration-250">
             {/* Drawer Header */}
             <div className="flex items-center justify-between bg-white dark:bg-[#0d131f] px-6 py-4 border-b border-[#EDEDED] dark:border-slate-800">
               <div>
