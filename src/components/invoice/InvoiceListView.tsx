@@ -115,6 +115,15 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
     );
   };
 
+  const handleUpdateStatus = (id: string, newStatus: 'Invoiced' | 'Paid') => {
+    setInvoices((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
+    );
+    toast.success(`Invoice status updated to ${newStatus}`, {
+      position: 'top-right',
+    });
+  };
+
   const updateCustomRangeString = (startStr: string, endStr: string) => {
     if (!startStr || !endStr) return;
     try {
@@ -435,11 +444,17 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                         </td>
 
                         <td className="py-3 px-4 text-center">
-                          <span
-                            className={`inline-flex items-center justify-center px-3 py-1 rounded-[6px] border text-[10px] font-semibold ${statusClass}`}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const nextStatus = inv.status === 'Invoiced' ? 'Paid' : 'Invoiced';
+                              handleUpdateStatus(inv.id, nextStatus);
+                            }}
+                            title="Click to toggle status (Invoiced / Paid)"
+                            className={`inline-flex items-center justify-center px-3 py-1 rounded-[6px] border text-[10px] font-semibold cursor-pointer hover:opacity-80 transition-opacity ${statusClass}`}
                           >
                             {inv.status}
-                          </span>
+                          </button>
                         </td>
 
                         <td className="py-3 px-4 text-right relative">
@@ -455,7 +470,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
 
                           {/* Figma Popup Menu (Union 1010:8855) */}
                           {activeMenuId === inv.id && (
-                            <div className="absolute right-4 top-10 z-30 w-28 bg-white dark:bg-[#141c2b] border border-[#EDEDED] dark:border-slate-800 rounded-[10px] shadow-lg p-1 space-y-0.5 text-left text-[11px] font-semibold">
+                            <div className="absolute right-4 top-10 z-30 w-36 bg-white dark:bg-[#141c2b] border border-[#EDEDED] dark:border-slate-800 rounded-[10px] shadow-lg p-1.5 space-y-0.5 text-left text-[11px] font-semibold animate-in fade-in zoom-in-95 duration-100">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -465,28 +480,53 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                                 className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-[#241F20] dark:text-slate-200 cursor-pointer"
                               >
                                 <span>View</span>
-                                <Icon name="Eye" size={12} className="text-slate-400" />
+                                <Icon name="Eye" size={13} className="text-slate-400" />
                               </button>
+
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  toast.success(`Downloading ${inv.invoiceNumber}...`);
                                   setActiveMenuId(null);
                                 }}
                                 className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-[#241F20] dark:text-slate-200 cursor-pointer"
                               >
                                 <span>Download</span>
-                                <Icon name="Download" size={12} className="text-slate-400" />
+                                <Icon name="Download" size={13} className="text-slate-400" />
                               </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setActiveMenuId(null);
-                                }}
-                                className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md hover:bg-amber-50 dark:hover:bg-amber-950/40 text-[#FFAE4C] cursor-pointer"
-                              >
-                                <span>Query</span>
-                                <Icon name="HelpCircle" size={12} className="text-[#FFAE4C]" />
-                              </button>
+
+                              <div className="border-t border-slate-100 dark:border-slate-800 pt-1 mt-1">
+                                <div className="px-2.5 py-0.5 text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                                  Edit Status
+                                </div>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUpdateStatus(inv.id, 'Invoiced');
+                                    setActiveMenuId(null);
+                                  }}
+                                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer ${
+                                    inv.status === 'Invoiced' ? 'font-bold text-[#FFAE4C]' : 'text-[#241F20] dark:text-slate-200'
+                                  }`}
+                                >
+                                  <span>Invoiced</span>
+                                  {inv.status === 'Invoiced' && <span className="text-[#FFAE4C] text-xs font-bold">✓</span>}
+                                </button>
+
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUpdateStatus(inv.id, 'Paid');
+                                    setActiveMenuId(null);
+                                  }}
+                                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer ${
+                                    inv.status === 'Paid' ? 'font-bold text-[#27AE60]' : 'text-[#241F20] dark:text-slate-200'
+                                  }`}
+                                >
+                                  <span>Paid</span>
+                                  {inv.status === 'Paid' && <span className="text-[#27AE60] text-xs font-bold">✓</span>}
+                                </button>
+                              </div>
                             </div>
                           )}
                         </td>
