@@ -922,58 +922,9 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
       {/* SCREEN 3: INVOICE PREVIEW LIGHT MODE (FIGMA NODE 1018:10225) */}
       {/* ========================================================================= */}
       {viewMode === 'preview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start pt-1">
-          {/* LEFT SIDEBAR: INVOICE LIST (Node 1018:10393, width 246px) */}
-          <div className="lg:col-span-3 space-y-3">
-            <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[8px] overflow-hidden shadow-2xs">
-              <div className="p-3 border-b border-[#EDEDED] dark:border-slate-800 bg-[#FCFCFC] dark:bg-slate-900/50">
-                <h3 className="text-xs font-bold text-[#241F20] dark:text-white">
-                  All Invoices ({invoices.length})
-                </h3>
-              </div>
-
-              <div className="divide-y divide-[#EDEDED] dark:divide-slate-800 max-h-[680px] overflow-y-auto">
-                {invoices.map((inv) => {
-                  const isSelected = activePreviewInvoice?.id === inv.id || (!activePreviewInvoice && inv.invoiceNumber === 'INV-001');
-
-                  return (
-                    <div
-                      key={inv.id}
-                      onClick={() => setActivePreviewInvoice(inv)}
-                      className={`p-3.5 cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-900/80 ${
-                        isSelected ? 'bg-slate-50/90 dark:bg-slate-800/60 border-l-4 border-l-[#27AE60]' : ''
-                      }`}
-                    >
-                      <div className="flex items-center justify-between text-xs font-semibold text-[#241F20] dark:text-white mb-1">
-                        <span className="font-bold truncate max-w-[140px]">{inv.client}</span>
-                        <span className="text-[11px] font-bold">{inv.itemCount.toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-[11px] text-[#A6A6A6]">
-                        <span>{inv.invoiceNumber}</span>
-                        <span
-                          className={`font-semibold ${
-                            inv.status === 'Paid'
-                              ? 'text-[#27AE60]'
-                              : inv.status === 'Invoiced'
-                              ? 'text-[#FFAE4C]'
-                              : 'text-[#E84040]'
-                          }`}
-                        >
-                          {inv.status === 'Invoiced' ? 'Unpaid' : inv.status}
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-[#A6A6A6] mt-1">
-                        {inv.dateRange}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* RIGHT MAIN PANEL: INVOICE DOCUMENT SHEET (Node 1018:10317) */}
-          <div className="lg:col-span-9 bg-[#EDEDED]/60 dark:bg-slate-900/50 border border-[#EDEDED] dark:border-slate-800 rounded-[8px] p-6 shadow-2xs space-y-4 relative">
+        <div className="w-full space-y-4 pt-1">
+          {/* MAIN INVOICE DOCUMENT PANEL */}
+          <div className="bg-[#EDEDED]/60 dark:bg-slate-900/50 border border-[#EDEDED] dark:border-slate-800 rounded-[8px] p-6 shadow-2xs space-y-4 relative max-w-4xl mx-auto">
             {/* Top Controls Bar */}
             <div className="flex items-center justify-between bg-white dark:bg-[#0d131f] p-4 rounded-[8px] border border-[#EDEDED] dark:border-slate-800 shadow-2xs">
               <div>
