@@ -91,7 +91,9 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
   const [genClient, setGenClient] = useState<string>('Derby County Football Club');
   const [genLocation, setGenLocation] = useState<string>('Pride Park Stadium');
   const [genDateRange, setGenDateRange] = useState<string>('1st Sep - 30th Sep, 2025');
-  const [presetRange, setPresetRange] = useState<'weekend' | 'month' | 'custom' | null>('weekend');
+  const [presetRange, setPresetRange] = useState<'month' | 'custom'>('month');
+  const [customStartDate, setCustomStartDate] = useState<string>('2025-09-01');
+  const [customEndDate, setCustomEndDate] = useState<string>('2025-09-30');
   const [servicesFilter, setServicesFilter] = useState<{ wash: boolean; damaged: boolean; lost: boolean }>({
     wash: true,
     damaged: true,
@@ -99,6 +101,29 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
   });
   const [dueDate, setDueDate] = useState<string>('2025-09-09');
   const [summaryItems] = useState<ItemSummaryRow[]>(initialSummaryItems);
+
+  const updateCustomRangeString = (startStr: string, endStr: string) => {
+    if (!startStr || !endStr) return;
+    try {
+      const s = new Date(startStr);
+      const e = new Date(endStr);
+      const startFmt = `${s.getDate()}${getOrdinalSuffix(s.getDate())} ${s.toLocaleString('default', { month: 'short' })}`;
+      const endFmt = `${e.getDate()}${getOrdinalSuffix(e.getDate())} ${e.toLocaleString('default', { month: 'short' })}, ${e.getFullYear()}`;
+      setGenDateRange(`${startFmt} - ${endFmt}`);
+    } catch {
+      // Fallback
+    }
+  };
+
+  function getOrdinalSuffix(d: number) {
+    if (d > 3 && d < 21) return 'th';
+    switch (d % 10) {
+      case 1:  return 'st';
+      case 2:  return 'nd';
+      case 3:  return 'rd';
+      default: return 'th';
+    }
+  }
 
   // Confirmation Modal State (Figma Node 1010:9499)
   const [isConfirmationOpen, setIsConfirmationOpen] = useState<boolean>(false);
@@ -573,29 +598,15 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                     />
                   </div>
 
-                  {/* Preset Date Range Buttons (Figma node 1010:9415 - 1010:9419) */}
+                  {/* Preset Date Range Buttons */}
                   <div className="flex items-center gap-1.5 mt-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPresetRange('weekend');
-                        setGenDateRange('6th - 7th Sep, 2025');
-                      }}
-                      className={`px-2.5 py-1 rounded-[6px] border text-[10px] font-semibold transition-all cursor-pointer ${
-                        presetRange === 'weekend'
-                          ? 'border-[#27AE60] text-[#241F20] dark:text-white bg-white shadow-2xs font-bold'
-                          : 'border-[#EDEDED] text-[#241F20] hover:bg-slate-50'
-                      }`}
-                    >
-                      Last Weekend
-                    </button>
                     <button
                       type="button"
                       onClick={() => {
                         setPresetRange('month');
                         setGenDateRange('1st Sep - 30th Sep, 2025');
                       }}
-                      className={`px-2.5 py-1 rounded-[6px] border text-[10px] font-semibold transition-all cursor-pointer ${
+                      className={`px-3 py-1 rounded-[6px] border text-[10px] font-semibold transition-all cursor-pointer ${
                         presetRange === 'month'
                           ? 'border-[#27AE60] text-[#241F20] dark:text-white bg-white shadow-2xs font-bold'
                           : 'border-[#EDEDED] text-[#241F20] hover:bg-slate-50'
@@ -607,8 +618,9 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                       type="button"
                       onClick={() => {
                         setPresetRange('custom');
+                        updateCustomRangeString(customStartDate, customEndDate);
                       }}
-                      className={`px-2.5 py-1 rounded-[6px] border text-[10px] font-semibold transition-all cursor-pointer ${
+                      className={`px-3 py-1 rounded-[6px] border text-[10px] font-semibold transition-all cursor-pointer ${
                         presetRange === 'custom'
                           ? 'border-[#27AE60] text-[#241F20] dark:text-white bg-white shadow-2xs font-bold'
                           : 'border-[#EDEDED] text-[#241F20] hover:bg-slate-50'
@@ -617,6 +629,42 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                       Custom Range
                     </button>
                   </div>
+
+                  {/* Interactive Custom Range Calendar Input Fields */}
+                  {presetRange === 'custom' && (
+                    <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-900 border border-[#EDEDED] dark:border-slate-800 rounded-[8px] space-y-2 animate-in fade-in duration-150">
+                      <div className="flex items-center justify-between text-[10px] font-bold text-[#241F20] dark:text-slate-200">
+                        <span>Select Custom Calendar Dates</span>
+                        <Icon name="Calendar" size={13} className="text-[#27AE60]" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[9px] font-semibold text-[#9D9D9D] mb-1">Start Date</label>
+                          <input
+                            type="date"
+                            value={customStartDate}
+                            onChange={(e) => {
+                              setCustomStartDate(e.target.value);
+                              updateCustomRangeString(e.target.value, customEndDate);
+                            }}
+                            className="w-full px-2 py-1 rounded-[6px] border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-950 text-[#241F20] dark:text-white text-[11px] font-semibold focus:outline-none cursor-pointer"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] font-semibold text-[#9D9D9D] mb-1">End Date</label>
+                          <input
+                            type="date"
+                            value={customEndDate}
+                            onChange={(e) => {
+                              setCustomEndDate(e.target.value);
+                              updateCustomRangeString(customStartDate, e.target.value);
+                            }}
+                            className="w-full px-2 py-1 rounded-[6px] border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-950 text-[#241F20] dark:text-white text-[11px] font-semibold focus:outline-none cursor-pointer"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Services Checkbox Filters */}
