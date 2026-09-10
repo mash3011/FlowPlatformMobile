@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --theme-primary: #3b82f6;
+  --theme-primary-hover: #2563eb;
+  --theme-primary-light: #eff6ff;
+  --theme-primary-dark-bg: rgba(59, 130, 246, 0.18);
+  --font-family: 'Source Sans 3', 'Source Sans Pro', sans-serif;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card-bg: #ffffff;
+  --card-fg: #0f172a;
+  --border-color: #e2e8f0;
+}
+
+.dark {
+  --background: #090d16;
+  --foreground: #f8fafc;
+  --card-bg: #111723;
+  --card-fg: #f8fafc;
+  --border-color: #1e293b;
+}
+
+/* Dynamic color theme classes on root HTML element */
+.theme-violet {
+  --theme-primary: #8b5cf6;
+  --theme-primary-hover: #7c3aed;
+  --theme-primary-light: #f3e8ff;
+  --theme-primary-dark-bg: rgba(139, 92, 246, 0.18);
+}
+
+.theme-blue {
+  --theme-primary: #3b82f6;
+  --theme-primary-hover: #2563eb;
+  --theme-primary-light: #eff6ff;
+  --theme-primary-dark-bg: rgba(59, 130, 246, 0.18);
+}
+
+.theme-green {
+  --theme-primary: #10b981;
+  --theme-primary-hover: #059669;
+  --theme-primary-light: #ecfdf5;
+  --theme-primary-dark-bg: rgba(16, 185, 129, 0.18);
+}
+
+.theme-yellow {
+  --theme-primary: #d97706;
+  --theme-primary-hover: #b45309;
+  --theme-primary-light: #fffbeb;
+  --theme-primary-dark-bg: rgba(217, 119, 6, 0.18);
+}
+
+.theme-red {
+  --theme-primary: #ef4444;
+  --theme-primary-hover: #dc2626;
+  --theme-primary-light: #fef2f2;
+  --theme-primary-dark-bg: rgba(239, 68, 68, 0.18);
+}
+
+.theme-mastercard {
+  --theme-primary: #f97316;
+  --theme-primary-hover: #ea580c;
+  --theme-primary-light: #fff7ed;
+  --theme-primary-dark-bg: rgba(249, 115, 22, 0.18);
+}
+
+.theme-neutral {
+  --theme-primary: #64748b;
+  --theme-primary-hover: #475569;
+  --theme-primary-light: #f1f5f9;
+  --theme-primary-dark-bg: rgba(100, 116, 139, 0.18);
+}
+
+.theme-custom {
+  --theme-primary: #06b6d4;
+  --theme-primary-hover: #0891b2;
+  --theme-primary-light: #ecfeff;
+  --theme-primary-dark-bg: rgba(6, 182, 212, 0.18);
+}
+
+/* Helper theme utility classes */
+.bg-theme-primary {
+  background-color: var(--theme-primary) !important;
+}
+
+.text-theme-primary {
+  color: var(--theme-primary) !important;
+}
+
+.border-theme-primary {
+  border-color: var(--theme-primary) !important;
+}
+
+.bg-theme-light {
+  background-color: var(--theme-primary-light) !important;
+}
+
+.dark .bg-theme-light {
+  background-color: var(--theme-primary-dark-bg) !important;
+}
+
+/* Clockwise rotation animation for settings gear icons */
+@keyframes spinClockwise {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-clockwise {
+  animation: spinClockwise 8s linear infinite;
+}
+
+.animate-spin-clockwise-fast {
+  animation: spinClockwise 3s linear infinite;
+}
+
+html, body, button, input, select, textarea {
+  font-family: 'Source Sans 3', 'Source Sans Pro', sans-serif !important;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.25s ease, color 0.25s ease;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
