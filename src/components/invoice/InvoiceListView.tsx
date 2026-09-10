@@ -856,12 +856,12 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                 </div>
 
                 {/* Primary Generate Invoice Button Below Amount */}
-                <div className="pt-3 border-t border-[#EDEDED] dark:border-slate-800">
+                <div className="pt-3 border-t border-[#EDEDED] dark:border-slate-800 flex justify-end">
                   <button
                     onClick={handleGenerateInvoiceSubmit}
-                    className="w-full py-2.5 rounded-md bg-[#241F20] hover:bg-black text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+                    className="px-5 py-2 rounded-[6px] bg-[#241F20] hover:bg-black text-white text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
                   >
-                    <Icon name="FileText" size={15} />
+                    <Icon name="FileText" size={14} />
                     <span>Generate Invoice</span>
                   </button>
                 </div>
