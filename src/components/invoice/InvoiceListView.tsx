@@ -1147,51 +1147,177 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
         </div>
       )}
 
-      {/* DETAIL MODAL FOR LIST VIEW */}
+      {/* SIDE DRAWER INVOICE PREVIEW */}
       {selectedInvoice && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-xl shadow-2xl max-w-md w-full p-5 space-y-4">
-            <div className="flex items-center justify-between border-b pb-3 border-slate-100 dark:border-slate-800">
-              <h3 className="text-sm font-bold text-[#241F20] dark:text-white flex items-center gap-2">
-                <span>{selectedInvoice.invoiceNumber} Details</span>
-              </h3>
-              <button
-                onClick={() => setSelectedInvoice(null)}
-                className="text-slate-400 hover:text-slate-600 text-sm cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
+        <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+            onClick={() => setSelectedInvoice(null)}
+          />
 
-            <div className="space-y-3 text-xs font-semibold">
-              <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-[#EDEDED] dark:border-slate-800 space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Client:</span>
-                  <span className="font-bold text-[#241F20] dark:text-white">{selectedInvoice.client}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Date Range:</span>
-                  <span>{selectedInvoice.dateRange}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Item Count:</span>
-                  <span className="font-bold">{selectedInvoice.itemCount.toLocaleString()} units</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Status:</span>
+          {/* Drawer Panel */}
+          <div className="relative w-screen max-w-2xl bg-[#EDEDED]/40 dark:bg-slate-950 border-l border-[#EDEDED] dark:border-slate-800 shadow-2xl flex flex-col h-full z-10 animate-in slide-in-from-right duration-250">
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between bg-white dark:bg-[#0d131f] px-6 py-4 border-b border-[#EDEDED] dark:border-slate-800">
+              <div>
+                <span className="text-[10px] text-[#A6A6A6] font-semibold block">Invoice Preview</span>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-base font-bold text-[#241F20] dark:text-white">
+                    {selectedInvoice.invoiceNumber}
+                  </span>
                   <span className={`px-2 py-0.5 rounded-[6px] border text-[10px] font-semibold ${getStatusStyle(selectedInvoice.status)}`}>
                     {selectedInvoice.status}
                   </span>
                 </div>
               </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    toast.success('Downloading Invoice PDF...', {
+                      description: `Invoice ${selectedInvoice.invoiceNumber} ready.`,
+                    });
+                  }}
+                  className="px-3.5 py-1.5 rounded-[6px] border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#241F20] dark:text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                >
+                  <Icon name="Download" size={14} />
+                  <span>Download PDF</span>
+                </button>
+
+                <button
+                  onClick={() => setSelectedInvoice(null)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-[#A6A6A6] hover:text-[#241F20] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-base font-bold transition-colors cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
-            <div className="pt-2 flex justify-end gap-2">
+            {/* Scrollable Drawer Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {/* WHITE PAPER DOCUMENT SHEET */}
+              <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[8px] p-6 shadow-sm space-y-5 text-xs">
+                {/* Document Header Row */}
+                <div className="flex items-center justify-between text-xs pb-3 border-b border-[#EDEDED] dark:border-slate-800">
+                  <div>
+                    <span className="text-[#A6A6A6]">Invoice Number: </span>
+                    <span className="font-bold text-[#241F20] dark:text-white ml-1">
+                      {selectedInvoice.invoiceNumber}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[#A6A6A6]">Invoice Range: </span>
+                    <span className="font-bold text-[#241F20] dark:text-white ml-1">
+                      {selectedInvoice.dateRange}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Addresses Grid */}
+                <div className="grid grid-cols-2 gap-6 text-xs pt-1">
+                  {/* Billed to */}
+                  <div className="space-y-1">
+                    <span className="text-[#A6A6A6] text-[10px] font-semibold block mb-1">Billed to:</span>
+                    <div className="font-bold text-[#241F20] dark:text-white text-sm">
+                      {selectedInvoice.client}
+                    </div>
+                    <div className="text-[#241F20] dark:text-slate-300 font-semibold">Pride Park Stadium</div>
+                    <div className="text-[#241F20] dark:text-slate-300 font-semibold">Pride Park</div>
+                    <div className="text-[#241F20] dark:text-slate-300 font-semibold">Derby</div>
+                    <div className="text-[#241F20] dark:text-slate-300 font-semibold">DE24 8XL</div>
+                  </div>
+
+                  {/* Billed by */}
+                  <div className="space-y-1">
+                    <span className="text-[#A6A6A6] text-[10px] font-semibold block mb-1">Billed by:</span>
+                    <div className="font-bold text-[#241F20] dark:text-white text-sm">Circulayo Limited</div>
+                    <div className="text-[#241F20] dark:text-slate-300 font-semibold">1 St James Court</div>
+                    <div className="text-[#241F20] dark:text-slate-300 font-semibold">Friar Gate</div>
+                    <div className="text-[#241F20] dark:text-slate-300 font-semibold">Derby</div>
+                    <div className="text-[#241F20] dark:text-slate-300 font-semibold">DE1 1BT</div>
+                  </div>
+                </div>
+
+                {/* Dates Row */}
+                <div className="flex items-center justify-between text-xs pt-2 pb-3 border-b border-[#EDEDED] dark:border-slate-800">
+                  <div>
+                    <span className="text-[#A6A6A6]">Date Issued: </span>
+                    <span className="font-bold text-[#241F20] dark:text-white ml-1">30th Aug, 2025</span>
+                  </div>
+                  <div>
+                    <span className="text-[#A6A6A6]">Due Date: </span>
+                    <span className="font-bold text-[#241F20] dark:text-white ml-1">5th Sep, 2025</span>
+                  </div>
+                </div>
+
+                {/* Invoice Details Section */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-bold text-[#241F20] dark:text-white">
+                    Invoice Details
+                  </h4>
+
+                  <div className="border border-[#EDEDED] dark:border-slate-800 rounded-[6px] overflow-hidden">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-[#FBFBFB] dark:bg-slate-900/80 border-b border-[#EDEDED] dark:border-slate-800 text-[#241F20] dark:text-slate-300 font-semibold h-[36px]">
+                          <th className="py-2 px-3">Item</th>
+                          <th className="py-2 px-3">Service</th>
+                          <th className="py-2 px-3 text-center">Quantity</th>
+                          <th className="py-2 px-3 text-center">Unit Cost (£)</th>
+                          <th className="py-2 px-3 text-right">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#EDEDED] dark:divide-slate-800">
+                        {summaryItems.map((row) => (
+                          <tr key={row.id} className="h-[38px]">
+                            <td className="py-2 px-3 font-semibold text-[#241F20] dark:text-white">{row.item}</td>
+                            <td className="py-2 px-3 text-[#241F20] dark:text-slate-300 font-semibold">{row.service}</td>
+                            <td className="py-2 px-3 text-center text-[#A6A6A6] font-semibold">{row.quantity.toLocaleString()}</td>
+                            <td className="py-2 px-3 text-center text-[#A6A6A6] font-semibold">{row.unitCost}</td>
+                            <td className="py-2 px-3 text-right text-[#A6A6A6] font-semibold">£{(row.quantity * row.unitCost).toFixed(1)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Document Footer: Payment Details Left & Subtotal Right */}
+                <div className="pt-4 border-t border-[#EDEDED] dark:border-slate-800 grid grid-cols-2 gap-4 items-end bg-[#FBFBFB] dark:bg-slate-900/40 p-4 rounded-[6px]">
+                  {/* Payment Info */}
+                  <div className="space-y-1 text-xs">
+                    <div className="font-semibold text-[#241F20] dark:text-white">Please make payments to:</div>
+                    <div className="font-semibold text-[#241F20] dark:text-slate-300">Circulayo Limited</div>
+                    <div className="font-semibold text-[#241F20] dark:text-slate-300">Barclays Bank</div>
+                    <div className="font-semibold text-[#241F20] dark:text-slate-300">Account number: 83168891</div>
+                  </div>
+
+                  {/* Subtotal & Tax */}
+                  <div className="space-y-1.5 text-xs text-right">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-[#241F20] dark:text-white">Subtotal</span>
+                      <span className="font-semibold text-[#241F20] dark:text-white">£{subtotal.toFixed(1)}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-[#241F20] dark:text-white">Tax ({taxRatePercent}%)</span>
+                      <span className="font-semibold text-[#241F20] dark:text-white">£{taxAmount.toFixed(0)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Drawer Footer */}
+            <div className="bg-white dark:bg-[#0d131f] px-6 py-3 border-t border-[#EDEDED] dark:border-slate-800 flex items-center justify-between">
+              <span className="text-xs text-slate-500 font-semibold">
+                Grand Total: <span className="font-bold text-[#241F20] dark:text-white text-sm">£{grandTotal.toFixed(2)}</span>
+              </span>
               <button
                 onClick={() => setSelectedInvoice(null)}
-                className="px-4 py-2 rounded-md bg-[#241F20] text-white font-semibold cursor-pointer"
+                className="px-4 py-2 rounded-[6px] bg-[#241F20] hover:bg-black text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
               >
-                Close
+                Close Preview
               </button>
             </div>
           </div>
@@ -1200,3 +1326,4 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
     </div>
   );
 };
+
