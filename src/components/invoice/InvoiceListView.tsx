@@ -10,7 +10,7 @@ interface InvoiceRowData {
   dateRange: string;
   activities: string[];
   itemCount: number;
-  status: 'Invoiced' | 'Not Invoiced' | 'Paid';
+  status: 'Invoiced' | 'Paid';
 }
 
 // Mock Data for List View (Node 1010:8649)
@@ -22,7 +22,7 @@ const figmaMockInvoices: InvoiceRowData[] = [
     dateRange: '13th - 15th Jul, 2025',
     activities: ['Wash', 'Damage'],
     itemCount: 1204,
-    status: 'Not Invoiced',
+    status: 'Invoiced',
   },
   {
     id: '2',
@@ -49,7 +49,7 @@ const figmaMockInvoices: InvoiceRowData[] = [
     dateRange: '1st - 31st Aug, 2025',
     activities: ['Lost', 'Damage'],
     itemCount: 12421,
-    status: 'Not Invoiced',
+    status: 'Invoiced',
   },
 ];
 
@@ -80,7 +80,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
 
   // List View States
   const [invoices, setInvoices] = useState<InvoiceRowData[]>(figmaMockInvoices);
-  const [activeTabFilter, setActiveTabFilter] = useState<'All' | 'Not Invoiced' | 'Invoiced' | 'Paid'>('All');
+  const [activeTabFilter, setActiveTabFilter] = useState<'All' | 'Invoiced' | 'Paid'>('All');
   const [selectedClientFilter, setSelectedClientFilter] = useState<string>('all');
   const [selectedLocationFilter, setSelectedLocationFilter] = useState<string>('all');
   const [dateRangeFilter, setDateRangeFilter] = useState<string>('all');
@@ -144,7 +144,6 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
 
   // Filtered List View Data
   const filteredInvoices = invoices.filter((item) => {
-    if (activeTabFilter === 'Not Invoiced') return item.status === 'Not Invoiced';
     if (activeTabFilter === 'Invoiced') return item.status === 'Invoiced';
     if (activeTabFilter === 'Paid') return item.status === 'Paid';
     if (selectedClientFilter !== 'all' && item.client !== selectedClientFilter) return false;
@@ -161,10 +160,8 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
       case 'Paid':
         return 'text-[#27AE60] bg-white border-[#EDEDED]';
       case 'Invoiced':
-        return 'text-[#FFAE4C] bg-white border-[#EDEDED]';
-      case 'Not Invoiced':
       default:
-        return 'text-[#E84040] bg-white border-[#EDEDED]';
+        return 'text-[#FFAE4C] bg-white border-[#EDEDED]';
     }
   };
 
@@ -295,17 +292,6 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                 }`}
               >
                 All Invoices({invoices.length})
-              </button>
-
-              <button
-                onClick={() => setActiveTabFilter('Not Invoiced')}
-                className={`px-3 py-1 rounded-[6px] border text-xs transition-all cursor-pointer ${
-                  activeTabFilter === 'Not Invoiced'
-                    ? 'border-[#27AE60] bg-white text-[#241F20] font-bold shadow-2xs'
-                    : 'border-[#EDEDED] bg-white text-[#241F20] hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300'
-                }`}
-              >
-                Not Invoiced
               </button>
 
               <button
