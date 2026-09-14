@@ -254,6 +254,12 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
   const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState<boolean>(false);
   const [customStartDate, setCustomStartDate] = useState<string>('2026-09-01');
   const [customEndDate, setCustomEndDate] = useState<string>('2026-09-30');
+  const [lastUpdatedText, setLastUpdatedText] = useState<string>('Updated 5 min ago');
+
+  const handleRefreshData = () => {
+    setLastUpdatedText('Updated just now');
+    toast.success('Workspace data refreshed successfully');
+  };
   
   // Selected Services Checklist State (Autoselected all at start)
   const [selectedServices, setSelectedServices] = useState<string[]>(() =>
@@ -497,8 +503,8 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
 
       {/* HEADER & SECTION TITLE */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 gap-3">
-        {/* Section Header Title */}
-        <div className="flex items-center gap-2">
+        {/* Section Header Title & Updated Badge */}
+        <div className="flex items-center gap-3 flex-wrap">
           <h1 className="text-lg font-bold text-[#241F20] dark:text-white flex items-center gap-2">
             {viewMode === 'services' && (
               <span>Services</span>
@@ -530,6 +536,19 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
               </>
             )}
           </h1>
+
+          {/* Updated X min ago Pill Badge (Matching Uploaded Image) */}
+          <div className="px-3 py-1 rounded-[10px] border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2 shadow-2xs">
+            <span>{lastUpdatedText}</span>
+            <button
+              type="button"
+              onClick={handleRefreshData}
+              title="Refresh Data"
+              className="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-transform active:rotate-180 cursor-pointer"
+            >
+              <Icon name="RotateCw" size={14} />
+            </button>
+          </div>
         </div>        {/* Top Header Action Buttons */}
         <div className="flex items-center gap-2">
           {viewMode === 'services' && (
