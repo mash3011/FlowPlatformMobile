@@ -848,94 +848,91 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   )}
                 </div>
 
-                {/* Single Unified Date Range Dropdown */}
+                {/* Date Range Dropdown with Figma Calendar */}
                 <div>
                   <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
                     Date Range
                   </label>
-                  <CustomSelect
+                  <CustomDateRangePicker
                     value={selectedMonthRange}
                     onChange={(val) => {
                       setSelectedMonthRange(val);
-                      setPresetRange('month');
-                      setIsDatePickerOpen(false);
+                      setPresetRange('custom');
                     }}
-                    options={monthOptions}
-                    placeholder="Select Date Range..."
+                    isOpen={isDatePickerOpen}
+                    onOpenChange={(open) => setIsDatePickerOpen(open)}
+                    showPresets={false}
+                    className="w-full"
+                    align="left"
+                  />
+
+                  {/* Preset Pills: This Month Dropdown & Custom Range */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="flex-1 min-w-0">
+                      <CustomSelect
+                        value={
+                          monthOptions.find((m) => m.value === selectedMonthRange)?.value ||
+                          monthOptions[0].value
+                        }
+                        onChange={(val) => {
+                          setSelectedMonthRange(val);
+                          setPresetRange('month');
+                          setIsDatePickerOpen(false);
+                        }}
+                        options={monthOptions}
+                        placeholder="This Month..."
+                        searchable={true}
+                        buttonClassName="py-1 px-3 text-xs font-semibold"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPresetRange('custom');
+                        setIsDatePickerOpen((prev) => !prev);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border shrink-0 ${
+                        presetRange === 'custom' || isDatePickerOpen
+                          ? 'border-emerald-500 text-emerald-600 bg-emerald-50/40 dark:bg-emerald-950/30 font-bold'
+                          : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
+                      }`}
+                    >
+                      Custom Range
+                    </button>
+                  </div>
+                </div>
+
+                {/* Services Multiselect Dropdown with Hover Edit/Delete & Fixed Create Button */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
+                    Services
+                  </label>
+                  <CustomMultiSelect
+                    values={selectedServices}
+                    onChange={(vals) => setSelectedServices(vals)}
+                    options={servicesList.map((s) => ({ value: s.label, label: s.label }))}
+                    placeholder="Select services..."
                     searchable={true}
                     className="w-full"
                     footerAction={{
-                      label: 'Custom Date Range (Calendar)',
-                      onClick: () => {
-                        setIsDatePickerOpen((prev) => !prev);
-                      },
-                      icon: 'Calendar',
+                      label: 'Create New Service',
+                      onClick: handleOpenAddService,
+                      icon: 'Plus',
+                    }}
+                    onEditOption={(srvLabel) => {
+                      const found = servicesList.find((s) => s.label === srvLabel);
+                      if (found) {
+                        handleOpenEditService(found);
+                      }
+                    }}
+                    onDeleteOption={(srvLabel) => {
+                      const found = servicesList.find((s) => s.label === srvLabel);
+                      if (found) {
+                        handleDeleteService(found.id, found.label);
+                        setSelectedServices((prev) => prev.filter((label) => label !== srvLabel));
+                      }
                     }}
                   />
-
-                  {/* Custom Calendar Popover when Custom Date Range is clicked */}
-                  {isDatePickerOpen && (
-                    <div className="mt-2">
-                      <CustomDateRangePicker
-                        value={selectedMonthRange}
-                        onChange={(val) => {
-                          setSelectedMonthRange(val);
-                          setPresetRange('custom');
-                          setIsDatePickerOpen(false);
-                        }}
-                        isOpen={isDatePickerOpen}
-                        onOpenChange={(open) => setIsDatePickerOpen(open)}
-                        showPresets={false}
-                        className="w-full"
-                        align="left"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* Services Checklist (Matching 2nd Image) */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300">
-                      Services ({selectedServices.length}/{servicesList.length})
-                    </label>
-                    {selectedServices.length > 0 ? (
-                      <button
-                        type="button"
-                        onClick={() => setSelectedServices([])}
-                        className="text-[11px] font-semibold text-red-600 hover:text-red-700 dark:text-red-400 cursor-pointer underline"
-                      >
-                        Clear All
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setSelectedServices(servicesList.map((s) => s.label))}
-                        className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer underline"
-                      >
-                        Select All
-                      </button>
-                    )}
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    {servicesList.map((srv) => {
-                      const isChecked = selectedServices.includes(srv.label);
-                      return (
-                        <label
-                          key={srv.id}
-                          className="flex items-center gap-1.5 text-xs font-semibold text-[#241F20] dark:text-slate-200 cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => handleToggleServiceCheck(srv.label)}
-                            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                          />
-                          <span>{srv.label}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
                 </div>
               </div>
             </div>

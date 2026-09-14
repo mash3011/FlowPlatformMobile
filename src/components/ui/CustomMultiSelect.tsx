@@ -7,6 +7,12 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
+export interface FooterAction {
+  label: string;
+  onClick: () => void;
+  icon?: string;
+}
+
 export interface CustomMultiSelectProps {
   values: string[];
   onChange: (values: string[]) => void;
@@ -17,18 +23,24 @@ export interface CustomMultiSelectProps {
   buttonClassName?: string;
   menuClassName?: string;
   disabled?: boolean;
+  footerAction?: FooterAction;
+  onEditOption?: (value: string) => void;
+  onDeleteOption?: (value: string) => void;
 }
 
 export const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
   values = [],
   onChange,
   options,
-  placeholder = 'Select locations...',
+  placeholder = 'Select options...',
   searchable = true,
   className = '',
   buttonClassName = '',
   menuClassName = '',
   disabled = false,
+  footerAction,
+  onEditOption,
+  onDeleteOption,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -164,7 +176,7 @@ export const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search locations..."
+                placeholder="Search..."
                 className="w-full bg-transparent text-sm text-[#241F20] dark:text-white placeholder:text-slate-400 focus:outline-none"
               />
             </div>
@@ -184,24 +196,26 @@ export const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
             </button>
           </div>
 
-          {/* Options List with Checkboxes */}
+          {/* Options List with Checkboxes and Hover Actions */}
           <div className="max-h-56 overflow-y-auto divide-y divide-[#EDEDED] dark:divide-slate-800/60">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => {
                 const isSelected = values.includes(option.value);
                 return (
-                  <button
+                  <div
                     key={option.value}
-                    type="button"
-                    disabled={option.disabled}
-                    onClick={() => handleToggleOption(option.value)}
-                    className={`w-full text-left px-3.5 py-2.5 text-xs font-medium transition-colors cursor-pointer flex items-center justify-between ${
+                    className={`group w-full text-left px-3.5 py-2 text-xs font-medium transition-colors flex items-center justify-between ${
                       isSelected
                         ? 'bg-blue-50/50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 font-semibold'
                         : 'text-[#241F20] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/70'
                     } ${option.disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
                   >
-                    <div className="flex items-center gap-2.5 truncate">
+                    <button
+                      type="button"
+                      disabled={option.disabled}
+                      onClick={() => handleToggleOption(option.value)}
+                      className="flex items-center gap-2.5 truncate flex-1 text-left cursor-pointer py-0.5"
+                    >
                       <div
                         className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
                           isSelected
@@ -212,16 +226,66 @@ export const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                         {isSelected && <Icon name="Check" size={12} className="stroke-[3]" />}
                       </div>
                       <span className="truncate">{option.label}</span>
-                    </div>
-                  </button>
+                    </button>
+
+                    {/* Hover Action Buttons: Edit & Delete */}
+                    {(onEditOption || onDeleteOption) && (
+                      <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity shrink-0 ml-2">
+                        {onEditOption && (
+                          <button
+                            type="button"
+                            title="Edit Service"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEditOption(option.value);
+                            }}
+                            className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded cursor-pointer transition-colors"
+                          >
+                            <Icon name="Pencil" size={13} />
+                          </button>
+                        )}
+                        {onDeleteOption && (
+                          <button
+                            type="button"
+                            title="Delete Service"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteOption(option.value);
+                            }}
+                            className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50 rounded cursor-pointer transition-colors"
+                          >
+                            <Icon name="Trash" size={13} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 );
               })
             ) : (
               <div className="px-4 py-4 text-center text-xs text-slate-400">
-                No matching locations found
+                No matching options found
               </div>
             )}
           </div>
+
+          {/* Fixed Bottom Footer Button */}
+          {footerAction && (
+            <div className="p-2.5 border-t border-[#EDEDED] dark:border-slate-800 bg-[#F9FAFB] dark:bg-slate-900/90 sticky bottom-0 z-10">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  setSearchTerm('');
+                  footerAction.onClick();
+                }}
+                className="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+              >
+                {footerAction.icon && <Icon name={footerAction.icon} size={14} />}
+                <span>{footerAction.label}</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
