@@ -40,11 +40,25 @@ export const SingleDatePicker: React.FC<SingleDatePickerProps> = ({
   buttonClassName = '',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropUp, setDropUp] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const parsed = parseDateStr(value) || new Date();
   const [viewYear, setViewYear] = useState<number>(parsed.getFullYear());
   const [viewMonth, setViewMonth] = useState<number>(parsed.getMonth());
+
+  // Auto detect if popover should open upwards when space below is tight
+  useEffect(() => {
+    if (isOpen && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      if (spaceBelow < 320 && rect.top > 300) {
+        setDropUp(true);
+      } else {
+        setDropUp(false);
+      }
+    }
+  }, [isOpen]);
 
   // Keep view in sync when value changes
   useEffect(() => {
@@ -156,7 +170,11 @@ export const SingleDatePicker: React.FC<SingleDatePickerProps> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[16px] shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-4 w-[280px] animate-in fade-in zoom-in-95 duration-100">
+        <div
+          className={`absolute right-0 ${
+            dropUp ? 'bottom-full mb-2' : 'top-full mt-2'
+          } z-[90] bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[16px] shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-4 w-[280px] animate-in fade-in zoom-in-95 duration-100`}
+        >
           {/* Header Month Navigation */}
           <div className="flex items-center justify-between mb-3 px-0.5">
             <button

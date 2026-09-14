@@ -89,8 +89,22 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
 
   // Selection flow state (picking start date vs end date on calendar)
   const [selectingStep, setSelectingStep] = useState<'start' | 'end'>('start');
+  const [dropUp, setDropUp] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Auto detect if popover should open upwards when space below is tight
+  useEffect(() => {
+    if (isPopoverOpen && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      if (spaceBelow < 380 && rect.top > 320) {
+        setDropUp(true);
+      } else {
+        setDropUp(false);
+      }
+    }
+  }, [isPopoverOpen]);
 
   // Close popover when clicking outside
   useEffect(() => {
@@ -388,7 +402,9 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
         <div
           className={`absolute ${
             align === 'right' ? 'right-0' : 'left-0'
-          } top-full mt-2 z-50 bg-white dark:bg-[#0d131f] border border-[#e5e7eb] dark:border-slate-800 rounded-[12px] shadow-2xl drop-shadow-[0px_18px_24px_rgba(0,0,0,0.22)] p-5 flex flex-col md:flex-row gap-5 ${
+          } ${
+            dropUp ? 'bottom-full mb-2' : 'top-full mt-2'
+          } z-[90] bg-white dark:bg-[#0d131f] border border-[#e5e7eb] dark:border-slate-800 rounded-[12px] shadow-2xl drop-shadow-[0px_18px_24px_rgba(0,0,0,0.22)] p-5 flex flex-col md:flex-row gap-5 ${
             showPresets ? 'min-w-[700px]' : 'min-w-[530px]'
           } animate-in fade-in-50 zoom-in-95 duration-150`}
         >
