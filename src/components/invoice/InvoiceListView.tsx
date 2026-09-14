@@ -501,13 +501,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
         <div className="flex items-center gap-2">
           <h1 className="text-lg font-bold text-[#241F20] dark:text-white flex items-center gap-2">
             {viewMode === 'services' && (
-              <>
-                <Icon name="Wrench" size={18} className="text-blue-600 dark:text-blue-400" />
-                <span>Services</span>
-                <span className="ml-1 px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-extrabold">
-                  {servicesList.length}
-                </span>
-              </>
+              <span>Services</span>
             )}
             {viewMode === 'generate' && (
               <div className="flex items-center gap-2 text-lg font-bold">
@@ -929,7 +923,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300">
-                      Services ({selectedServices.length}/{servicesList.length})
+                      Services
                     </label>
                     <div className="flex items-center gap-2 text-[11px] font-semibold">
                       <button
