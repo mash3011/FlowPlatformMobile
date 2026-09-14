@@ -69,7 +69,7 @@ export const SingleDatePicker: React.FC<SingleDatePickerProps> = ({
     }
   }, [value]);
 
-  // Close popover on click outside
+  // Close popover on click outside cleanly
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -77,11 +77,14 @@ export const SingleDatePicker: React.FC<SingleDatePickerProps> = ({
       }
     };
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      const timer = setTimeout(() => {
+        document.addEventListener('click', handleClickOutside);
+      }, 0);
+      return () => {
+        clearTimeout(timer);
+        document.removeEventListener('click', handleClickOutside);
+      };
     }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
   }, [isOpen]);
 
   const handlePrevMonth = () => {

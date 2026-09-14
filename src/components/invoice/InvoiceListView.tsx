@@ -895,7 +895,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                       }}
                       className={`px-4 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer border ${
                         presetRange === 'month'
-                          ? 'border-emerald-600 border-[1.5px] text-[#241F20] dark:text-white bg-white dark:bg-slate-900 shadow-2xs'
+                          ? 'border-blue-600 border-[1.5px] text-blue-600 bg-blue-50/50 dark:bg-blue-950/30 dark:border-blue-500 dark:text-blue-400 font-extrabold shadow-2xs'
                           : 'border-[#EDEDED] dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
                       }`}
                     >
@@ -910,7 +910,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                       }}
                       className={`px-4 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer border ${
                         presetRange === 'custom'
-                          ? 'border-emerald-600 border-[1.5px] text-[#241F20] dark:text-white bg-white dark:bg-slate-900 shadow-2xs'
+                          ? 'border-blue-600 border-[1.5px] text-blue-600 bg-blue-50/50 dark:bg-blue-950/30 dark:border-blue-500 dark:text-blue-400 font-extrabold shadow-2xs'
                           : 'border-[#EDEDED] dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
                       }`}
                     >

@@ -106,7 +106,7 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
     }
   }, [isPopoverOpen]);
 
-  // Close popover when clicking outside
+  // Close popover when clicking outside cleanly
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -114,11 +114,14 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
       }
     };
     if (isPopoverOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      const timer = setTimeout(() => {
+        document.addEventListener('click', handleClickOutside);
+      }, 0);
+      return () => {
+        clearTimeout(timer);
+        document.removeEventListener('click', handleClickOutside);
+      };
     }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
   }, [isPopoverOpen]);
 
   // Sync display value when prop changes
