@@ -899,14 +899,13 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                         setSelectedMonthRange('1st Sep - 30th Sep, 2026');
                         setIsDatePickerOpen(false);
                       }}
-                      className={`px-4 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                      className={`px-4 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer border ${
                         presetRange === 'month'
                           ? 'border-emerald-600 border-[1.5px] text-[#241F20] dark:text-white bg-white dark:bg-slate-900 shadow-2xs'
                           : 'border-[#EDEDED] dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
                       }`}
                     >
-                      <span>This Month</span>
-                      <Icon name="ChevronDown" size={12} className="text-slate-400" />
+                      This Month
                     </button>
 
                     <button
