@@ -137,14 +137,14 @@ export const SingleDatePicker: React.FC<SingleDatePickerProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-[14px] border bg-white dark:bg-slate-900 text-xs font-medium transition-all cursor-pointer shadow-2xs ${
+        className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg border bg-white dark:bg-slate-900 text-xs font-semibold transition-all cursor-pointer shadow-2xs ${
           isOpen
             ? 'border-blue-500 ring-2 ring-blue-500/20 dark:border-blue-500 text-blue-600 dark:text-blue-400'
             : 'border-[#EDEDED] dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-[#241F20] dark:text-white'
         } ${buttonClassName}`}
       >
         <span>{value || placeholder}</span>
-        <Icon name="Calendar" size={16} className={`shrink-0 ${isOpen ? 'text-blue-500' : 'text-slate-800 dark:text-slate-200'}`} />
+        <Icon name="Calendar" size={14} className={`shrink-0 ${isOpen ? 'text-blue-500' : 'text-slate-500 dark:text-slate-400'}`} />
       </button>
 
       {isOpen && (

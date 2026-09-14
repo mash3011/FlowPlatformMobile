@@ -1093,37 +1093,37 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   Invoice Totals Breakdown
                 </h3>
 
-                <div className="space-y-3 text-xs font-semibold">
-                  <div className="flex items-center justify-between">
+                <div className="space-y-2.5 text-xs font-semibold">
+                  <div className="flex items-center justify-between min-h-[34px]">
                     <span className="text-[#9D9D9D]">Created Date</span>
                     <SingleDatePicker
                       value={createdDate}
                       onChange={(val) => setCreatedDate(val)}
                       placeholder="14/09/2026"
-                      className="w-36 sm:w-40"
+                      className="w-36"
                     />
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between min-h-[34px]">
                     <span className="text-[#9D9D9D]">Due Date</span>
                     <SingleDatePicker
                       value={dueDate}
                       onChange={(val) => setDueDate(val)}
                       placeholder="28/09/2026"
-                      className="w-36 sm:w-40"
+                      className="w-36"
                     />
                   </div>
 
-                  <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center justify-between min-h-[34px]">
                     <span className="text-[#9D9D9D]">Subtotal (Excl. VAT)</span>
-                    <span className="text-[#241F20] dark:text-white font-bold">
+                    <span className="text-[#241F20] dark:text-white font-bold text-sm">
                       £{subtotal.toFixed(2)}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between min-h-[34px]">
                     <span className="text-[#9D9D9D]">Total VAT Amount</span>
-                    <span className="text-[#241F20] dark:text-white font-bold">
+                    <span className="text-[#241F20] dark:text-white font-bold text-sm">
                       £{totalVatAmount.toFixed(2)}
                     </span>
                   </div>
