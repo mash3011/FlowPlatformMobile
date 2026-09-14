@@ -189,7 +189,9 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
             <div className="p-2.5 border-t border-[#EDEDED] dark:border-slate-800 bg-[#F9FAFB] dark:bg-slate-900/90 sticky bottom-0 z-10">
               <button
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
                   setIsOpen(false);
                   setSearchTerm('');
                   footerAction.onClick();
