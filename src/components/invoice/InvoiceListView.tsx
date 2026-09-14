@@ -23,16 +23,18 @@ export interface ServiceItem {
   xeroId: string;
   label: string;
   description: string;
+  unitCost?: number;
+  vatPercent?: number;
 }
 
 // Pre-populated Default Services requested by team feedback
 const initialServicesList: ServiceItem[] = [
-  { id: '1', xeroId: 'XERO-001', label: 'Lost Cup', description: 'Charges for lost reusable cups during events' },
-  { id: '2', xeroId: 'XERO-002', label: 'Washed Cup', description: 'Professional cleaning and washing service per cup' },
-  { id: '3', xeroId: 'XERO-003', label: 'Damaged', description: 'Replacement fees for damaged cups or equipment' },
-  { id: '4', xeroId: 'XERO-004', label: 'Tote Lost', description: 'Missing tote storage box replacement fee' },
-  { id: '5', xeroId: 'XERO-005', label: 'Wheely Bins', description: 'Wheely bin collection and rental service' },
-  { id: '6', xeroId: 'XERO-006', label: 'DRS Bins', description: 'Deposit Return Scheme bin setup and collection' },
+  { id: '1', xeroId: 'XERO-001', label: 'Lost Cup', description: 'Charges for lost reusable cups during events', unitCost: 1.50, vatPercent: 20 },
+  { id: '2', xeroId: 'XERO-002', label: 'Washed Cup', description: 'Professional cleaning and washing service per cup', unitCost: 0.50, vatPercent: 20 },
+  { id: '3', xeroId: 'XERO-003', label: 'Damaged', description: 'Replacement fees for damaged cups or equipment', unitCost: 2.00, vatPercent: 20 },
+  { id: '4', xeroId: 'XERO-004', label: 'Tote Lost', description: 'Missing tote storage box replacement fee', unitCost: 15.00, vatPercent: 20 },
+  { id: '5', xeroId: 'XERO-005', label: 'Wheely Bins', description: 'Wheely bin collection and rental service', unitCost: 25.00, vatPercent: 20 },
+  { id: '6', xeroId: 'XERO-006', label: 'DRS Bins', description: 'Deposit Return Scheme bin setup and collection', unitCost: 30.00, vatPercent: 20 },
 ];
 
 // User Info Interface & Initial Data
@@ -165,6 +167,8 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
   const [serviceXeroId, setServiceXeroId] = useState<string>('');
   const [serviceLabel, setServiceLabel] = useState<string>('');
   const [serviceDescription, setServiceDescription] = useState<string>('');
+  const [serviceUnitCost, setServiceUnitCost] = useState<string>('1.50');
+  const [serviceVatPercent, setServiceVatPercent] = useState<string>('20');
 
   // Close 3-dot dropdown menus on outside click
   React.useEffect(() => {
@@ -347,6 +351,8 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
     setServiceXeroId(`XERO-00${servicesList.length + 1}`);
     setServiceLabel('');
     setServiceDescription('');
+    setServiceUnitCost('1.50');
+    setServiceVatPercent('20');
     setIsServiceModalOpen(true);
   };
 
@@ -355,6 +361,8 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
     setServiceXeroId(service.xeroId);
     setServiceLabel(service.label);
     setServiceDescription(service.description);
+    setServiceUnitCost(service.unitCost !== undefined ? String(service.unitCost) : '1.50');
+    setServiceVatPercent(service.vatPercent !== undefined ? String(service.vatPercent) : '20');
     setIsServiceModalOpen(true);
   };
 
@@ -365,11 +373,21 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
       return;
     }
 
+    const unitCostNum = parseFloat(serviceUnitCost) || 0;
+    const vatNum = parseFloat(serviceVatPercent) || 0;
+
     if (editingService) {
       setServicesList((prev) =>
         prev.map((s) =>
           s.id === editingService.id
-            ? { ...s, xeroId: serviceXeroId, label: serviceLabel, description: serviceDescription }
+            ? {
+                ...s,
+                xeroId: serviceXeroId,
+                label: serviceLabel,
+                description: serviceDescription,
+                unitCost: unitCostNum,
+                vatPercent: vatNum,
+              }
             : s
         )
       );
@@ -380,6 +398,8 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
         xeroId: serviceXeroId || `XERO-00${servicesList.length + 1}`,
         label: serviceLabel,
         description: serviceDescription,
+        unitCost: unitCostNum,
+        vatPercent: vatNum,
       };
       setServicesList((prev) => [...prev, newService]);
       toast.success(`Service "${serviceLabel}" added successfully`);
@@ -1155,6 +1175,8 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                 <tr className="bg-[#FBFBFB] dark:bg-slate-900/80 border-b border-[#EDEDED] dark:border-slate-800 text-[#241F20] dark:text-slate-300 font-semibold h-[42px]">
                   <th className="py-2.5 px-4">Xero ID</th>
                   <th className="py-2.5 px-4">Label (Service Name)</th>
+                  <th className="py-2.5 px-4 text-center">Definite Unit Cost (£)</th>
+                  <th className="py-2.5 px-4 text-center">Definite VAT (%)</th>
                   <th className="py-2.5 px-4">Description</th>
                   <th className="py-2.5 px-4 text-right">Actions</th>
                 </tr>
@@ -1167,6 +1189,12 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                     </td>
                     <td className="py-3 px-4 font-bold text-[#241F20] dark:text-white">
                       {srv.label}
+                    </td>
+                    <td className="py-3 px-4 text-center font-semibold text-[#241F20] dark:text-slate-200">
+                      £{(srv.unitCost ?? 0).toFixed(2)}
+                    </td>
+                    <td className="py-3 px-4 text-center font-semibold text-[#241F20] dark:text-slate-200">
+                      {srv.vatPercent ?? 0}%
                     </td>
                     <td className="py-3 px-4 text-slate-600 dark:text-slate-300 font-medium">
                       {srv.description || '—'}
@@ -1417,6 +1445,41 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   placeholder="e.g. Lost Cup, Washed Cup, Damaged..."
                   className="w-full px-3 py-2 rounded-lg border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
+                    Definite Unit Cost (£)*
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    required
+                    value={serviceUnitCost}
+                    onChange={(e) => setServiceUnitCost(e.target.value)}
+                    placeholder="e.g. 1.50"
+                    className="w-full px-3 py-2 rounded-lg border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
+                    Definite VAT (%)*
+                  </label>
+                  <input
+                    type="number"
+                    step="1"
+                    min="0"
+                    max="100"
+                    required
+                    value={serviceVatPercent}
+                    onChange={(e) => setServiceVatPercent(e.target.value)}
+                    placeholder="e.g. 20"
+                    className="w-full px-3 py-2 rounded-lg border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
+                  />
+                </div>
               </div>
 
               <div>
