@@ -6,6 +6,7 @@ export interface SingleDatePickerProps {
   onChange: (dateStr: string) => void;
   placeholder?: string;
   className?: string;
+  buttonClassName?: string;
 }
 
 // Helper to format Date to DD/MM/YYYY
@@ -36,6 +37,7 @@ export const SingleDatePicker: React.FC<SingleDatePickerProps> = ({
   onChange,
   placeholder = 'DD/MM/YYYY',
   className = '',
+  buttonClassName = '',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -139,7 +141,7 @@ export const SingleDatePicker: React.FC<SingleDatePickerProps> = ({
           isOpen
             ? 'border-blue-500 ring-2 ring-blue-500/20 dark:border-blue-500 text-blue-600 dark:text-blue-400'
             : 'border-[#EDEDED] dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-[#241F20] dark:text-white'
-        }`}
+        } ${buttonClassName}`}
       >
         <span>{value || placeholder}</span>
         <Icon name="Calendar" size={16} className={`shrink-0 ${isOpen ? 'text-blue-500' : 'text-slate-800 dark:text-slate-200'}`} />

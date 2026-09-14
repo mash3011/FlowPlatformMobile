@@ -1093,35 +1093,28 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   Invoice Totals Breakdown
                 </h3>
 
-                {/* CREATED DATE & DUE DATE SECTION */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-3 border-b border-[#EDEDED] dark:border-slate-800">
-                  <div>
-                    <label className="block text-xs font-bold text-[#241F20] dark:text-slate-300 mb-1.5">
-                      Created Date
-                    </label>
+                <div className="space-y-3 text-xs font-semibold">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#9D9D9D]">Created Date</span>
                     <SingleDatePicker
                       value={createdDate}
                       onChange={(val) => setCreatedDate(val)}
                       placeholder="14/09/2026"
-                      className="w-full"
+                      className="w-36 sm:w-40"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-[#241F20] dark:text-slate-300 mb-1.5">
-                      Due Date
-                    </label>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[#9D9D9D]">Due Date</span>
                     <SingleDatePicker
                       value={dueDate}
                       onChange={(val) => setDueDate(val)}
                       placeholder="28/09/2026"
-                      className="w-full"
+                      className="w-36 sm:w-40"
                     />
                   </div>
-                </div>
 
-                <div className="space-y-2.5 text-xs font-semibold">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between pt-1">
                     <span className="text-[#9D9D9D]">Subtotal (Excl. VAT)</span>
                     <span className="text-[#241F20] dark:text-white font-bold">
                       £{subtotal.toFixed(2)}
