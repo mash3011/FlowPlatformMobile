@@ -1087,9 +1087,14 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                 </div>
               </div>
 
-              {/* CREATED DATE & DUE DATE CARD (MATCHING 1ST IMAGE DESIGN) */}
-              <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[8px] p-5 shadow-2xs">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* TOTALS SUMMARY WITH CREATED & DUE DATE PICKERS */}
+              <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[8px] p-5 shadow-2xs space-y-4">
+                <h3 className="text-sm font-bold text-[#241F20] dark:text-white">
+                  Invoice Totals Breakdown
+                </h3>
+
+                {/* CREATED DATE & DUE DATE SECTION */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-3 border-b border-[#EDEDED] dark:border-slate-800">
                   <div>
                     <label className="block text-xs font-bold text-[#241F20] dark:text-slate-300 mb-1.5">
                       Created Date
@@ -1114,13 +1119,6 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                     />
                   </div>
                 </div>
-              </div>
-
-              {/* TOTALS SUMMARY */}
-              <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[8px] p-5 shadow-2xs space-y-4">
-                <h3 className="text-sm font-bold text-[#241F20] dark:text-white">
-                  Invoice Totals Breakdown
-                </h3>
 
                 <div className="space-y-2.5 text-xs font-semibold">
                   <div className="flex items-center justify-between">
