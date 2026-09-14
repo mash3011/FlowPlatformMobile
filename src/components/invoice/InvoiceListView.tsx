@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Icon } from '../ui/Icon';
 import { toast } from 'sonner';
 import { CustomSelect } from '../ui/CustomSelect';
+import { CustomDateRangePicker } from '../ui/CustomDateRangePicker';
+import { SingleDatePicker } from '../ui/SingleDatePicker';
 
 // Types for Invoice List
 interface InvoiceRowData {
@@ -30,6 +32,39 @@ const initialServicesList: ServiceItem[] = [
   { id: '4', xeroId: 'XERO-004', label: 'Tote Lost', description: 'Missing tote storage box replacement fee' },
   { id: '5', xeroId: 'XERO-005', label: 'Wheely Bins', description: 'Wheely bin collection and rental service' },
   { id: '6', xeroId: 'XERO-006', label: 'DRS Bins', description: 'Deposit Return Scheme bin setup and collection' },
+];
+
+// User Info Interface & Initial Data
+export interface UserInfo {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+}
+
+const initialUsersList: UserInfo[] = [
+  {
+    id: 'usr-1',
+    firstName: 'John',
+    lastName: 'Doe',
+    phone: '+44 7700 900077',
+    email: 'john.doe@example.com',
+  },
+  {
+    id: 'usr-2',
+    firstName: 'Sarah',
+    lastName: 'Jenkins',
+    phone: '+44 7700 900123',
+    email: 'sarah.j@example.com',
+  },
+  {
+    id: 'usr-3',
+    firstName: 'Mark',
+    lastName: 'Smith',
+    phone: '+44 7700 900456',
+    email: 'm.smith@example.com',
+  },
 ];
 
 // Mock Data for List View
@@ -80,6 +115,7 @@ interface ItemSummaryRow {
   quantity: number;
   unitCost: number;
   vatPercent: number; // Row-level VAT percentage
+  isCustom?: boolean; // True for newly added rows allowing service select
 }
 
 const initialSummaryItems: ItemSummaryRow[] = [
@@ -91,12 +127,24 @@ const initialSummaryItems: ItemSummaryRow[] = [
 ];
 
 interface InvoiceListViewProps {
+  activeTab?: string;
   onSelectDashboard?: (tabId: string) => void;
 }
 
-export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
+export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onSelectDashboard }) => {
   // View mode: 'list' | 'generate' | 'preview' | 'services'
-  const [viewMode, setViewMode] = useState<'list' | 'generate' | 'preview' | 'services'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'generate' | 'preview' | 'services'>(() => {
+    if (activeTab === 'invoice-services' || activeTab === 'services') return 'services';
+    return 'list';
+  });
+
+  React.useEffect(() => {
+    if (activeTab === 'invoice-services' || activeTab === 'services') {
+      setViewMode('services');
+    } else if (activeTab === 'invoice-list' || activeTab === 'invoice') {
+      setViewMode('list');
+    }
+  }, [activeTab]);
 
   // List View States
   const [invoices, setInvoices] = useState<InvoiceRowData[]>(figmaMockInvoices);
@@ -110,11 +158,22 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
 
   // Services Management State (CRUD)
   const [servicesList, setServicesList] = useState<ServiceItem[]>(initialServicesList);
+  const [activeServiceMenuId, setActiveServiceMenuId] = useState<string | null>(null);
   const [isServiceModalOpen, setIsServiceModalOpen] = useState<boolean>(false);
   const [editingService, setEditingService] = useState<ServiceItem | null>(null);
   const [serviceXeroId, setServiceXeroId] = useState<string>('');
   const [serviceLabel, setServiceLabel] = useState<string>('');
   const [serviceDescription, setServiceDescription] = useState<string>('');
+
+  // Close 3-dot dropdown menus on outside click
+  React.useEffect(() => {
+    const handleGlobalClick = () => {
+      setActiveMenuId(null);
+      setActiveServiceMenuId(null);
+    };
+    window.addEventListener('click', handleGlobalClick);
+    return () => window.removeEventListener('click', handleGlobalClick);
+  }, []);
 
   // Preview Mode State
   const [activePreviewInvoice, setActivePreviewInvoice] = useState<InvoiceRowData | null>(figmaMockInvoices[0]);
@@ -124,14 +183,73 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
   // Generate View States
   const [genClient, setGenClient] = useState<string>('Derby County Football Club');
   const [genLocation, setGenLocation] = useState<string>('Pride Park Stadium');
+
+  // User Info Dropdown & Create Modal State
+  const [usersList, setUsersList] = useState<UserInfo[]>(initialUsersList);
+  const [selectedUserId, setSelectedUserId] = useState<string>('usr-1');
+  const [isUserModalOpen, setIsUserModalOpen] = useState<boolean>(false);
+  const [userFirstName, setUserFirstName] = useState<string>('');
+  const [userLastName, setUserLastName] = useState<string>('');
+  const [userPhone, setUserPhone] = useState<string>('');
+  const [userEmail, setUserEmail] = useState<string>('');
+
+  const selectedUser = usersList.find((u) => u.id === selectedUserId) || usersList[0];
+
+  const handleOpenAddUser = () => {
+    setUserFirstName('');
+    setUserLastName('');
+    setUserPhone('');
+    setUserEmail('');
+    setIsUserModalOpen(true);
+  };
+
+  const handleSaveUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userFirstName.trim() || !userLastName.trim()) {
+      toast.error('First name and Second name are required');
+      return;
+    }
+    if (!userEmail.trim()) {
+      toast.error('Email address is required');
+      return;
+    }
+
+    const newUser: UserInfo = {
+      id: `usr-${Date.now()}`,
+      firstName: userFirstName.trim(),
+      lastName: userLastName.trim(),
+      phone: userPhone.trim() || '—',
+      email: userEmail.trim(),
+    };
+
+    setUsersList((prev) => [...prev, newUser]);
+    setSelectedUserId(newUser.id);
+    setIsUserModalOpen(false);
+    toast.success(`User "${newUser.firstName} ${newUser.lastName}" created successfully!`);
+  };
+
   const [selectedMonthRange, setSelectedMonthRange] = useState<string>('September 2026');
   const [presetRange, setPresetRange] = useState<'month' | 'custom'>('month');
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(false);
   const [customStartDate, setCustomStartDate] = useState<string>('2026-09-01');
   const [customEndDate, setCustomEndDate] = useState<string>('2026-09-30');
   
+  // Selected Services Checklist State (Autoselected all at start)
+  const [selectedServices, setSelectedServices] = useState<string[]>(() =>
+    initialServicesList.map((s) => s.label)
+  );
+
+  const handleToggleServiceCheck = (label: string) => {
+    if (selectedServices.includes(label)) {
+      setSelectedServices(selectedServices.filter((s) => s !== label));
+    } else {
+      setSelectedServices([...selectedServices, label]);
+    }
+  };
+
   // Date selection fields for Created Date & Due Date
-  const [createdDate, setCreatedDate] = useState<string>('2026-09-14');
-  const [dueDate, setDueDate] = useState<string>('2026-09-28');
+  const [createdDate, setCreatedDate] = useState<string>('14/09/2026');
+  const [dueDate, setDueDate] = useState<string>('28/09/2026');
 
   // Items table state
   const [summaryItems, setSummaryItems] = useState<ItemSummaryRow[]>(initialSummaryItems);
@@ -183,6 +301,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
       quantity: 100,
       unitCost: 1.0,
       vatPercent: 20,
+      isCustom: true,
     };
     setSummaryItems((prev) => [...prev, newRow]);
     toast.success('New line item added');
@@ -258,10 +377,6 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
     toast.success(`Service "${label}" deleted`);
   };
 
-  // Confirmation Modal State
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState<boolean>(false);
-  const [createdInvoiceNumber, setCreatedInvoiceNumber] = useState<string>('INV-0001');
-
   // Filtered List View Data
   const filteredInvoices = invoices.filter((item) => {
     if (activeTabFilter === 'Invoiced') return item.status === 'Invoiced';
@@ -304,9 +419,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
     setInvoices([newInv, ...invoices]);
     setActivePreviewInvoice(newInv);
     setSelectedInvoice(newInv);
-    setViewMode('list');
-    setCreatedInvoiceNumber(invNum);
-    setIsConfirmationOpen(true);
+    setViewMode('preview');
     setToastInvoiceNum(invNum);
     setShowSuccessToast(true);
 
@@ -342,60 +455,50 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
         </div>
       )}
 
-      {/* HEADER & NAVIGATION TABS */}
+      {/* HEADER & SECTION TITLE */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 gap-3">
-        {/* Navigation Tabs */}
+        {/* Section Header Title */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setViewMode('list')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all cursor-pointer ${
-              viewMode === 'list'
-                ? 'bg-[#241F20] text-white shadow-xs'
-                : 'text-[#A6A6A6] hover:text-[#241F20] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
-          >
-            Invoice List
-          </button>
-
-          <button
-            onClick={() => setViewMode('generate')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all cursor-pointer ${
-              viewMode === 'generate'
-                ? 'bg-[#241F20] text-white shadow-xs'
-                : 'text-[#A6A6A6] hover:text-[#241F20] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
-          >
-            Generate Invoice
-          </button>
-
-          <button
-            onClick={() => setViewMode('services')}
-            className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              viewMode === 'services'
-                ? 'bg-[#241F20] text-white shadow-xs'
-                : 'text-[#A6A6A6] hover:text-[#241F20] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
-          >
-            <Icon name="Wrench" size={14} />
-            <span>Services</span>
-            <span className="ml-1 px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-extrabold">
-              {servicesList.length}
-            </span>
-          </button>
-
-          {viewMode === 'preview' && (
-            <div className="flex items-center gap-1.5 text-xs text-[#A6A6A6]">
-              <Icon name="ChevronRight" size={14} />
-              <span className="font-semibold text-[#241F20] dark:text-white">
-                {activePreviewInvoice ? activePreviewInvoice.invoiceNumber : 'INV-0001'}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Top Header Action Buttons */}
+          <h1 className="text-lg font-bold text-[#241F20] dark:text-white flex items-center gap-2">
+            {viewMode === 'services' && (
+              <>
+                <Icon name="Wrench" size={18} className="text-blue-600 dark:text-blue-400" />
+                <span>Services</span>
+                <span className="ml-1 px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-extrabold">
+                  {servicesList.length}
+                </span>
+              </>
+            )}
+            {viewMode === 'generate' && (
+              <div className="flex items-center gap-2 text-lg font-bold text-[#A6A6A6] dark:text-slate-400">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('list')}
+                  className="hover:text-[#241F20] dark:hover:text-white transition-colors cursor-pointer"
+                >
+                  Invoice List
+                </button>
+                <Icon name="ChevronRight" size={16} className="text-[#A6A6A6]" />
+                <span className="text-[#A6A6A6] font-bold">Generate Invoice</span>
+              </div>
+            )}
+            {(viewMode === 'list' || viewMode === 'preview') && (
+              <>
+                <span>Invoice List</span>
+                {viewMode === 'preview' && (
+                  <div className="flex items-center gap-1.5 text-xs text-[#A6A6A6] font-normal">
+                    <Icon name="ChevronRight" size={14} />
+                    <span className="font-semibold text-[#241F20] dark:text-white">
+                      {activePreviewInvoice ? activePreviewInvoice.invoiceNumber : 'INV-0001'}
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
+          </h1>
+        </div>        {/* Top Header Action Buttons */}
         <div className="flex items-center gap-2">
-          {viewMode === 'services' ? (
+          {viewMode === 'services' && (
             <button
               onClick={handleOpenAddService}
               className="px-4 py-1.5 rounded-lg bg-[#241F20] hover:bg-black text-white text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-xs"
@@ -403,13 +506,15 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
               <Icon name="Plus" size={15} />
               <span>Add Service</span>
             </button>
-          ) : (
+          )}
+
+          {viewMode === 'generate' && (
             <button
-              onClick={handleOpenAddService}
-              className="px-3 py-1.5 rounded-lg border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-slate-200 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+              onClick={() => setViewMode('list')}
+              className="px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
             >
-              <Icon name="Plus" size={14} className="text-blue-500" />
-              <span>Quick Add Service</span>
+              <Icon name="ArrowLeft" size={14} />
+              <span>Back to List</span>
             </button>
           )}
 
@@ -493,17 +598,11 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                 className="w-40"
               />
 
-              <CustomSelect
-                value={dateRangeFilter}
+              <CustomDateRangePicker
+                value={dateRangeFilter === 'all' ? 'Select date range' : dateRangeFilter}
                 onChange={(val) => setDateRangeFilter(val)}
-                options={[
-                  { value: 'all', label: 'Select date range' },
-                  { value: 'sep2026', label: 'September 2026' },
-                  { value: 'aug2026', label: 'August 2026' },
-                  { value: 'jul2026', label: 'July 2026' },
-                  { value: 'jun2026', label: 'June 2026' },
-                ]}
-                className="w-48"
+                className="w-56"
+                align="right"
               />
             </div>
           </div>
@@ -555,21 +654,15 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right relative">
-                      <div className="inline-flex items-center gap-2">
-                        <button
-                          onClick={() => setSelectedInvoice(inv)}
-                          className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-[#241F20] dark:text-white font-semibold text-xs transition-all cursor-pointer"
-                        >
-                          View
-                        </button>
-
-                        <button
-                          onClick={() => setActiveMenuId(activeMenuId === inv.id ? null : inv.id)}
-                          className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 cursor-pointer"
-                        >
-                          <Icon name="MoreVertical" size={16} />
-                        </button>
-                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveMenuId(activeMenuId === inv.id ? null : inv.id);
+                        }}
+                        className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer transition-all shadow-2xs"
+                      >
+                        <Icon name="MoreVertical" size={16} />
+                      </button>
 
                       {/* 3-Dot Context Menu */}
                       {activeMenuId === inv.id && (
@@ -583,6 +676,19 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                           >
                             <Icon name="Eye" size={13} />
                             <span>Preview</span>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              toast.success(`Downloading ${inv.id} PDF...`, {
+                                description: `Preparing PDF export for ${inv.client}`,
+                              });
+                              setActiveMenuId(null);
+                            }}
+                            className="w-full px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer"
+                          >
+                            <Icon name="Download" size={13} />
+                            <span>Download</span>
                           </button>
 
                           <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
@@ -625,18 +731,15 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
       {viewMode === 'generate' && (
         <div className="space-y-5">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-            {/* LEFT FORM CONTROL PANEL */}
+            {/* LEFT FORM CONTROL PANEL (MATCHING 2ND IMAGE) */}
             <div className="lg:col-span-4 bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[8px] p-5 shadow-2xs space-y-4">
               <div className="border-b border-[#EDEDED] dark:border-slate-800 pb-3">
                 <h3 className="text-sm font-bold text-[#241F20] dark:text-white">
-                  Invoice Details
+                  Select your criteria below
                 </h3>
-                <p className="text-[11px] text-[#9D9D9D]">
-                  Select criteria and configure dates
-                </p>
               </div>
 
-              <div className="space-y-3.5 text-xs">
+              <div className="space-y-4 text-xs">
                 {/* Client Select */}
                 <div>
                   <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
@@ -665,48 +768,161 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                     options={[
                       { value: 'Pride Park Stadium', label: 'Pride Park Stadium' },
                       { value: 'Derby Arena', label: 'Derby Arena' },
+                      { value: 'All(7)', label: 'All(7)' },
                     ]}
                     className="w-full"
                   />
                 </div>
 
-                {/* Date Range Dropdown with Descending Months */}
+                {/* User Info Select */}
                 <div>
                   <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
-                    Date Range (Month)
+                    User Info
                   </label>
                   <CustomSelect
-                    value={selectedMonthRange}
-                    onChange={(val) => setSelectedMonthRange(val)}
-                    options={monthOptions}
+                    value={selectedUserId}
+                    onChange={(val) => {
+                      if (val === '__CREATE_NEW_USER__') {
+                        handleOpenAddUser();
+                      } else {
+                        setSelectedUserId(val);
+                      }
+                    }}
+                    options={[
+                      ...usersList.map((u) => ({
+                        value: u.id,
+                        label: `${u.firstName} ${u.lastName} (${u.email})`,
+                      })),
+                      {
+                        value: '__CREATE_NEW_USER__',
+                        label: '+ Create New User',
+                      },
+                    ]}
                     className="w-full"
                   />
+
+                  {/* Selected User Details Pill/Card */}
+                  {selectedUser && (
+                    <div className="mt-2 p-2.5 bg-slate-50 dark:bg-slate-900/60 border border-[#EDEDED] dark:border-slate-800/80 rounded-lg text-[11px] space-y-1">
+                      <div className="flex items-center justify-between font-semibold text-[#241F20] dark:text-slate-200">
+                        <span className="flex items-center gap-1.5">
+                          <Icon name="User" size={12} className="text-blue-500" />
+                          {selectedUser.firstName} {selectedUser.lastName}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-normal">Contact Person</span>
+                      </div>
+                      <div className="text-slate-500 dark:text-slate-400 flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5 text-[10px]">
+                        <span>Email: <strong className="text-slate-700 dark:text-slate-300">{selectedUser.email}</strong></span>
+                        <span>Phone: <strong className="text-slate-700 dark:text-slate-300">{selectedUser.phone}</strong></span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Editable Created Date & Due Date Fields */}
-                <div className="grid grid-cols-2 gap-3 pt-1">
-                  <div>
-                    <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
-                      Created Date
-                    </label>
-                    <input
-                      type="date"
-                      value={createdDate}
-                      onChange={(e) => setCreatedDate(e.target.value)}
-                      className="w-full px-2.5 py-2 rounded-lg border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white text-xs font-semibold focus:outline-none focus:border-blue-500 cursor-pointer"
-                    />
-                  </div>
+                {/* Date Range Dropdown with Figma Calendar */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
+                    Date Range
+                  </label>
+                  <CustomDateRangePicker
+                    value={selectedMonthRange}
+                    onChange={(val) => {
+                      setSelectedMonthRange(val);
+                      setPresetRange('custom');
+                    }}
+                    isOpen={isDatePickerOpen}
+                    onOpenChange={(open) => setIsDatePickerOpen(open)}
+                    showPresets={false}
+                    className="w-full"
+                    align="left"
+                  />
 
-                  <div>
-                    <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
-                      Due Date
+                  {/* Preset Pills (Matching 2nd Image) */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPresetRange('month');
+                        setSelectedMonthRange('1st Sep - 30th Sep, 2026');
+                        setIsDatePickerOpen(false);
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer border ${
+                        presetRange === 'month'
+                          ? 'border-emerald-500 text-emerald-600 bg-emerald-50/40 dark:bg-emerald-950/30'
+                          : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900'
+                      }`}
+                    >
+                      This Month
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPresetRange('custom');
+                        setIsDatePickerOpen(true);
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer border ${
+                        presetRange === 'custom' || isDatePickerOpen
+                          ? 'border-emerald-500 text-emerald-600 bg-emerald-50/40 dark:bg-emerald-950/30 font-bold'
+                          : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900'
+                      }`}
+                    >
+                      Custom Range
+                    </button>
+                  </div>
+                </div>
+
+                {/* Services Checklist (Matching 2nd Image) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300">
+                      Services ({selectedServices.length}/{servicesList.length})
                     </label>
-                    <input
-                      type="date"
-                      value={dueDate}
-                      onChange={(e) => setDueDate(e.target.value)}
-                      className="w-full px-2.5 py-2 rounded-lg border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white text-xs font-semibold focus:outline-none focus:border-blue-500 cursor-pointer"
-                    />
+                    {selectedServices.length > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedServices([])}
+                        className="text-[11px] font-semibold text-red-600 hover:text-red-700 dark:text-red-400 cursor-pointer underline"
+                      >
+                        Clear All
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedServices(servicesList.map((s) => s.label))}
+                        className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer underline"
+                      >
+                        Select All
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {servicesList.map((srv) => {
+                      const isChecked = selectedServices.includes(srv.label);
+                      return (
+                        <label
+                          key={srv.id}
+                          className="flex items-center gap-1.5 text-xs font-semibold text-[#241F20] dark:text-slate-200 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => handleToggleServiceCheck(srv.label)}
+                            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                          />
+                          <span>{srv.label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Activity Overview (Matching 2nd Image) */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
+                    Activity Overview
+                  </label>
+                  <div className="w-full px-3.5 py-2.5 rounded-[8px] border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white text-xs font-semibold shadow-2xs">
+                    {selectedMonthRange || '1st - 30th Sep, 2026'}
                   </div>
                 </div>
               </div>
@@ -726,23 +942,14 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={handleOpenAddService}
-                      className="px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50/60 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-100 transition-all cursor-pointer flex items-center gap-1"
-                    >
-                      <Icon name="Plus" size={13} />
-                      <span>New Service</span>
-                    </button>
-
+                  <div>
                     <button
                       type="button"
                       onClick={handleAddItemRow}
-                      className="px-3 py-1.5 rounded-lg bg-[#241F20] hover:bg-black text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                      className="px-3.5 py-1.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
-                      <Icon name="Plus" size={13} />
-                      <span>Add Row</span>
+                      <Icon name="Plus" size={14} />
+                      <span>Add Additional Row Item</span>
                     </button>
                   </div>
                 </div>
@@ -783,12 +990,18 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                               />
                             </td>
                             <td className="py-2 px-3">
-                              <CustomSelect
-                                value={row.service}
-                                onChange={(val) => handleServiceChange(row.id, val)}
-                                options={servicesList.map((s) => ({ value: s.label, label: s.label }))}
-                                className="w-36"
-                              />
+                              {row.isCustom ? (
+                                <CustomSelect
+                                  value={row.service}
+                                  onChange={(val) => handleServiceChange(row.id, val)}
+                                  options={servicesList.map((s) => ({ value: s.label, label: s.label }))}
+                                  className="w-36"
+                                />
+                              ) : (
+                                <div className="px-2 py-1 bg-slate-50 dark:bg-slate-900 border border-[#EDEDED] dark:border-slate-800 rounded text-xs font-semibold text-[#241F20] dark:text-slate-200">
+                                  {row.service}
+                                </div>
+                              )}
                             </td>
                             <td className="py-2 px-3 text-center">
                               <input
@@ -839,16 +1052,34 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                     </tbody>
                   </table>
                 </div>
+              </div>
 
-                <div className="flex justify-start pt-1">
-                  <button
-                    type="button"
-                    onClick={handleAddItemRow}
-                    className="px-3.5 py-1.5 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 flex items-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    <Icon name="Plus" size={14} />
-                    <span>Add Additional Row Item</span>
-                  </button>
+              {/* CREATED DATE & DUE DATE CARD (MATCHING 1ST IMAGE DESIGN) */}
+              <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[8px] p-5 shadow-2xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-[#241F20] dark:text-slate-300 mb-1.5">
+                      Created Date
+                    </label>
+                    <SingleDatePicker
+                      value={createdDate}
+                      onChange={(val) => setCreatedDate(val)}
+                      placeholder="14/09/2026"
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#241F20] dark:text-slate-300 mb-1.5">
+                      Due Date
+                    </label>
+                    <SingleDatePicker
+                      value={dueDate}
+                      onChange={(val) => setDueDate(val)}
+                      placeholder="28/09/2026"
+                      className="w-full"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -927,23 +1158,46 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
                     <td className="py-3 px-4 text-slate-600 dark:text-slate-300 font-medium">
                       {srv.description || '—'}
                     </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="inline-flex items-center gap-2">
-                        <button
-                          onClick={() => handleOpenEditService(srv)}
-                          className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-[#241F20] dark:text-white font-semibold text-xs transition-all cursor-pointer flex items-center gap-1"
+                    <td className="py-3 px-4 text-right relative">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveServiceMenuId(activeServiceMenuId === srv.id ? null : srv.id);
+                        }}
+                        className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer transition-all shadow-2xs"
+                      >
+                        <Icon name="MoreVertical" size={16} />
+                      </button>
+
+                      {/* 3-Dot Context Menu */}
+                      {activeServiceMenuId === srv.id && (
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute right-4 top-10 z-50 w-36 bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-lg shadow-xl py-1 text-left animate-in fade-in duration-100"
                         >
-                          <Icon name="Edit" size={13} />
-                          <span>Edit</span>
-                        </button>
-                        <button
-                          onClick={() => handleDeleteService(srv.id, srv.label)}
-                          className="px-2.5 py-1 rounded bg-red-50 hover:bg-red-100 text-red-600 font-semibold text-xs transition-all cursor-pointer flex items-center gap-1"
-                        >
-                          <Icon name="Trash" size={13} />
-                          <span>Delete</span>
-                        </button>
-                      </div>
+                          <button
+                            onClick={() => {
+                              handleOpenEditService(srv);
+                              setActiveServiceMenuId(null);
+                            }}
+                            className="w-full px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer transition-colors"
+                          >
+                            <Icon name="Edit" size={14} className="text-slate-500" />
+                            <span>Edit</span>
+                          </button>
+                          <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
+                          <button
+                            onClick={() => {
+                              handleDeleteService(srv.id, srv.label);
+                              setActiveServiceMenuId(null);
+                            }}
+                            className="w-full px-3 py-2 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center gap-2 cursor-pointer transition-colors"
+                          >
+                            <Icon name="Trash" size={14} className="text-red-500" />
+                            <span>Delete</span>
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -1185,44 +1439,99 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = () => {
         </div>
       )}
 
-      {/* CONFIRMATION MODAL */}
-      {isConfirmationOpen && (
-        <div className="fixed inset-0 bg-[rgba(15,15,15,0.26)] backdrop-blur-[6px] z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[12px] shadow-2xl w-[360px] p-6 text-center space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto shadow-2xs">
-              <Icon name="CheckCircle" size={28} />
-            </div>
-
-            <div className="space-y-1">
-              <h3 className="text-base font-bold text-[#241F20] dark:text-white">
-                Generate Invoice
+      {/* ========================================================================= */}
+      {/* CREATE NEW USER MODAL DIALOG */}
+      {/* ========================================================================= */}
+      {isUserModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b pb-3 border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-bold text-[#241F20] dark:text-white flex items-center gap-2">
+                <Icon name="User" size={16} className="text-blue-500" />
+                <span>Create New User</span>
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Invoice <span className="font-bold text-[#241F20] dark:text-white">{createdInvoiceNumber}</span> successfully generated for <span className="font-semibold">{genClient}</span>.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 pt-2">
               <button
-                onClick={() => {
-                  setIsConfirmationOpen(false);
-                  setViewMode('list');
-                }}
-                className="flex-1 py-2 rounded-[6px] border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-slate-200 text-xs font-semibold hover:bg-slate-50 transition-all cursor-pointer"
+                onClick={() => setIsUserModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm cursor-pointer p-1"
               >
-                Back to Home
-              </button>
-
-              <button
-                onClick={() => {
-                  setIsConfirmationOpen(false);
-                  setViewMode('preview');
-                }}
-                className="flex-1 py-2 rounded-[6px] bg-[#241F20] hover:bg-black text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
-              >
-                View Invoice
+                ✕
               </button>
             </div>
+
+            <form onSubmit={handleSaveUser} className="space-y-3.5 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
+                    First Name*
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={userFirstName}
+                    onChange={(e) => setUserFirstName(e.target.value)}
+                    placeholder="e.g. John"
+                    className="w-full px-3 py-2 rounded-lg border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
+                    Second Name*
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={userLastName}
+                    onChange={(e) => setUserLastName(e.target.value)}
+                    placeholder="e.g. Doe"
+                    className="w-full px-3 py-2 rounded-lg border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
+                  Phone Number*
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={userPhone}
+                  onChange={(e) => setUserPhone(e.target.value)}
+                  placeholder="e.g. +44 7700 900077"
+                  className="w-full px-3 py-2 rounded-lg border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
+                  Email Address*
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={userEmail}
+                  onChange={(e) => setUserEmail(e.target.value)}
+                  placeholder="e.g. john.doe@example.com"
+                  className="w-full px-3 py-2 rounded-lg border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white text-xs font-semibold focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsUserModalOpen(false)}
+                  className="px-4 py-2 rounded-md border border-[#EDEDED] dark:border-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-md bg-[#241F20] hover:bg-black text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
+                >
+                  Save User
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -93,9 +93,11 @@ export const App: React.FC = () => {
         return <FlowCalendarView onSelectTab={setActiveTab} />;
       case 'invoice':
       case 'invoice-list':
+      case 'invoice-services':
+      case 'services':
       case 'invoice-reconciliation':
       case 'invoice-history':
-        return <InvoiceListView onSelectDashboard={setActiveTab} />;
+        return <InvoiceListView activeTab={activeTab} onSelectDashboard={setActiveTab} />;
       case 'performance-metrics':
         return <PerformanceMetricsDashboard onSelectDashboard={setActiveTab} />;
       case 'tech-bin-dashboard':

@@ -142,7 +142,8 @@ export const FlowSidebar: React.FC<FlowSidebarProps> = ({
           label: 'Invoice',
           icon: 'FileText',
           subItems: [
-            { id: 'invoice-list', label: 'List' },
+            { id: 'invoice-list', label: 'Invoice List' },
+            { id: 'invoice-services', label: 'Services' },
           ],
         },
         {

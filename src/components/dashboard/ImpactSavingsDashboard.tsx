@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Icon } from '../ui/Icon';
 import { toast } from 'sonner';
 import { CustomSelect } from '../ui/CustomSelect';
+import { CustomDateRangePicker } from '../ui/CustomDateRangePicker';
 import {
   LineChart,
   Line,
@@ -22,6 +23,7 @@ export const ImpactSavingsDashboard: React.FC<ImpactSavingsDashboardProps> = ({ 
   const [timeFilter, setTimeFilter] = useState<'D' | 'W' | 'M' | 'Y'>('Y');
   const [selectedClient, setSelectedClient] = useState('All Clients');
   const [selectedLocation, setSelectedLocation] = useState('All Locations');
+  const [dateRange, setDateRange] = useState('Select date range');
   const [themeHexColor, setThemeHexColor] = useState('#3b82f6');
 
   // Read primary theme color dynamically from CSS variable
@@ -153,11 +155,12 @@ export const ImpactSavingsDashboard: React.FC<ImpactSavingsDashboardProps> = ({ 
             className="w-44"
           />
 
-          {/* Date Picker Button */}
-          <div className="flex items-center gap-2 bg-white dark:bg-[#141b27] border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 px-4 py-2 rounded-xl font-medium cursor-pointer shadow-2xs">
-            <Icon name="Calendar" size={14} />
-            <span>Select date range</span>
-          </div>
+          {/* Date Range Picker Component */}
+          <CustomDateRangePicker
+            value={dateRange}
+            onChange={(val) => setDateRange(val)}
+            align="right"
+          />
         </div>
       </div>
 
