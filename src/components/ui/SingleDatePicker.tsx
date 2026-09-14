@@ -94,6 +94,14 @@ export const SingleDatePicker: React.FC<SingleDatePickerProps> = ({
     setIsOpen(false);
   };
 
+  const handleSelectToday = () => {
+    const today = new Date();
+    setViewYear(today.getFullYear());
+    setViewMonth(today.getMonth());
+    onChange(formatDate(today));
+    setIsOpen(false);
+  };
+
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -121,10 +129,10 @@ export const SingleDatePicker: React.FC<SingleDatePickerProps> = ({
         key={`day-${day}`}
         type="button"
         onClick={() => handleDaySelect(day)}
-        className={`w-8 h-8 rounded-lg text-xs flex items-center justify-center cursor-pointer transition-all ${
+        className={`w-8 h-8 rounded-[6px] text-xs flex items-center justify-center cursor-pointer transition-all font-medium ${
           isSelected
-            ? 'bg-blue-600 text-white font-bold shadow-xs'
-            : 'text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium'
+            ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-500/25'
+            : 'text-[#1a2333] dark:text-slate-200 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/40 dark:hover:text-blue-400'
         }`}
       >
         {day}
@@ -148,38 +156,59 @@ export const SingleDatePicker: React.FC<SingleDatePickerProps> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-xl shadow-2xl p-4 w-[280px] animate-in fade-in zoom-in-95 duration-100">
-          <div className="flex items-center justify-between mb-3">
+        <div className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-[16px] shadow-[0_20px_50px_rgba(0,0,0,0.12)] p-4 w-[280px] animate-in fade-in zoom-in-95 duration-100">
+          {/* Header Month Navigation */}
+          <div className="flex items-center justify-between mb-3 px-0.5">
             <button
               type="button"
               onClick={handlePrevMonth}
-              className="w-7 h-7 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer font-bold text-base"
+              className="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer transition-colors"
             >
-              ‹
+              <Icon name="ChevronLeft" size={16} />
             </button>
-            <span className="text-xs font-bold text-[#241F20] dark:text-white">
+            <span className="text-sm font-bold text-[#1E293B] dark:text-slate-100 tracking-tight">
               {monthNames[viewMonth]} {viewYear}
             </span>
             <button
               type="button"
               onClick={handleNextMonth}
-              className="w-7 h-7 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer font-bold text-base"
+              className="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer transition-colors"
             >
-              ›
+              <Icon name="ChevronRight" size={16} />
             </button>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-semibold text-slate-400 mb-1">
-            <div>Su</div>
-            <div>Mo</div>
-            <div>Tu</div>
-            <div>We</div>
-            <div>Th</div>
-            <div>Fr</div>
-            <div>Sa</div>
+          {/* Weekday Row Header */}
+          <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-2">
+            <div>SU</div>
+            <div>MO</div>
+            <div>TU</div>
+            <div>WE</div>
+            <div>TH</div>
+            <div>FR</div>
+            <div>SA</div>
           </div>
 
+          {/* Days Grid */}
           <div className="grid grid-cols-7 gap-1">{dayCells}</div>
+
+          {/* Quick Action Footer */}
+          <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+            <button
+              type="button"
+              onClick={handleSelectToday}
+              className="font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+            >
+              Select Today
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
     </div>
