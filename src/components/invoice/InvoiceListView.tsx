@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Icon } from '../ui/Icon';
 import { toast } from 'sonner';
 import { CustomSelect } from '../ui/CustomSelect';
+import { CustomMultiSelect } from '../ui/CustomMultiSelect';
 import { CustomDateRangePicker } from '../ui/CustomDateRangePicker';
 import { SingleDatePicker } from '../ui/SingleDatePicker';
 
@@ -182,7 +183,22 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
 
   // Generate View States
   const [genClient, setGenClient] = useState<string>('Derby County Football Club');
-  const [genLocation, setGenLocation] = useState<string>('Pride Park Stadium');
+  
+  // Available Locations for Multiselect
+  const locationOptions = [
+    'Pride Park Stadium',
+    'Derby Arena',
+    'Electric Daisy',
+    'Moorways Sports Village',
+    'Rolls-Royce Leisure',
+    'Derby Theatre',
+    'Silk Mill Museum',
+  ];
+  
+  const [genLocations, setGenLocations] = useState<string[]>([
+    'Pride Park Stadium',
+    'Derby Arena',
+  ]);
 
   // User Info Dropdown & Create Modal State
   const [usersList, setUsersList] = useState<UserInfo[]>(initialUsersList);
@@ -757,19 +773,16 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   />
                 </div>
 
-                {/* Location Select */}
+                {/* Location Multiselect */}
                 <div>
                   <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
                     Location
                   </label>
-                  <CustomSelect
-                    value={genLocation}
-                    onChange={(val) => setGenLocation(val)}
-                    options={[
-                      { value: 'Pride Park Stadium', label: 'Pride Park Stadium' },
-                      { value: 'Derby Arena', label: 'Derby Arena' },
-                      { value: 'All(7)', label: 'All(7)' },
-                    ]}
+                  <CustomMultiSelect
+                    values={genLocations}
+                    onChange={(vals) => setGenLocations(vals)}
+                    options={locationOptions}
+                    placeholder="Select locations..."
                     className="w-full"
                   />
                 </div>
