@@ -509,16 +509,16 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
               </>
             )}
             {viewMode === 'generate' && (
-              <div className="flex items-center gap-2 text-lg font-bold text-[#A6A6A6] dark:text-slate-400">
+              <div className="flex items-center gap-2 text-lg font-bold">
                 <button
                   type="button"
                   onClick={() => setViewMode('list')}
-                  className="hover:text-[#241F20] dark:hover:text-white transition-colors cursor-pointer"
+                  className="text-[#A6A6A6] dark:text-slate-400 hover:text-[#241F20] dark:hover:text-white transition-colors cursor-pointer"
                 >
                   Invoice List
                 </button>
                 <Icon name="ChevronRight" size={16} className="text-[#A6A6A6]" />
-                <span className="text-[#A6A6A6] font-bold">Generate Invoice</span>
+                <span className="text-[#241F20] dark:text-white font-extrabold">Generate Invoice</span>
               </div>
             )}
             {(viewMode === 'list' || viewMode === 'preview') && (
@@ -904,9 +904,28 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
 
                 {/* Services Multiselect Dropdown with Hover Edit/Delete & Fixed Create Button */}
                 <div>
-                  <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
-                    Services
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300">
+                      Services ({selectedServices.length}/{servicesList.length})
+                    </label>
+                    <div className="flex items-center gap-2 text-[11px] font-semibold">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedServices(servicesList.map((s) => s.label))}
+                        className="text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer underline"
+                      >
+                        Select All
+                      </button>
+                      <span className="text-slate-300 dark:text-slate-700">|</span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedServices([])}
+                        className="text-red-600 hover:text-red-700 dark:text-red-400 cursor-pointer underline"
+                      >
+                        Clear All
+                      </button>
+                    </div>
+                  </div>
                   <CustomMultiSelect
                     values={selectedServices}
                     onChange={(vals) => setSelectedServices(vals)}
@@ -1370,7 +1389,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
       {/* SERVICE ADD/EDIT MODAL DIALOG */}
       {/* ========================================================================= */}
       {isServiceModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[100] flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b pb-3 border-slate-100 dark:border-slate-800">
               <h3 className="text-sm font-bold text-[#241F20] dark:text-white flex items-center gap-2">
@@ -1486,7 +1505,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
       {/* CREATE NEW USER MODAL DIALOG */}
       {/* ========================================================================= */}
       {isUserModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[100] flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b pb-3 border-slate-100 dark:border-slate-800">
               <h3 className="text-sm font-bold text-[#241F20] dark:text-white flex items-center gap-2">

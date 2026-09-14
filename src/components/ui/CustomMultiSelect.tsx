@@ -182,18 +182,28 @@ export const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
             </div>
           )}
 
-          {/* Select All Header */}
+          {/* Select All / Clear All Header */}
           <div className="px-3.5 py-2 bg-slate-50/70 dark:bg-slate-900/40 border-b border-[#EDEDED] dark:border-slate-800 flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
               {values.length} of {allValues.length} Selected
             </span>
-            <button
-              type="button"
-              onClick={handleToggleSelectAll}
-              className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
-            >
-              {isAllSelected ? 'Deselect All' : 'Select All'}
-            </button>
+            <div className="flex items-center gap-2 text-[11px] font-semibold">
+              <button
+                type="button"
+                onClick={() => onChange(allValues)}
+                className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+              >
+                Select All
+              </button>
+              <span className="text-slate-300 dark:text-slate-700">|</span>
+              <button
+                type="button"
+                onClick={() => onChange([])}
+                className="text-red-600 dark:text-red-400 hover:underline cursor-pointer"
+              >
+                Clear All
+              </button>
+            </div>
           </div>
 
           {/* Options List with Checkboxes and Hover Actions */}
@@ -237,6 +247,8 @@ export const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                             title="Edit Service"
                             onClick={(e) => {
                               e.stopPropagation();
+                              setIsOpen(false);
+                              setSearchTerm('');
                               onEditOption(option.value);
                             }}
                             className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded cursor-pointer transition-colors"
@@ -250,6 +262,8 @@ export const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                             title="Delete Service"
                             onClick={(e) => {
                               e.stopPropagation();
+                              setIsOpen(false);
+                              setSearchTerm('');
                               onDeleteOption(option.value);
                             }}
                             className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50 rounded cursor-pointer transition-colors"
