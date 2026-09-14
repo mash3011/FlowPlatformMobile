@@ -251,6 +251,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
   const [selectedMonthRange, setSelectedMonthRange] = useState<string>('September 2026');
   const [presetRange, setPresetRange] = useState<'month' | 'custom'>('month');
   const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(false);
+  const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState<boolean>(false);
   const [customStartDate, setCustomStartDate] = useState<string>('2026-09-01');
   const [customEndDate, setCustomEndDate] = useState<string>('2026-09-30');
   
@@ -866,35 +867,60 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                     align="left"
                   />
 
-                  {/* Preset Pills: This Month Dropdown & Custom Range */}
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="flex-1 min-w-0">
-                      <CustomSelect
-                        value={
-                          monthOptions.find((m) => m.value === selectedMonthRange)?.value ||
-                          monthOptions[0].value
-                        }
-                        onChange={(val) => {
-                          setSelectedMonthRange(val);
+                  {/* Preset Pills: This Month & Custom Range (Matching Uploaded Image) */}
+                  <div className="flex items-center gap-2.5 mt-2">
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => {
                           setPresetRange('month');
+                          setSelectedMonthRange('1st Sep - 30th Sep, 2026');
                           setIsDatePickerOpen(false);
+                          setIsMonthDropdownOpen((prev) => !prev);
                         }}
-                        options={monthOptions}
-                        placeholder="This Month..."
-                        searchable={true}
-                        buttonClassName="py-1 px-3 text-xs font-semibold"
-                      />
+                        className={`px-4 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                          presetRange === 'month' && !isDatePickerOpen
+                            ? 'border-emerald-600 border-[1.5px] text-[#241F20] dark:text-white bg-white dark:bg-slate-900 shadow-2xs'
+                            : 'border-[#EDEDED] dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
+                        }`}
+                      >
+                        <span>This Month</span>
+                        <Icon name="ChevronDown" size={12} className="text-slate-400" />
+                      </button>
+
+                      {/* Month Dropdown Popover for Previous Months */}
+                      {isMonthDropdownOpen && (
+                        <div className="absolute left-0 top-full mt-1.5 z-[80] w-64 bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in duration-100">
+                          <CustomSelect
+                            value={
+                              monthOptions.find((m) => m.value === selectedMonthRange)?.value ||
+                              monthOptions[0].value
+                            }
+                            onChange={(val) => {
+                              setSelectedMonthRange(val);
+                              setPresetRange('month');
+                              setIsMonthDropdownOpen(false);
+                            }}
+                            options={monthOptions}
+                            placeholder="Select Month..."
+                            searchable={true}
+                            className="w-full"
+                          />
+                        </div>
+                      )}
                     </div>
+
                     <button
                       type="button"
                       onClick={() => {
                         setPresetRange('custom');
                         setIsDatePickerOpen((prev) => !prev);
+                        setIsMonthDropdownOpen(false);
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border shrink-0 ${
+                      className={`px-4 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer border ${
                         presetRange === 'custom' || isDatePickerOpen
-                          ? 'border-emerald-500 text-emerald-600 bg-emerald-50/40 dark:bg-emerald-950/30 font-bold'
-                          : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
+                          ? 'border-emerald-600 border-[1.5px] text-[#241F20] dark:text-white bg-white dark:bg-slate-900 shadow-2xs'
+                          : 'border-[#EDEDED] dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
                       }`}
                     >
                       Custom Range
