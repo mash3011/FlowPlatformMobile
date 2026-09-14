@@ -848,58 +848,49 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   )}
                 </div>
 
-                {/* Date Range Dropdown with Figma Calendar */}
+                {/* Single Unified Date Range Dropdown */}
                 <div>
                   <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
                     Date Range
                   </label>
-                  <CustomDateRangePicker
+                  <CustomSelect
                     value={selectedMonthRange}
                     onChange={(val) => {
                       setSelectedMonthRange(val);
-                      setPresetRange('custom');
+                      setPresetRange('month');
+                      setIsDatePickerOpen(false);
                     }}
-                    isOpen={isDatePickerOpen}
-                    onOpenChange={(open) => setIsDatePickerOpen(open)}
-                    showPresets={false}
+                    options={monthOptions}
+                    placeholder="Select Date Range..."
+                    searchable={true}
                     className="w-full"
-                    align="left"
+                    footerAction={{
+                      label: 'Custom Date Range (Calendar)',
+                      onClick: () => {
+                        setIsDatePickerOpen((prev) => !prev);
+                      },
+                      icon: 'Calendar',
+                    }}
                   />
 
-                  {/* Month Selection Dropdown & Custom Range Button */}
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="flex-1 min-w-0">
-                      <CustomSelect
-                        value={
-                          monthOptions.find((m) => m.value === selectedMonthRange)?.value ||
-                          monthOptions[0].value
-                        }
+                  {/* Custom Calendar Popover when Custom Date Range is clicked */}
+                  {isDatePickerOpen && (
+                    <div className="mt-2">
+                      <CustomDateRangePicker
+                        value={selectedMonthRange}
                         onChange={(val) => {
                           setSelectedMonthRange(val);
-                          setPresetRange('month');
+                          setPresetRange('custom');
                           setIsDatePickerOpen(false);
                         }}
-                        options={monthOptions}
-                        placeholder="Select Month..."
-                        searchable={true}
-                        buttonClassName="py-1 px-3 text-xs font-semibold"
+                        isOpen={isDatePickerOpen}
+                        onOpenChange={(open) => setIsDatePickerOpen(open)}
+                        showPresets={false}
+                        className="w-full"
+                        align="left"
                       />
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPresetRange('custom');
-                        setIsDatePickerOpen(true);
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border shrink-0 ${
-                        presetRange === 'custom' || isDatePickerOpen
-                          ? 'border-emerald-500 text-emerald-600 bg-emerald-50/40 dark:bg-emerald-950/30 font-bold'
-                          : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
-                      }`}
-                    >
-                      Custom Range
-                    </button>
-                  </div>
+                  )}
                 </div>
 
                 {/* Services Checklist (Matching 2nd Image) */}
