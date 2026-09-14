@@ -25,6 +25,7 @@ export interface CustomSelectProps {
   disabled?: boolean;
   id?: string;
   name?: string;
+  icon?: string;
   footerAction?: FooterAction;
 }
 
@@ -38,6 +39,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   buttonClassName = '',
   menuClassName = '',
   disabled = false,
+  icon,
   footerAction,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -121,7 +123,10 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
             : 'border-[#EDEDED] dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${buttonClassName}`}
       >
-        <span className="truncate">{displayLabel}</span>
+        <div className="flex items-center gap-2.5 truncate">
+          {icon && <Icon name={icon} size={16} className="text-slate-400 shrink-0" />}
+          <span className="truncate">{displayLabel}</span>
+        </div>
         <Icon
           name={isOpen ? 'ChevronUp' : 'ChevronDown'}
           size={16}

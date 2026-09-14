@@ -849,76 +849,74 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   )}
                 </div>
 
-                {/* Date Range Dropdown with Figma Calendar */}
+                {/* Date Range Section */}
                 <div>
                   <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
                     Date Range
                   </label>
-                  <CustomDateRangePicker
-                    value={selectedMonthRange}
-                    onChange={(val) => {
-                      setSelectedMonthRange(val);
-                      setPresetRange('custom');
-                    }}
-                    isOpen={isDatePickerOpen}
-                    onOpenChange={(open) => setIsDatePickerOpen(open)}
-                    showPresets={false}
-                    className="w-full"
-                    align="left"
-                  />
 
-                  {/* Preset Pills: This Month & Custom Range (Matching Uploaded Image) */}
+                  {/* Mode 1: Month Mode (Searchable Month Dropdown with Search Bar & Previous Months) */}
+                  {presetRange === 'month' && (
+                    <CustomSelect
+                      value={
+                        monthOptions.find((m) => m.value === selectedMonthRange)?.value ||
+                        monthOptions[0].value
+                      }
+                      onChange={(val) => {
+                        setSelectedMonthRange(val);
+                        setPresetRange('month');
+                      }}
+                      options={monthOptions}
+                      placeholder="Select Month..."
+                      searchable={true}
+                      icon="Calendar"
+                      className="w-full"
+                    />
+                  )}
+
+                  {/* Mode 2: Custom Range Mode (Figma Dual-Calendar Picker) */}
+                  {presetRange === 'custom' && (
+                    <CustomDateRangePicker
+                      value={selectedMonthRange}
+                      onChange={(val) => {
+                        setSelectedMonthRange(val);
+                        setPresetRange('custom');
+                      }}
+                      isOpen={isDatePickerOpen}
+                      onOpenChange={(open) => setIsDatePickerOpen(open)}
+                      showPresets={false}
+                      className="w-full"
+                      align="left"
+                    />
+                  )}
+
+                  {/* Preset Pills: This Month & Custom Range */}
                   <div className="flex items-center gap-2.5 mt-2">
-                    <div className="relative">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPresetRange('month');
-                          setSelectedMonthRange('1st Sep - 30th Sep, 2026');
-                          setIsDatePickerOpen(false);
-                          setIsMonthDropdownOpen((prev) => !prev);
-                        }}
-                        className={`px-4 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${
-                          presetRange === 'month' && !isDatePickerOpen
-                            ? 'border-emerald-600 border-[1.5px] text-[#241F20] dark:text-white bg-white dark:bg-slate-900 shadow-2xs'
-                            : 'border-[#EDEDED] dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
-                        }`}
-                      >
-                        <span>This Month</span>
-                        <Icon name="ChevronDown" size={12} className="text-slate-400" />
-                      </button>
-
-                      {/* Month Dropdown Popover for Previous Months */}
-                      {isMonthDropdownOpen && (
-                        <div className="absolute left-0 top-full mt-1.5 z-[80] w-64 bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in duration-100">
-                          <CustomSelect
-                            value={
-                              monthOptions.find((m) => m.value === selectedMonthRange)?.value ||
-                              monthOptions[0].value
-                            }
-                            onChange={(val) => {
-                              setSelectedMonthRange(val);
-                              setPresetRange('month');
-                              setIsMonthDropdownOpen(false);
-                            }}
-                            options={monthOptions}
-                            placeholder="Select Month..."
-                            searchable={true}
-                            className="w-full"
-                          />
-                        </div>
-                      )}
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPresetRange('month');
+                        setSelectedMonthRange('1st Sep - 30th Sep, 2026');
+                        setIsDatePickerOpen(false);
+                      }}
+                      className={`px-4 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${
+                        presetRange === 'month'
+                          ? 'border-emerald-600 border-[1.5px] text-[#241F20] dark:text-white bg-white dark:bg-slate-900 shadow-2xs'
+                          : 'border-[#EDEDED] dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
+                      }`}
+                    >
+                      <span>This Month</span>
+                      <Icon name="ChevronDown" size={12} className="text-slate-400" />
+                    </button>
 
                     <button
                       type="button"
                       onClick={() => {
                         setPresetRange('custom');
-                        setIsDatePickerOpen((prev) => !prev);
-                        setIsMonthDropdownOpen(false);
+                        setIsDatePickerOpen(true);
                       }}
                       className={`px-4 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer border ${
-                        presetRange === 'custom' || isDatePickerOpen
+                        presetRange === 'custom'
                           ? 'border-emerald-600 border-[1.5px] text-[#241F20] dark:text-white bg-white dark:bg-slate-900 shadow-2xs'
                           : 'border-[#EDEDED] dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
                       }`}
