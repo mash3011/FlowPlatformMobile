@@ -276,15 +276,18 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
 
   // Month Date Range Options in Descending Order (Current Month First)
   const monthOptions = [
-    { value: 'September 2026', label: 'September 2026 (Current)' },
-    { value: 'August 2026', label: 'August 2026' },
-    { value: 'July 2026', label: 'July 2026' },
-    { value: 'June 2026', label: 'June 2026' },
-    { value: 'May 2026', label: 'May 2026' },
-    { value: 'April 2026', label: 'April 2026' },
-    { value: 'March 2026', label: 'March 2026' },
-    { value: 'February 2026', label: 'February 2026' },
-    { value: 'January 2026', label: 'January 2026' },
+    { value: '1st Sep - 30th Sep, 2026', label: 'September 2026 (Current)' },
+    { value: '1st Aug - 31st Aug, 2026', label: 'August 2026' },
+    { value: '1st Jul - 31st Jul, 2026', label: 'July 2026' },
+    { value: '1st Jun - 30th Jun, 2026', label: 'June 2026' },
+    { value: '1st May - 31st May, 2026', label: 'May 2026' },
+    { value: '1st Apr - 30th Apr, 2026', label: 'April 2026' },
+    { value: '1st Mar - 31st Mar, 2026', label: 'March 2026' },
+    { value: '1st Feb - 28th Feb, 2026', label: 'February 2026' },
+    { value: '1st Jan - 31st Jan, 2026', label: 'January 2026' },
+    { value: '1st Dec - 31st Dec, 2025', label: 'December 2025' },
+    { value: '1st Nov - 30th Nov, 2025', label: 'November 2025' },
+    { value: '1st Oct - 31st Oct, 2025', label: 'October 2025' },
   ];
 
   // Item Table Handlers
@@ -863,33 +866,35 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                     align="left"
                   />
 
-                  {/* Preset Pills (Matching 2nd Image) */}
+                  {/* Month Selection Dropdown & Custom Range Button */}
                   <div className="flex items-center gap-2 mt-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPresetRange('month');
-                        setSelectedMonthRange('1st Sep - 30th Sep, 2026');
-                        setIsDatePickerOpen(false);
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer border ${
-                        presetRange === 'month'
-                          ? 'border-emerald-500 text-emerald-600 bg-emerald-50/40 dark:bg-emerald-950/30'
-                          : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900'
-                      }`}
-                    >
-                      This Month
-                    </button>
+                    <div className="flex-1 min-w-0">
+                      <CustomSelect
+                        value={
+                          monthOptions.find((m) => m.value === selectedMonthRange)?.value ||
+                          monthOptions[0].value
+                        }
+                        onChange={(val) => {
+                          setSelectedMonthRange(val);
+                          setPresetRange('month');
+                          setIsDatePickerOpen(false);
+                        }}
+                        options={monthOptions}
+                        placeholder="Select Month..."
+                        searchable={true}
+                        buttonClassName="py-1 px-3 text-xs font-semibold"
+                      />
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
                         setPresetRange('custom');
                         setIsDatePickerOpen(true);
                       }}
-                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer border ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border shrink-0 ${
                         presetRange === 'custom' || isDatePickerOpen
                           ? 'border-emerald-500 text-emerald-600 bg-emerald-50/40 dark:bg-emerald-950/30 font-bold'
-                          : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900'
+                          : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
                       }`}
                     >
                       Custom Range
@@ -939,16 +944,6 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                         </label>
                       );
                     })}
-                  </div>
-                </div>
-
-                {/* Activity Overview (Matching 2nd Image) */}
-                <div>
-                  <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
-                    Activity Overview
-                  </label>
-                  <div className="w-full px-3.5 py-2.5 rounded-[8px] border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white text-xs font-semibold shadow-2xs">
-                    {selectedMonthRange || '1st - 30th Sep, 2026'}
                   </div>
                 </div>
               </div>
