@@ -1409,8 +1409,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[100] flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b pb-3 border-slate-100 dark:border-slate-800">
-              <h3 className="text-sm font-bold text-[#241F20] dark:text-white flex items-center gap-2">
-                <Icon name="Wrench" size={16} className="text-blue-500" />
+              <h3 className="text-sm font-bold text-[#241F20] dark:text-white">
                 <span>{editingService ? 'Edit Service' : 'Add New Service'}</span>
               </h3>
               <button
@@ -1525,8 +1524,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[100] flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b pb-3 border-slate-100 dark:border-slate-800">
-              <h3 className="text-sm font-bold text-[#241F20] dark:text-white flex items-center gap-2">
-                <Icon name="User" size={16} className="text-blue-500" />
+              <h3 className="text-sm font-bold text-[#241F20] dark:text-white">
                 <span>Create New User</span>
               </h3>
               <button
