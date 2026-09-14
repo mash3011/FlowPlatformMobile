@@ -2,6 +2,7 @@ import React from 'react';
 import { OnboardingState, CategoryType } from '../../types';
 import { ALL_FEATURES } from '../../data/mockData';
 import { Icon } from '../ui/Icon';
+import { CustomSelect } from '../ui/CustomSelect';
 import { toast } from 'sonner';
 
 interface SettingsModalProps {
@@ -70,16 +71,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <label className="block text-xs font-semibold text-muted-foreground mb-1">
                 Team Size Tier
               </label>
-              <select
+              <CustomSelect
                 value={state.teamSize}
-                onChange={(e) => onUpdateState({ teamSize: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl bg-input-background border border-border text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="1-5 members">1-5 members</option>
-                <option value="6-20 members">6-20 members</option>
-                <option value="21-100 members">21-100 members</option>
-                <option value="100+ Enterprise">100+ Enterprise</option>
-              </select>
+                onChange={(val) => onUpdateState({ teamSize: val })}
+                options={['1-5 members', '6-20 members', '21-100 members', '100+ Enterprise']}
+                className="w-full"
+              />
             </div>
           </div>
         </div>

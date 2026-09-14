@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Icon } from '../ui/Icon';
+import { toast } from 'sonner';
+import { CustomSelect } from '../ui/CustomSelect';
 
 interface TechBinDashboardProps {
   onSelectDashboard: (dashId: string) => void;
@@ -99,32 +101,20 @@ export const TechBinDashboard: React.FC<TechBinDashboardProps> = ({ onSelectDash
         {/* Dropdowns & Date Range */}
         <div className="flex flex-wrap items-center gap-3 text-xs">
           {/* Client Select */}
-          <div className="relative">
-            <select
-              value={selectedClient}
-              onChange={(e) => setSelectedClient(e.target.value)}
-              className="appearance-none bg-white dark:bg-[#141b27] border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 px-4 py-2 pr-8 rounded-xl font-medium focus:outline-none cursor-pointer shadow-2xs"
-            >
-              <option value="All Clients">All Clients</option>
-              <option value="Client A">Client A</option>
-              <option value="Client B">Client B</option>
-            </select>
-            <Icon name="ChevronDown" size={14} className="absolute right-2.5 top-3 text-slate-400 pointer-events-none" />
-          </div>
+          <CustomSelect
+            value={selectedClient}
+            onChange={(val) => setSelectedClient(val)}
+            options={['All Clients', 'Derby County Football Club', 'EcoX test partner', 'Mastercard', 'Mistolin Factory', 'Notts County', 'Organisation Default Client Test']}
+            className="w-48"
+          />
 
           {/* Location Select */}
-          <div className="relative">
-            <select
-              value={selectedLocation}
-              onChange={(e) => setSelectedLocation(e.target.value)}
-              className="appearance-none bg-white dark:bg-[#141b27] border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 px-4 py-2 pr-8 rounded-xl font-medium focus:outline-none cursor-pointer shadow-2xs"
-            >
-              <option value="All Locations">All Locations</option>
-              <option value="Location 1">Location 1</option>
-              <option value="Location 2">Location 2</option>
-            </select>
-            <Icon name="ChevronDown" size={14} className="absolute right-2.5 top-3 text-slate-400 pointer-events-none" />
-          </div>
+          <CustomSelect
+            value={selectedLocation}
+            onChange={(val) => setSelectedLocation(val)}
+            options={['All Locations', 'Pride Park Stadium', 'Derby Arena', 'Location 1', 'Location 2']}
+            className="w-44"
+          />
 
           {/* Date Picker Button */}
           <div className="flex items-center gap-2 bg-white dark:bg-[#141b27] border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 px-4 py-2 rounded-xl font-medium cursor-pointer shadow-2xs">

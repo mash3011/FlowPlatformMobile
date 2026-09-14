@@ -1,5 +1,6 @@
 import React from 'react';
 import { Icon } from '../ui/Icon';
+import { CustomSelect } from '../ui/CustomSelect';
 
 interface PreferencesDrawerProps {
   isOpen: boolean;
@@ -172,20 +173,16 @@ export const PreferencesDrawer: React.FC<PreferencesDrawerProps> = ({
               <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400">
                 Font Family
               </label>
-              <div className="relative">
-                <select
-                  value={fontFamily}
-                  onChange={(e) => onSelectFontFamily(e.target.value)}
-                  className="w-full appearance-none bg-white dark:bg-[#141b27] border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 px-3.5 py-2.5 rounded-xl text-xs font-semibold focus:outline-none cursor-pointer"
-                >
-                  <option value="Source Sans Pro">Source Sans</option>
-                </select>
-                <Icon
-                  name="ChevronDown"
-                  size={14}
-                  className="absolute right-3.5 top-3.5 text-slate-400 pointer-events-none"
-                />
-              </div>
+              <CustomSelect
+                value={fontFamily}
+                onChange={(val) => onSelectFontFamily(val)}
+                options={[
+                  { value: 'Source Sans Pro', label: 'Source Sans' },
+                  { value: 'Inter', label: 'Inter' },
+                  { value: 'Roboto', label: 'Roboto' },
+                ]}
+                className="w-full"
+              />
             </div>
 
             {/* Font Size Slider */}

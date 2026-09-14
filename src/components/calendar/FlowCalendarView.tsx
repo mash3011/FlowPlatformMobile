@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Icon } from '../ui/Icon';
 import { toast } from 'sonner';
+import { CustomSelect } from '../ui/CustomSelect';
 
 export interface CalendarEvent {
   id: string;
@@ -470,23 +471,19 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
               </h2>
 
               {/* Categories Dropdown right beside September 2026 */}
-              <div className="relative">
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="appearance-none pl-3 pr-8 py-1.5 rounded-xl border border-theme-primary/30 bg-theme-light text-theme-primary text-xs font-bold focus:outline-none focus:border-theme-primary cursor-pointer shadow-2xs transition-all"
-                >
-                  <option value="all">All Categories ({events.length})</option>
-                  <option value="festival">Festivals & Cultural ({events.filter(e => e.category === 'festival').length})</option>
-                  <option value="gala">Galas & Ceremonies ({events.filter(e => e.category === 'gala').length})</option>
-                  <option value="party">Parties & Gatherings ({events.filter(e => e.category === 'party').length})</option>
-                  <option value="holiday">Holidays & Observances ({events.filter(e => e.category === 'holiday').length})</option>
-                  <option value="reminder">Event Reminders ({events.filter(e => e.category === 'reminder').length})</option>
-                </select>
-                <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-theme-primary">
-                  <Icon name="ChevronDown" size={14} />
-                </div>
-              </div>
+              <CustomSelect
+                value={selectedCategory}
+                onChange={(val) => setSelectedCategory(val)}
+                options={[
+                  { value: 'all', label: `All Categories (${events.length})` },
+                  { value: 'festival', label: `Festivals & Cultural (${events.filter(e => e.category === 'festival').length})` },
+                  { value: 'gala', label: `Galas & Ceremonies (${events.filter(e => e.category === 'gala').length})` },
+                  { value: 'party', label: `Parties & Gatherings (${events.filter(e => e.category === 'party').length})` },
+                  { value: 'holiday', label: `Holidays & Observances (${events.filter(e => e.category === 'holiday').length})` },
+                  { value: 'reminder', label: `Event Reminders (${events.filter(e => e.category === 'reminder').length})` },
+                ]}
+                className="w-56"
+              />
             </div>
 
             {/* Right View Mode Switcher */}
@@ -932,20 +929,17 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
                   <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                     CLIENT*
                   </label>
-                  <div className="relative">
-                    <select
-                      value={newEventClient}
-                      onChange={(e) => setNewEventClient(e.target.value)}
-                      className="w-full appearance-none pl-3.5 pr-8 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 cursor-pointer"
-                      required
-                    >
-                      <option value="" disabled>Select client</option>
-                      <option value="Derby County Football Club">Derby County Football Club</option>
-                      <option value="Derby LIVE">Derby LIVE</option>
-                      <option value="Electric Daisy">Electric Daisy</option>
-                    </select>
-                    <Icon name="ChevronDown" size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                  </div>
+                  <CustomSelect
+                    value={newEventClient}
+                    onChange={(val) => setNewEventClient(val)}
+                    placeholder="Select client"
+                    options={[
+                      'Derby County Football Club',
+                      'Derby LIVE',
+                      'Electric Daisy',
+                    ]}
+                    className="w-full"
+                  />
                 </div>
 
                 {/* SITE(S)* */}
@@ -954,19 +948,18 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
                     SITE(S)*
                   </label>
                   <div className="flex items-center gap-2">
-                    <div className="relative flex-1">
-                      <select
+                    <div className="flex-1">
+                      <CustomSelect
                         value={newEventSite}
-                        onChange={(e) => setNewEventSite(e.target.value)}
-                        className="w-full appearance-none pl-3.5 pr-8 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 cursor-pointer"
-                        required
-                      >
-                        <option value="" disabled>Select sites</option>
-                        <option value="Pride Park Stadium">Pride Park Stadium</option>
-                        <option value="Derby Arena">Derby Arena</option>
-                        <option value="Central Plaza">Central Plaza</option>
-                      </select>
-                      <Icon name="ChevronDown" size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                        onChange={(val) => setNewEventSite(val)}
+                        placeholder="Select sites"
+                        options={[
+                          'Pride Park Stadium',
+                          'Derby Arena',
+                          'Central Plaza',
+                        ]}
+                        className="w-full"
+                      />
                     </div>
 
                     <button
