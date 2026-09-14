@@ -7,6 +7,12 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
+export interface FooterAction {
+  label: string;
+  onClick: () => void;
+  icon?: string;
+}
+
 export interface CustomSelectProps {
   value: string;
   onChange: (value: string) => void;
@@ -19,6 +25,7 @@ export interface CustomSelectProps {
   disabled?: boolean;
   id?: string;
   name?: string;
+  footerAction?: FooterAction;
 }
 
 export const CustomSelect: React.FC<CustomSelectProps> = ({
@@ -31,6 +38,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   buttonClassName = '',
   menuClassName = '',
   disabled = false,
+  footerAction,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -175,6 +183,24 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
               </div>
             )}
           </div>
+
+          {/* Fixed Bottom Footer Button */}
+          {footerAction && (
+            <div className="p-2.5 border-t border-[#EDEDED] dark:border-slate-800 bg-[#F9FAFB] dark:bg-slate-900/90 sticky bottom-0 z-10">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  setSearchTerm('');
+                  footerAction.onClick();
+                }}
+                className="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+              >
+                {footerAction.icon && <Icon name={footerAction.icon} size={14} />}
+                <span>{footerAction.label}</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

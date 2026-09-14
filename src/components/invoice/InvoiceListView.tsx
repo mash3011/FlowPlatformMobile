@@ -814,23 +814,16 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   </label>
                   <CustomSelect
                     value={selectedUserId}
-                    onChange={(val) => {
-                      if (val === '__CREATE_NEW_USER__') {
-                        handleOpenAddUser();
-                      } else {
-                        setSelectedUserId(val);
-                      }
+                    onChange={(val) => setSelectedUserId(val)}
+                    options={usersList.map((u) => ({
+                      value: u.id,
+                      label: `${u.firstName} ${u.lastName} (${u.email})`,
+                    }))}
+                    footerAction={{
+                      label: 'Create New User',
+                      onClick: handleOpenAddUser,
+                      icon: 'Plus',
                     }}
-                    options={[
-                      ...usersList.map((u) => ({
-                        value: u.id,
-                        label: `${u.firstName} ${u.lastName} (${u.email})`,
-                      })),
-                      {
-                        value: '__CREATE_NEW_USER__',
-                        label: '+ Create New User',
-                      },
-                    ]}
                     className="w-full"
                   />
 
