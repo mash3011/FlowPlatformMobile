@@ -11,9 +11,11 @@ interface InvoiceRowData {
   id: string;
   invoiceNumber: string;
   client: string;
-  dateRange: string;
+  billCycle: string;
+  dateRange?: string;
   activities: string[];
-  itemCount: number;
+  amount: number;
+  itemCount?: number;
   status: 'Invoiced' | 'Paid';
 }
 
@@ -76,36 +78,36 @@ const figmaMockInvoices: InvoiceRowData[] = [
     id: '1',
     invoiceNumber: 'INV-001',
     client: 'Derby County Football Club',
-    dateRange: '1st - 30th Sep, 2026',
+    billCycle: '1st - 30th Sep, 2026',
     activities: ['Washed Cup', 'Damaged'],
-    itemCount: 1204,
+    amount: 1444.80,
     status: 'Invoiced',
   },
   {
     id: '2',
     invoiceNumber: 'INV-002',
     client: 'Derby LIVE',
-    dateRange: '1st - 31st Aug, 2026',
+    billCycle: '1st - 31st Aug, 2026',
     activities: ['Washed Cup', 'Damaged'],
-    itemCount: 953,
+    amount: 1143.60,
     status: 'Invoiced',
   },
   {
     id: '3',
     invoiceNumber: 'INV-003',
     client: 'Electric Daisy',
-    dateRange: '1st - 31st Jul, 2026',
+    billCycle: '1st - 31st Jul, 2026',
     activities: ['Washed Cup', 'Tote Lost'],
-    itemCount: 1240,
+    amount: 1488.00,
     status: 'Paid',
   },
   {
     id: '4',
     invoiceNumber: 'INV-004',
     client: 'Derby County Football Club',
-    dateRange: '1st - 30th Jun, 2026',
+    billCycle: '1st - 30th Jun, 2026',
     activities: ['Lost Cup', 'Wheely Bins'],
-    itemCount: 12421,
+    amount: 14905.20,
     status: 'Invoiced',
   },
 ];
@@ -473,8 +475,10 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
       id: Date.now().toString(),
       invoiceNumber: invNum,
       client: genClient,
+      billCycle: selectedMonthRange,
       dateRange: selectedMonthRange,
       activities: summaryItems.map((s) => s.service),
+      amount: grandTotal,
       itemCount: summaryItems.reduce((acc, r) => acc + r.quantity, 0),
       status: 'Invoiced',
     };
@@ -684,9 +688,9 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                 <tr className="bg-[#FBFBFB] dark:bg-slate-900/80 border-b border-[#EDEDED] dark:border-slate-800 text-[#241F20] dark:text-slate-300 font-semibold h-[42px]">
                   <th className="py-2.5 px-4">Invoice Number</th>
                   <th className="py-2.5 px-4">Client</th>
-                  <th className="py-2.5 px-4">Date Range</th>
-                  <th className="py-2.5 px-4">Activities</th>
-                  <th className="py-2.5 px-4 text-center">Item Count</th>
+                  <th className="py-2.5 px-4">Bill Cycle</th>
+                  <th className="py-2.5 px-4">Services</th>
+                  <th className="py-2.5 px-4 text-center">Amount (£)</th>
                   <th className="py-2.5 px-4 text-center">Status</th>
                   <th className="py-2.5 px-4 text-right">Actions</th>
                 </tr>
@@ -701,7 +705,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                       {inv.client}
                     </td>
                     <td className="py-3 px-4 text-[#A6A6A6] font-medium">
-                      {inv.dateRange}
+                      {inv.billCycle || inv.dateRange}
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex flex-wrap gap-1">
@@ -715,8 +719,8 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                         ))}
                       </div>
                     </td>
-                    <td className="py-3 px-4 text-center text-[#241F20] dark:text-slate-200 font-semibold">
-                      {inv.itemCount.toLocaleString()}
+                    <td className="py-3 px-4 text-center text-[#241F20] dark:text-slate-200 font-bold">
+                      £{inv.amount ? inv.amount.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
                     </td>
                     <td className="py-3 px-4 text-center">
                       <span className={`px-2.5 py-1 rounded-[6px] border text-[11px] font-semibold ${getStatusStyle(inv.status)}`}>
@@ -841,10 +845,10 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   />
                 </div>
 
-                {/* Date Range Section (Version 1) */}
+                {/* Bill Cycle Section (Version 1) */}
                 <div>
                   <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
-                    Date Range (Version 1)
+                    Bill Cycle (Version 1)
                   </label>
 
                   {presetRange === 'month' ? (
@@ -888,10 +892,10 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   )}
                 </div>
 
-                {/* Date Range Section (Version 2) */}
+                {/* Bill Cycle Section (Version 2) */}
                 <div>
                   <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
-                    Date Range (Version 2)
+                    Bill Cycle (Version 2)
                   </label>
                   <CustomDateRangePicker
                     value={v2MonthRange}
