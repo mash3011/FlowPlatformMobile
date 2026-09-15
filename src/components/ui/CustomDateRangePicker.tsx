@@ -109,12 +109,13 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Auto detect if popover should open upwards when space below is tight
+  // Auto detect if popover should open upwards when space below is tight AND ample space exists above
   useEffect(() => {
     if (isPopoverOpen && containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
-      if (spaceBelow < 380 && rect.top > 320) {
+      // Only dropUp if space below is less than 400 AND space above is at least 480px so top doesn't get cut off
+      if (spaceBelow < 400 && rect.top >= 480) {
         setDropUp(true);
       } else {
         setDropUp(false);
@@ -455,7 +456,7 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
             dropUp ? 'bottom-full mb-2' : 'top-full mt-2'
           } z-[90] bg-white dark:bg-[#0d131f] border border-[#e5e7eb] dark:border-slate-800 rounded-[12px] shadow-2xl drop-shadow-[0px_18px_24px_rgba(0,0,0,0.22)] p-5 flex flex-col md:flex-row gap-5 ${
             showPresets ? 'min-w-[700px]' : 'min-w-[530px]'
-          } animate-in fade-in-50 zoom-in-95 duration-150`}
+          } max-h-[calc(100vh-100px)] overflow-y-auto animate-in fade-in-50 zoom-in-95 duration-150`}
         >
           {/* LEFT SIDEBAR: PRESET PERIODS (CONDITIONALLY RENDERED) */}
           {showPresets && (
