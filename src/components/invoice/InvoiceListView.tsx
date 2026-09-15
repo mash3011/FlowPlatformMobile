@@ -503,9 +503,9 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
 
       {/* HEADER & SECTION TITLE */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 gap-3">
-        {/* Section Header Title & Updated Badge */}
+        {/* Section Header Title & Updated Sync Badge */}
         <div className="flex items-center gap-3 flex-wrap">
-          <h1 className="text-lg font-bold text-[#241F20] dark:text-white flex items-center gap-2">
+          <h1 className="text-lg font-bold text-[#241F20] dark:text-white flex items-center gap-3">
             {viewMode === 'services' && (
               <span>Services</span>
             )}
@@ -535,20 +535,20 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                 )}
               </>
             )}
-          </h1>
 
-          {/* Updated X min ago Pill Badge (Matching Uploaded Image) */}
-          <div className="px-3 py-1 rounded-[10px] border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2 shadow-2xs">
-            <span>{lastUpdatedText}</span>
-            <button
-              type="button"
-              onClick={handleRefreshData}
-              title="Refresh Data"
-              className="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-transform active:rotate-180 cursor-pointer"
-            >
-              <Icon name="RotateCw" size={14} />
-            </button>
-          </div>
+            {/* Updated / Sync Pill Badge (Rendered directly inline beside heading title) */}
+            <div className="px-3 py-1 rounded-[10px] border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-2 shadow-2xs">
+              <span>{lastUpdatedText}</span>
+              <button
+                type="button"
+                onClick={handleRefreshData}
+                title="Refresh Data"
+                className="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-transform active:rotate-180 cursor-pointer"
+              >
+                <Icon name="RotateCw" size={14} />
+              </button>
+            </div>
+          </h1>
         </div>        {/* Top Header Action Buttons */}
         <div className="flex items-center gap-2">
           {viewMode === 'services' && (
@@ -824,52 +824,13 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   />
                 </div>
 
-                {/* User Info Select */}
-                <div>
-                  <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
-                    User Info
-                  </label>
-                  <CustomSelect
-                    value={selectedUserId}
-                    onChange={(val) => setSelectedUserId(val)}
-                    options={usersList.map((u) => ({
-                      value: u.id,
-                      label: `${u.firstName} ${u.lastName} (${u.email})`,
-                    }))}
-                    footerAction={{
-                      label: 'Create New User',
-                      onClick: handleOpenAddUser,
-                      icon: 'Plus',
-                    }}
-                    className="w-full"
-                  />
-
-                  {/* Selected User Details Pill/Card */}
-                  {selectedUser && (
-                    <div className="mt-2 p-2.5 bg-slate-50 dark:bg-slate-900/60 border border-[#EDEDED] dark:border-slate-800/80 rounded-lg text-[11px] space-y-1">
-                      <div className="flex items-center justify-between font-semibold text-[#241F20] dark:text-slate-200">
-                        <span className="flex items-center gap-1.5">
-                          <Icon name="User" size={12} className="text-blue-500" />
-                          {selectedUser.firstName} {selectedUser.lastName}
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-normal">Contact Person</span>
-                      </div>
-                      <div className="text-slate-500 dark:text-slate-400 flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5 text-[10px]">
-                        <span>Email: <strong className="text-slate-700 dark:text-slate-300">{selectedUser.email}</strong></span>
-                        <span>Phone: <strong className="text-slate-700 dark:text-slate-300">{selectedUser.phone}</strong></span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
                 {/* Date Range Section */}
                 <div>
                   <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
                     Date Range
                   </label>
 
-                  {/* Mode 1: Month Mode (Searchable Month Dropdown with Search Bar & Previous Months) */}
-                  {presetRange === 'month' && (
+                  {presetRange === 'month' ? (
                     <CustomSelect
                       value={
                         monthOptions.find((m) => m.value === selectedMonthRange)?.value ||
@@ -883,85 +844,38 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                       placeholder="Select Month..."
                       searchable={true}
                       icon="Calendar"
+                      footerAction={{
+                        label: 'Custom Date Range...',
+                        onClick: () => {
+                          setPresetRange('custom');
+                          setIsDatePickerOpen(true);
+                        },
+                        icon: 'Calendar',
+                      }}
                       className="w-full"
                     />
+                  ) : (
+                    <div className="space-y-2">
+                      <CustomDateRangePicker
+                        value={selectedMonthRange}
+                        onChange={(val) => {
+                          setSelectedMonthRange(val);
+                        }}
+                        isOpen={isDatePickerOpen}
+                        onOpenChange={(open) => setIsDatePickerOpen(open)}
+                        showPresets={false}
+                        className="w-full"
+                        align="left"
+                      />
+                    </div>
                   )}
-
-                  {/* Mode 2: Custom Range Mode (Figma Dual-Calendar Picker) */}
-                  {presetRange === 'custom' && (
-                    <CustomDateRangePicker
-                      value={selectedMonthRange}
-                      onChange={(val) => {
-                        setSelectedMonthRange(val);
-                        setPresetRange('custom');
-                      }}
-                      isOpen={isDatePickerOpen}
-                      onOpenChange={(open) => setIsDatePickerOpen(open)}
-                      showPresets={false}
-                      className="w-full"
-                      align="left"
-                    />
-                  )}
-
-                  {/* Preset Pills: This Month & Custom Range */}
-                  <div className="flex items-center gap-2.5 mt-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPresetRange('month');
-                        setSelectedMonthRange('1st Sep - 30th Sep, 2026');
-                        setIsDatePickerOpen(false);
-                      }}
-                      className={`px-4 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer border ${
-                        presetRange === 'month'
-                          ? 'border-blue-600 border-[1.5px] text-blue-600 bg-blue-50/50 dark:bg-blue-950/30 dark:border-blue-500 dark:text-blue-400 font-extrabold shadow-2xs'
-                          : 'border-[#EDEDED] dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
-                      }`}
-                    >
-                      This Month
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPresetRange('custom');
-                        setIsDatePickerOpen(true);
-                      }}
-                      className={`px-4 py-1.5 rounded-[12px] text-xs font-bold transition-all cursor-pointer border ${
-                        presetRange === 'custom'
-                          ? 'border-blue-600 border-[1.5px] text-blue-600 bg-blue-50/50 dark:bg-blue-950/30 dark:border-blue-500 dark:text-blue-400 font-extrabold shadow-2xs'
-                          : 'border-[#EDEDED] dark:border-slate-800 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:border-slate-300'
-                      }`}
-                    >
-                      Custom Range
-                    </button>
-                  </div>
                 </div>
 
-                {/* Services Multiselect Dropdown with Hover Edit/Delete & Fixed Create Button */}
+                {/* Services Multiselect Dropdown */}
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300">
-                      Services
-                    </label>
-                    <div className="flex items-center gap-2 text-[11px] font-semibold">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedServices(servicesList.map((s) => s.label))}
-                        className="text-blue-600 hover:text-blue-700 dark:text-blue-400 cursor-pointer underline"
-                      >
-                        Select All
-                      </button>
-                      <span className="text-slate-300 dark:text-slate-700">|</span>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedServices([])}
-                        className="text-red-600 hover:text-red-700 dark:text-red-400 cursor-pointer underline"
-                      >
-                        Clear All
-                      </button>
-                    </div>
-                  </div>
+                  <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
+                    Services
+                  </label>
                   <CustomMultiSelect
                     values={selectedServices}
                     onChange={(vals) => setSelectedServices(vals)}
@@ -1002,7 +916,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                       Invoice Line Items
                     </h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Configure services, quantities, unit costs, and row-level VAT percentages
+                      Configure services, quantities, unit costs, subtotal (excl. VAT), VAT %, and total inc. VAT
                     </p>
                   </div>
 
@@ -1018,17 +932,18 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   </div>
                 </div>
 
-                <div className="border border-[#EDEDED] dark:border-slate-800 rounded-[6px] relative z-20">
+                <div className="border border-[#EDEDED] dark:border-slate-800 rounded-[6px] relative z-20 overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
                       <tr className="bg-[#FBFBFB] dark:bg-slate-900/80 border-b border-[#EDEDED] dark:border-slate-800 text-[#241F20] dark:text-slate-300 font-semibold h-[38px]">
-                        <th className="py-2 px-3">Item</th>
-                        <th className="py-2 px-3">Service</th>
-                        <th className="py-2 px-3 text-center">Qty</th>
-                        <th className="py-2 px-3 text-center">Unit Cost (£)</th>
-                        <th className="py-2 px-3 text-center">VAT (%)</th>
-                        <th className="py-2 px-3 text-right">Total (£)</th>
-                        <th className="py-2 px-2 text-center">Action</th>
+                        <th className="py-2 px-3 min-w-[120px]">Item</th>
+                        <th className="py-2 px-3 min-w-[140px]">Service</th>
+                        <th className="py-2 px-2 text-center min-w-[60px]">Qty</th>
+                        <th className="py-2 px-2 text-center min-w-[85px]">Unit Cost (£)</th>
+                        <th className="py-2 px-3 text-right min-w-[95px]">Total (Excl. VAT)</th>
+                        <th className="py-2 px-2 text-center min-w-[70px]">VAT (%)</th>
+                        <th className="py-2 px-3 text-right min-w-[105px]">Total Inc VAT (£)</th>
+                        <th className="py-2 px-2 text-center min-w-[50px]">Action</th>
                       </tr>
                     </thead>
 
@@ -1036,7 +951,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                       {summaryItems.map((row) => {
                         const rowSubtotal = row.quantity * row.unitCost;
                         const rowVat = (rowSubtotal * (row.vatPercent || 0)) / 100;
-                        const rowTotal = rowSubtotal + rowVat;
+                        const rowTotalIncVat = rowSubtotal + rowVat;
 
                         return (
                           <tr key={row.id} className="h-[44px]">
@@ -1067,26 +982,29 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                                 </div>
                               )}
                             </td>
-                            <td className="py-2 px-3 text-center">
+                            <td className="py-2 px-2 text-center">
                               <input
                                 type="number"
                                 min="1"
                                 value={row.quantity}
                                 onChange={(e) => handleQuantityChange(row.id, parseInt(e.target.value) || 0)}
-                                className="w-16 px-1.5 py-1 border border-[#EDEDED] dark:border-slate-800 rounded text-center text-xs font-semibold focus:outline-none focus:border-blue-500 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white"
+                                className="w-14 px-1 py-1 border border-[#EDEDED] dark:border-slate-800 rounded text-center text-xs font-semibold focus:outline-none focus:border-blue-500 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white"
                               />
                             </td>
-                            <td className="py-2 px-3 text-center">
+                            <td className="py-2 px-2 text-center">
                               <input
                                 type="number"
                                 step="0.01"
                                 min="0"
                                 value={row.unitCost}
                                 onChange={(e) => handleUnitCostChange(row.id, parseFloat(e.target.value) || 0)}
-                                className="w-16 px-1.5 py-1 border border-[#EDEDED] dark:border-slate-800 rounded text-center text-xs font-semibold focus:outline-none focus:border-blue-500 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white"
+                                className="w-16 px-1 py-1 border border-[#EDEDED] dark:border-slate-800 rounded text-center text-xs font-semibold focus:outline-none focus:border-blue-500 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white"
                               />
                             </td>
-                            <td className="py-2 px-3 text-center">
+                            <td className="py-2 px-3 text-right font-semibold text-[#241F20] dark:text-slate-200">
+                              £{rowSubtotal.toFixed(2)}
+                            </td>
+                            <td className="py-2 px-2 text-center">
                               <input
                                 type="number"
                                 step="1"
@@ -1094,11 +1012,11 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                                 max="100"
                                 value={row.vatPercent}
                                 onChange={(e) => handleVatChange(row.id, parseFloat(e.target.value) || 0)}
-                                className="w-14 px-1.5 py-1 border border-[#EDEDED] dark:border-slate-800 rounded text-center text-xs font-semibold focus:outline-none focus:border-blue-500 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white"
+                                className="w-14 px-1 py-1 border border-[#EDEDED] dark:border-slate-800 rounded text-center text-xs font-semibold focus:outline-none focus:border-blue-500 bg-white dark:bg-slate-900 text-[#241F20] dark:text-white"
                               />
                             </td>
-                            <td className="py-2 px-3 text-right font-bold text-[#241F20] dark:text-white">
-                              £{rowTotal.toFixed(2)}
+                            <td className="py-2 px-3 text-right font-bold text-blue-600 dark:text-blue-400">
+                              £{rowTotalIncVat.toFixed(2)}
                             </td>
                             <td className="py-2 px-2 text-center">
                               <button
