@@ -278,6 +278,22 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
   const [createdDate, setCreatedDate] = useState<string>('14/09/2026');
   const [dueDate, setDueDate] = useState<string>('28/09/2026');
 
+  // Criteria Panel Action Handlers (Apply & Clear)
+  const handleApplyCriteria = () => {
+    toast.success('Criteria applied successfully!', {
+      description: `Filtering for ${genClient} across ${genLocations.length} location(s).`,
+    });
+  };
+
+  const handleClearCriteria = () => {
+    setGenClient('Derby County Football Club');
+    setGenLocations(['Pride Park Stadium', 'Derby Arena']);
+    setPresetRange('month');
+    setSelectedMonthRange('1st Sep - 30th Sep, 2026');
+    setSelectedServices(servicesList.map((s) => s.label));
+    toast.info('Criteria reset to default values.');
+  };
+
   // Items table state
   const [summaryItems, setSummaryItems] = useState<ItemSummaryRow[]>(initialSummaryItems);
 
@@ -902,6 +918,27 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                       }
                     }}
                   />
+                </div>
+
+                {/* Apply & Clear Action Buttons */}
+                <div className="pt-3 border-t border-[#EDEDED] dark:border-slate-800 flex items-center justify-between gap-2.5">
+                  <button
+                    type="button"
+                    onClick={handleClearCriteria}
+                    className="flex-1 py-2 px-3 rounded-lg border border-[#EDEDED] dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
+                  >
+                    <Icon name="RotateCcw" size={14} />
+                    <span>Clear</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleApplyCriteria}
+                    className="flex-1 py-2 px-3 rounded-lg bg-[#241F20] hover:bg-black text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                  >
+                    <Icon name="Check" size={14} />
+                    <span>Apply</span>
+                  </button>
                 </div>
               </div>
             </div>
