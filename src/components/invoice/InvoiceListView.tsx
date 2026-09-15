@@ -575,7 +575,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
           {viewMode === 'services' && (
             <button
               onClick={handleOpenAddService}
-              className="px-4 py-1.5 rounded-lg bg-[#241F20] hover:bg-black text-white text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-xs"
+              className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-xs"
             >
               <Icon name="Plus" size={15} />
               <span>Add Service</span>
@@ -595,7 +595,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
           {viewMode === 'list' && (
             <button
               onClick={() => setViewMode('generate')}
-              className="px-4 py-1.5 rounded-lg bg-[#241F20] hover:bg-black text-white text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-xs"
+              className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-xs"
             >
               <Icon name="Plus" size={15} />
               <span>New invoice</span>
@@ -955,7 +955,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   <button
                     type="button"
                     onClick={handleApplyCriteria}
-                    className="flex-1 py-2 px-3 rounded-lg bg-[#241F20] hover:bg-black text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                    className="flex-1 py-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
                   >
                     <Icon name="Check" size={14} />
                     <span>Apply</span>
@@ -1147,7 +1147,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   <div className="pt-5 mt-4 border-t border-[#EDEDED] dark:border-slate-800 flex justify-end">
                     <button
                       onClick={handleGenerateInvoiceSubmit}
-                      className="px-6 py-3 rounded-xl bg-[#241F20] hover:bg-black text-white text-xs font-bold flex items-center gap-2.5 transition-all cursor-pointer shadow-md active:scale-95"
+                      className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-2.5 transition-all cursor-pointer shadow-md active:scale-95"
                     >
                       <Icon name="FileText" size={16} />
                       <span>Generate Invoice</span>
@@ -1502,7 +1502,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-md bg-[#241F20] hover:bg-black text-white text-xs font-bold cursor-pointer shadow-xs"
+                  className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer shadow-xs transition-colors"
                 >
                   {editingService ? 'Update Service' : 'Add Service'}
                 </button>
@@ -1598,7 +1598,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-md bg-[#241F20] hover:bg-black text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
+                  className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
                 >
                   Save User
                 </button>
@@ -1764,7 +1764,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
               </span>
               <button
                 onClick={() => setSelectedInvoice(null)}
-                className="px-4 py-2 rounded-[6px] bg-[#241F20] hover:bg-black text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
+                className="px-4 py-2 rounded-[6px] bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
               >
                 Close Preview
               </button>
