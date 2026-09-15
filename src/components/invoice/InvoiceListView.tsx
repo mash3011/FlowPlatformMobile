@@ -249,6 +249,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
   };
 
   const [selectedMonthRange, setSelectedMonthRange] = useState<string>('September 2026');
+  const [v2MonthRange, setV2MonthRange] = useState<string>('01/09/2026 - 30/09/2026');
   const [presetRange, setPresetRange] = useState<'month' | 'custom'>('month');
   const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(false);
   const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState<boolean>(false);
@@ -840,10 +841,10 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                   />
                 </div>
 
-                {/* Date Range Section */}
+                {/* Date Range Section (Version 1) */}
                 <div>
                   <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
-                    Date Range
+                    Date Range (Version 1)
                   </label>
 
                   {presetRange === 'month' ? (
@@ -885,6 +886,22 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                       />
                     </div>
                   )}
+                </div>
+
+                {/* Date Range Section (Version 2) */}
+                <div>
+                  <label className="block text-[11px] font-bold text-[#241F20] dark:text-slate-300 mb-1">
+                    Date Range (Version 2)
+                  </label>
+                  <CustomDateRangePicker
+                    value={v2MonthRange}
+                    onChange={(val) => setV2MonthRange(val)}
+                    showPresets={true}
+                    presetMode="months"
+                    placeholder="Select date range..."
+                    className="w-full"
+                    align="left"
+                  />
                 </div>
 
                 {/* Services Multiselect Dropdown */}

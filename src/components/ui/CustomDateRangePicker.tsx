@@ -16,9 +16,10 @@ export interface CustomDateRangePickerProps {
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   showPresets?: boolean;
+  presetMode?: 'default' | 'months';
 }
 
-const PRESET_OPTIONS = [
+const DEFAULT_PRESETS = [
   'Today',
   'Yesterday',
   'Last 7 days',
@@ -27,6 +28,19 @@ const PRESET_OPTIONS = [
   'Last 12 months',
   'Last week',
   'Last month',
+  'Custom',
+];
+
+const MONTH_PRESETS = [
+  'September 2026 (Current)',
+  'August 2026',
+  'July 2026',
+  'June 2026',
+  'May 2026',
+  'April 2026',
+  'March 2026',
+  'February 2026',
+  'January 2026',
   'Custom',
 ];
 
@@ -62,7 +76,9 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
   isOpen: controlledIsOpen,
   onOpenChange,
   showPresets = true,
+  presetMode = 'default',
 }) => {
+  const presetOptions = presetMode === 'months' ? MONTH_PRESETS : DEFAULT_PRESETS;
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const isPopoverOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
@@ -135,36 +151,66 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
     let start = new Date(today);
     let end = new Date(today);
 
-    switch (preset) {
-      case 'Today':
-        break;
-      case 'Yesterday':
-        start.setDate(today.getDate() - 1);
-        end.setDate(today.getDate() - 1);
-        break;
-      case 'Last 7 days':
-        start.setDate(today.getDate() - 6);
-        break;
-      case 'Last 30 days':
-        start.setDate(today.getDate() - 29);
-        break;
-      case 'Last 90 days':
-        start.setDate(today.getDate() - 89);
-        break;
-      case 'Last 12 months':
-        start.setFullYear(today.getFullYear() - 1);
-        break;
-      case 'Last week':
-        start.setDate(today.getDate() - today.getDay() - 7);
-        end.setDate(start.getDate() + 6);
-        break;
-      case 'Last month':
-        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        end = new Date(today.getFullYear(), today.getMonth(), 0);
-        break;
-      case 'Custom':
-      default:
-        return;
+    // Month presets handling
+    if (preset.includes('September 2026')) {
+      start = new Date(2026, 8, 1);
+      end = new Date(2026, 8, 30);
+    } else if (preset === 'August 2026') {
+      start = new Date(2026, 7, 1);
+      end = new Date(2026, 7, 31);
+    } else if (preset === 'July 2026') {
+      start = new Date(2026, 6, 1);
+      end = new Date(2026, 6, 31);
+    } else if (preset === 'June 2026') {
+      start = new Date(2026, 5, 1);
+      end = new Date(2026, 5, 30);
+    } else if (preset === 'May 2026') {
+      start = new Date(2026, 4, 1);
+      end = new Date(2026, 4, 31);
+    } else if (preset === 'April 2026') {
+      start = new Date(2026, 3, 1);
+      end = new Date(2026, 3, 30);
+    } else if (preset === 'March 2026') {
+      start = new Date(2026, 2, 1);
+      end = new Date(2026, 2, 31);
+    } else if (preset === 'February 2026') {
+      start = new Date(2026, 1, 1);
+      end = new Date(2026, 1, 28);
+    } else if (preset === 'January 2026') {
+      start = new Date(2026, 0, 1);
+      end = new Date(2026, 0, 31);
+    } else {
+      switch (preset) {
+        case 'Today':
+          break;
+        case 'Yesterday':
+          start.setDate(today.getDate() - 1);
+          end.setDate(today.getDate() - 1);
+          break;
+        case 'Last 7 days':
+          start.setDate(today.getDate() - 6);
+          break;
+        case 'Last 30 days':
+          start.setDate(today.getDate() - 29);
+          break;
+        case 'Last 90 days':
+          start.setDate(today.getDate() - 89);
+          break;
+        case 'Last 12 months':
+          start.setFullYear(today.getFullYear() - 1);
+          break;
+        case 'Last week':
+          start.setDate(today.getDate() - today.getDay() - 7);
+          end.setDate(start.getDate() + 6);
+          break;
+        case 'Last month':
+          start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+          end = new Date(today.getFullYear(), today.getMonth(), 0);
+          break;
+        case 'Custom':
+        default:
+          return;
+      }
     }
 
     const startStr = formatDate(start);
@@ -415,10 +461,10 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
           {showPresets && (
             <div className="w-full md:w-[170px] border-r border-[#e5e7eb] dark:border-slate-800 pr-4 shrink-0 space-y-3">
               <h4 className="text-[14px] font-semibold text-[#1a2333] dark:text-slate-100">
-                Preset Periods
+                {presetMode === 'months' ? 'Months' : 'Preset Periods'}
               </h4>
               <div className="space-y-1">
-                {PRESET_OPTIONS.map((preset) => {
+                {presetOptions.map((preset) => {
                   const isActive = selectedPreset === preset;
                   return (
                     <button
