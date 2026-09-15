@@ -1135,7 +1135,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                     </span>
                   </div>
 
-                  <div className="border-t border-[#EDEDED] dark:border-slate-800 pt-3 flex items-center justify-between text-base">
+                  <div className="border-t border-[#EDEDED] dark:border-slate-800 pt-4 mt-3 flex items-center justify-between text-base">
                     <span className="font-extrabold text-[#241F20] dark:text-white">
                       Grand Total (Incl. VAT)
                     </span>
@@ -1144,12 +1144,12 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                     </span>
                   </div>
 
-                  <div className="pt-3 border-t border-[#EDEDED] dark:border-slate-800 flex justify-end">
+                  <div className="pt-5 mt-4 border-t border-[#EDEDED] dark:border-slate-800 flex justify-end">
                     <button
                       onClick={handleGenerateInvoiceSubmit}
-                      className="px-6 py-2.5 rounded-lg bg-[#241F20] hover:bg-black text-white text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-md"
+                      className="px-6 py-3 rounded-xl bg-[#241F20] hover:bg-black text-white text-xs font-bold flex items-center gap-2.5 transition-all cursor-pointer shadow-md active:scale-95"
                     >
-                      <Icon name="FileText" size={15} />
+                      <Icon name="FileText" size={16} />
                       <span>Generate Invoice</span>
                     </button>
                   </div>
