@@ -11,7 +11,9 @@ export const MobileApp: React.FC = () => {
   return (
     <div className="h-screen w-screen overflow-hidden bg-slate-100 text-slate-900">
       <Toaster position="top-right" richColors />
-      <MobileInvoicePrototype onBackToDesktop={() => window.open('http://127.0.0.1:3000', '_blank')} />
+      <MobileInvoicePrototype />
     </div>
   );
 };
+
+export default MobileApp;

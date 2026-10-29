@@ -1,11 +1,10 @@
 {
-  "name": "flow-platform",
+  "name": "flow-platform-mobile",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:mobile": "vite --config vite.config.mobile.ts",
     "build": "tsc -b && vite build",
     "preview": "vite preview"
   },

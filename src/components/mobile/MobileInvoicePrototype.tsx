@@ -6,13 +6,7 @@ import { MobileInvoiceListView } from './MobileInvoiceListView';
 import { MobileStockCheckView } from './MobileStockCheckView';
 import { Icon } from '../ui/Icon';
 
-interface MobileInvoicePrototypeProps {
-  onBackToDesktop?: () => void;
-}
-
-export const MobileInvoicePrototype: React.FC<MobileInvoicePrototypeProps> = ({
-  onBackToDesktop,
-}) => {
+export const MobileInvoicePrototype: React.FC = () => {
   const [selectedOS, setSelectedOS] = useState<MobileOSType>('ios');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('stock-check');
@@ -22,22 +16,12 @@ export const MobileInvoicePrototype: React.FC<MobileInvoicePrototypeProps> = ({
     <div className="h-screen w-screen bg-slate-100 text-slate-800 flex flex-col justify-between p-3 sm:px-6 sm:py-3 select-none font-sans overflow-hidden">
       {/* Top Prototype Controls Bar - Clean Light Mode Styling */}
       <header className="w-full flex items-center justify-start gap-4 bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-200/90 shadow-sm shrink-0">
-        {/* Left: Branding & Back Button */}
+        {/* Left: Branding */}
         <div className="flex items-center gap-3">
-          {onBackToDesktop && (
-            <button
-              onClick={onBackToDesktop}
-              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-200"
-            >
-              <Icon name="Monitor" size={14} />
-              <span className="hidden sm:inline">Desktop View</span>
-            </button>
-          )}
-
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <h1 className="text-sm font-extrabold tracking-tight text-slate-900">
-              Flow Platform Mobile Prototype
+              Flow Platform Mobile
             </h1>
           </div>
         </div>
