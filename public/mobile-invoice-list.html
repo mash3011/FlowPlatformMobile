@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow Platform - Mobile Invoice List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0b0f17;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      color: #0f172a;
+    }
+    .phone-frame {
+      width: 393px;
+      height: 852px;
+      background-color: #f8f9ff;
+      border-radius: 48px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 10px #1e1e24, 0 0 0 12px #334155;
+    }
+    /* Top Header matching Figma Frame 1142:8764 */
+    .top-header {
+      height: 56px;
+      background-color: #1e1e24;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+      flex-shrink: 0;
+      z-index: 20;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .header-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border-radius: 8px;
+      position: relative;
+    }
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+    .badge-dot {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 7px;
+      height: 7px;
+      background-color: #ef4444;
+      border-radius: 50%;
+      border: 1.5px solid #1e1e24;
+    }
+
+    /* Scrollable Screen Content */
+    .screen-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 88px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background-color: #f8f9ff;
+    }
+    .screen-content::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Title & CTA Row matching Figma Frame 1142:8779 */
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .page-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .generate-invoice-btn {
+      background-color: #10b981;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 12px;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+      transition: background-color 0.15s;
+      text-decoration: none;
+    }
+    .generate-invoice-btn:hover {
+      background-color: #059669;
+    }
+    .generate-invoice-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Segmented Tab Bar */
+    .subtabs-row {
+      display: flex;
+      align-items: center;
+      background-color: #e2e8f0;
+      padding: 2.5px;
+      border-radius: 10px;
+      width: fit-content;
+      gap: 4px;
+    }
+    .subtab-btn {
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+      background: none;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .subtab-btn.active {
+      background-color: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Filter Controls matching Frame 1142:8790 */
+    .filter-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .filter-row-1 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .filter-dropdown-btn {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    .filter-dropdown-btn svg {
+      width: 14px;
+      height: 14px;
+      color: #64748b;
+    }
+    .date-range-btn {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      width: 100%;
+    }
+    .date-range-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .date-range-left svg {
+      width: 15px;
+      height: 15px;
+      color: #64748b;
+    }
+
+    /* 4 Stat Summary Cards matching media_1789721848799.png */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .stat-card {
+      background-color: #f0fdf4;
+      border: 1px solid #d1fae5;
+      border-radius: 16px;
+      padding: 13px;
+      height: 102px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 1px 2px rgba(16, 185, 129, 0.05);
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+    }
+    .stat-bottom {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .stat-icon {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      min-height: 22px;
+      color: #10b981;
+    }
+
+    /* Status Pills Row matching Frame 1142:8817 */
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 2px;
+    }
+    .status-pills {
+      display: flex;
+      background-color: #f1f5f9;
+      padding: 2.5px;
+      border-radius: 8px;
+      gap: 2px;
+    }
+    .status-pill {
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      background: none;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .status-pill.active {
+      background-color: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 1px 2px rgba(37, 99, 235, 0.25);
+    }
+    .entry-count {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    /* Invoice Cards matching Frame 1142:8828 */
+    .invoice-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .invoice-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .invoice-card:hover {
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+    .card-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .inv-id-cycle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .inv-num {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .inv-cycle {
+      font-size: 11px;
+      font-weight: 500;
+      color: #64748b;
+    }
+    .status-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2.5px 8px;
+      border-radius: 999px;
+    }
+    .badge-invoiced {
+      background-color: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+    .badge-paid {
+      background-color: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+    .card-client-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .client-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .client-location {
+      font-size: 11px;
+      color: #64748b;
+    }
+    .tag-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-top: 2px;
+    }
+    .tag-chip {
+      background-color: #f1f5f9;
+      color: #475569;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .card-footer {
+      border-top: 1px solid #f1f5f9;
+      padding-top: 8px;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .amount-box {
+      display: flex;
+      flex-direction: column;
+    }
+    .amount-label {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .amount-value {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .mark-paid-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .mark-paid-btn:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    /* Bottom Navigation Dock matching Frame 1142:8728 */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 66px;
+      background-color: #1e1e24;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 6px 10px 6px;
+      z-index: 30;
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      color: #94a3b8;
+      font-size: 9.5px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      flex: 1;
+    }
+    .nav-item.active {
+      color: #10b981;
+    }
+    .nav-item svg {
+      width: 19px;
+      height: 19px;
+    }
+    .nav-center-action {
+      position: relative;
+      top: -14px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: #10b981;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+      border: 3.5px solid #1e1e24;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .nav-center-action svg {
+      width: 22px;
+      height: 22px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone-frame">
+    <!-- Top Dark Header -->
+    <header class="top-header">
+      <button class="icon-btn" title="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <span class="header-title">Flow Platform</span>
+      <button class="icon-btn" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+        <span class="badge-dot"></span>
+      </button>
+    </header>
+
+    <!-- Main Scrollable Screen Content -->
+    <main class="screen-content">
+      <!-- Title & Emerald CTA Row -->
+      <div class="title-row">
+        <h1 class="page-title">Invoice List</h1>
+        <a href="mobile-generate-invoice.html" class="generate-invoice-btn" title="Generate Invoice">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Generate Invoice</span>
+        </a>
+      </div>
+
+      <!-- Segmented Subtabs: Invoices | Services -->
+      <div class="subtabs-row">
+        <button class="subtab-btn active" onclick="location.href='mobile-invoice-list.html'">Invoices</button>
+        <button class="subtab-btn" onclick="location.href='mobile-services.html'">Services</button>
+      </div>
+
+      <!-- 2-Row Filter Bar matching Figma Frame 1142:8790 -->
+      <section class="filter-section">
+        <div class="filter-row-1">
+          <button class="filter-dropdown-btn">
+            <span>All Clients</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <button class="filter-dropdown-btn">
+            <span>All Locations</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+        </div>
+
+        <button class="date-range-btn" onclick="location.href='mobile-calendar-picker.html'">
+          <div class="date-range-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Select date range</span>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+      </section>
+
+      <!-- Status Pills Bar matching Frame 1142:8817 -->
+      <section class="status-row">
+        <div class="status-pills">
+          <button class="status-pill active">All</button>
+          <button class="status-pill">Invoiced</button>
+          <button class="status-pill">Paid</button>
+        </div>
+        <span class="entry-count">4 entries</span>
+      </section>
+
+      <!-- Invoice Cards List matching Figma Frame 1142:8828 -->
+      <section class="invoice-cards">
+        <!-- Card 1: INV-001 -->
+        <div class="invoice-card" onclick="location.href='mobile-generate-invoice.html'">
+          <div class="card-top-row">
+            <div class="inv-id-cycle">
+              <span class="inv-num">INV-001</span>
+              <span class="inv-cycle">1st - 30th Sep, 2026</span>
+            </div>
+            <span class="status-badge badge-invoiced">Invoiced</span>
+          </div>
+          <div class="card-client-info">
+            <h3 class="client-title">Derby County Football Club</h3>
+            <span class="client-location">Pride Park Stadium</span>
+          </div>
+          <div class="tag-chips">
+            <span class="tag-chip">Washed Cup</span>
+            <span class="tag-chip">Damaged</span>
+          </div>
+          <div class="card-footer">
+            <div class="amount-box">
+              <span class="amount-label">Amount</span>
+              <span class="amount-value">£1,444.80</span>
+            </div>
+            <button class="mark-paid-btn" onclick="event.stopPropagation(); this.innerText = this.innerText === 'Mark Paid' ? 'Mark Unpaid' : 'Mark Paid';">Mark Paid</button>
+          </div>
+        </div>
+
+        <!-- Card 2: INV-002 -->
+        <div class="invoice-card" onclick="location.href='mobile-generate-invoice.html'">
+          <div class="card-top-row">
+            <div class="inv-id-cycle">
+              <span class="inv-num">INV-002</span>
+              <span class="inv-cycle">1st - 31st Aug, 2026</span>
+            </div>
+            <span class="status-badge badge-invoiced">Invoiced</span>
+          </div>
+          <div class="card-client-info">
+            <h3 class="client-title">Derby LIVE</h3>
+            <span class="client-location">Derby Arena</span>
+          </div>
+          <div class="tag-chips">
+            <span class="tag-chip">Washed Cup</span>
+            <span class="tag-chip">Damaged</span>
+          </div>
+          <div class="card-footer">
+            <div class="amount-box">
+              <span class="amount-label">Amount</span>
+              <span class="amount-value">£1,143.60</span>
+            </div>
+            <button class="mark-paid-btn" onclick="event.stopPropagation(); this.innerText = this.innerText === 'Mark Paid' ? 'Mark Unpaid' : 'Mark Paid';">Mark Paid</button>
+          </div>
+        </div>
+
+        <!-- Card 3: INV-003 -->
+        <div class="invoice-card" onclick="location.href='mobile-generate-invoice.html'">
+          <div class="card-top-row">
+            <div class="inv-id-cycle">
+              <span class="inv-num">INV-003</span>
+              <span class="inv-cycle">1st - 31st Jul, 2026</span>
+            </div>
+            <span class="status-badge badge-paid">Paid</span>
+          </div>
+          <div class="card-client-info">
+            <h3 class="client-title">Electric Daisy</h3>
+            <span class="client-location">Electric Daisy Site</span>
+          </div>
+          <div class="tag-chips">
+            <span class="tag-chip">Washed Cup</span>
+            <span class="tag-chip">Tote Lost</span>
+          </div>
+          <div class="card-footer">
+            <div class="amount-box">
+              <span class="amount-label">Amount</span>
+              <span class="amount-value">£1,488.00</span>
+            </div>
+            <button class="mark-paid-btn" onclick="event.stopPropagation(); this.innerText = this.innerText === 'Mark Unpaid' ? 'Mark Paid' : 'Mark Unpaid';">Mark Unpaid</button>
+          </div>
+        </div>
+
+        <!-- Card 4: INV-004 -->
+        <div class="invoice-card" onclick="location.href='mobile-generate-invoice.html'">
+          <div class="card-top-row">
+            <div class="inv-id-cycle">
+              <span class="inv-num">INV-004</span>
+              <span class="inv-cycle">1st - 30th Jun, 2026</span>
+            </div>
+            <span class="status-badge badge-invoiced">Invoiced</span>
+          </div>
+          <div class="card-client-info">
+            <h3 class="client-title">Derby County Football Club</h3>
+            <span class="client-location">Pride Park Stadium</span>
+          </div>
+          <div class="tag-chips">
+            <span class="tag-chip">Lost Cup</span>
+            <span class="tag-chip">Wheely Bins</span>
+          </div>
+          <div class="card-footer">
+            <div class="amount-box">
+              <span class="amount-label">Amount</span>
+              <span class="amount-value">£14,905.20</span>
+            </div>
+            <button class="mark-paid-btn" onclick="event.stopPropagation(); this.innerText = this.innerText === 'Mark Paid' ? 'Mark Unpaid' : 'Mark Paid';">Mark Paid</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation Bar matching Frame 1142:8728 -->
+    <nav class="bottom-nav">
+      <a href="mobile-stitch-export.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>Home</span>
+      </a>
+      <a href="mobile-services.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+        <span>Stock Check</span>
+      </a>
+      <button class="nav-center-action" onclick="location.href='mobile-generate-invoice.html'" title="Generate Invoice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+      <a href="mobile-calendar-picker.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <span>Calendar</span>
+      </a>
+      <a href="mobile-invoice-list.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg>
+        <span>Batch</span>
+      </a>
+    </nav>
+  </div>
+
+</body>
+</html>

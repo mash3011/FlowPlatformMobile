@@ -12,6 +12,7 @@ export interface CustomDateRangePickerProps {
   onChange: (value: string, range?: DateRangeValue) => void;
   placeholder?: string;
   className?: string;
+  buttonClassName?: string;
   align?: 'left' | 'right';
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -72,6 +73,7 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
   onChange,
   placeholder = 'Select date range',
   className = '',
+  buttonClassName = '',
   align = 'right',
   isOpen: controlledIsOpen,
   onOpenChange,
@@ -332,28 +334,45 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
       'December',
     ];
 
-    const firstDayIndex = new Date(year, month, 1).getDay(); // 0 = Sun
-    const totalDays = new Date(year, month + 1, 0).getDate();
+    const firstDayOfMonth = new Date(year, month, 1);
+    const daysInCurrentMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+    // Monday start: 0 = Mon, 6 = Sun
+    const startDayOfWeek = (firstDayOfMonth.getDay() + 6) % 7;
 
     const dayCells = [];
-    // Leading blank slots
-    for (let i = 0; i < firstDayIndex; i++) {
-      dayCells.push(<div key={`blank-${i}`} className="w-[33px] h-[32px]" />);
+
+    // Prev month padding
+    for (let i = startDayOfWeek - 1; i >= 0; i--) {
+      const dayNum = daysInPrevMonth - i;
+      dayCells.push(
+        <div
+          key={`prev-${dayNum}`}
+          className="w-[34px] h-[34px] flex items-center justify-center text-[12px] font-medium text-slate-300 dark:text-slate-600 select-none"
+        >
+          {String(dayNum).padStart(2, '0')}
+        </div>
+      );
     }
 
     // Days 1..totalDays
-    for (let day = 1; day <= totalDays; day++) {
+    for (let day = 1; day <= daysInCurrentMonth; day++) {
       const { isStart, isEnd, isInRange } = getDateState(year, month, day);
+      const isToday =
+        new Date(year, month, day).toDateString() === new Date(2026, 8, 18).toDateString();
 
       let cellClass =
-        'w-[33px] h-[32px] rounded-[6px] text-[12px] flex items-center justify-center cursor-pointer transition-all font-normal ';
+        'w-[34px] h-[34px] text-[12px] font-semibold flex items-center justify-center cursor-pointer transition-all select-none ';
 
       if (isStart || isEnd) {
-        cellClass += 'bg-blue-600 text-white font-bold shadow-xs';
+        cellClass += 'bg-blue-600 text-white font-bold rounded-full shadow-xs z-10';
       } else if (isInRange) {
-        cellClass += 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 font-semibold rounded-[2px]';
+        cellClass += 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 font-bold rounded-xl';
+      } else if (isToday) {
+        cellClass += 'border-1.5 border-amber-400 text-amber-600 dark:text-amber-400 rounded-full font-bold hover:bg-slate-100 dark:hover:bg-slate-800';
       } else {
-        cellClass += 'text-[#1a2333] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800';
+        cellClass += 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full font-semibold';
       }
 
       dayCells.push(
@@ -363,49 +382,82 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
           onClick={() => handleDayClick(year, month, day)}
           className={cellClass}
         >
-          {day}
+          {String(day).padStart(2, '0')}
         </button>
       );
     }
 
+    // Next month padding to fill out 35 or 42 cells
+    const remainingCells = (7 - (dayCells.length % 7)) % 7;
+    for (let d = 1; d <= remainingCells; d++) {
+      dayCells.push(
+        <div
+          key={`next-${d}`}
+          className="w-[34px] h-[34px] flex items-center justify-center text-[12px] font-medium text-slate-300 dark:text-slate-600 select-none"
+        >
+          {String(d).padStart(2, '0')}
+        </div>
+      );
+    }
+
     return (
-      <div className="flex-1 flex flex-col gap-2 min-w-[240px]">
+      <div className="flex-1 flex flex-col gap-2 min-w-[250px]">
         {/* Month Header with Navigation */}
         <div className="flex items-center justify-between relative py-1 px-1">
           <button
             type="button"
             onClick={onPrev}
-            className="w-6 h-6 rounded-[4px] text-[#8b95a7] hover:text-[#1a2333] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-lg leading-none cursor-pointer"
+            className="w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center cursor-pointer transition-colors"
+            title="Previous Month"
           >
-            ‹
+            <Icon name="ChevronLeft" size={16} />
           </button>
-          <div className="text-[15px] font-semibold text-[#1a2333] dark:text-slate-100">
-            {monthNames[month]} {year}
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold text-sm text-slate-900 dark:text-white">
+              {monthNames[month]}
+            </span>
+            <span className="text-xs font-semibold text-slate-400">
+              {year}
+            </span>
           </div>
           <button
             type="button"
             onClick={onNext}
-            className="w-6 h-6 rounded-[4px] text-[#8b95a7] hover:text-[#1a2333] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-lg leading-none cursor-pointer"
+            className="w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center cursor-pointer transition-colors"
+            title="Next Month"
           >
-            ›
+            <Icon name="ChevronRight" size={16} />
           </button>
         </div>
 
-        {/* Weekday Row */}
-        <div className="grid grid-cols-7 gap-0.5 text-center text-[12px] text-[#8b95a7] font-normal">
-          <div className="w-[33px] h-[32px] flex items-center justify-center">Su</div>
-          <div className="w-[33px] h-[32px] flex items-center justify-center">Mo</div>
-          <div className="w-[33px] h-[32px] flex items-center justify-center">Tu</div>
-          <div className="w-[33px] h-[32px] flex items-center justify-center">We</div>
-          <div className="w-[33px] h-[32px] flex items-center justify-center">Th</div>
-          <div className="w-[33px] h-[32px] flex items-center justify-center">Fr</div>
-          <div className="w-[33px] h-[32px] flex items-center justify-center">Sa</div>
+        {/* Weekday Row: M T W T F S S (Figma layout) */}
+        <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-slate-400 py-1.5 border-b border-slate-100 dark:border-slate-800/80">
+          <div>M</div>
+          <div>T</div>
+          <div>W</div>
+          <div>T</div>
+          <div>F</div>
+          <div>S</div>
+          <div>S</div>
         </div>
 
         {/* Days Grid */}
-        <div className="grid grid-cols-7 gap-0.5 pt-1">{dayCells}</div>
+        <div className="grid grid-cols-7 gap-1 py-1 justify-items-center">
+          {dayCells}
+        </div>
       </div>
     );
+  };
+
+  const handleClear = () => {
+    setStartDateInput('');
+    setEndDateInput('');
+    onChange('Select date range', {
+      startDate: '',
+      endDate: '',
+      label: 'Select date range',
+    });
+    setOpen(false);
   };
 
   const handleApply = () => {
@@ -432,7 +484,7 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
           isPopoverOpen
             ? 'border-blue-500 ring-2 ring-blue-500/20 dark:border-blue-500'
             : 'border-[#EDEDED] dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-        }`}
+        } ${buttonClassName}`}
       >
         <div className="flex items-center gap-2 truncate">
           <Icon name="Calendar" size={16} className="text-slate-400 shrink-0" />
@@ -454,8 +506,10 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
             align === 'right' ? 'right-0' : 'left-0'
           } ${
             dropUp ? 'bottom-full mb-2' : 'top-full mt-2'
-          } z-[90] bg-white dark:bg-[#0d131f] border border-[#e5e7eb] dark:border-slate-800 rounded-[12px] shadow-2xl drop-shadow-[0px_18px_24px_rgba(0,0,0,0.22)] p-5 flex flex-col md:flex-row gap-5 ${
-            showPresets ? 'min-w-[700px]' : 'min-w-[530px]'
+          } z-[90] bg-white dark:bg-[#0d131f] border border-[#e5e7eb] dark:border-slate-800 rounded-[12px] shadow-2xl drop-shadow-[0px_18px_24px_rgba(0,0,0,0.22)] p-4 sm:p-5 flex flex-col md:flex-row gap-5 ${
+            showPresets
+              ? 'w-[calc(100vw-32px)] max-w-[340px] md:max-w-none md:w-auto md:min-w-[700px]'
+              : 'w-[calc(100vw-32px)] max-w-[340px] md:max-w-none md:w-auto md:min-w-[530px]'
           } max-h-[calc(100vh-100px)] overflow-y-auto animate-in fade-in-50 zoom-in-95 duration-150`}
         >
           {/* LEFT SIDEBAR: PRESET PERIODS (CONDITIONALLY RENDERED) */}
@@ -519,30 +573,58 @@ export const CustomDateRangePicker: React.FC<CustomDateRangePickerProps> = ({
                 handleLeftPrevMonth,
                 handleLeftNextMonth
               )}
-              {renderMonthCalendar(
-                rightYear,
-                rightMonth,
-                handleRightPrevMonth,
-                handleRightNextMonth
-              )}
+              <div className="hidden sm:block">
+                {renderMonthCalendar(
+                  rightYear,
+                  rightMonth,
+                  handleRightPrevMonth,
+                  handleRightNextMonth
+                )}
+              </div>
+            </div>
+
+            {/* Legend Row matching Figma */}
+            <div className="flex items-center justify-center gap-5 py-2 text-[10px] text-slate-500 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
+                <span>Selected</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-100 dark:bg-blue-950/50 border border-blue-600" />
+                <span>In Range</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full border border-amber-400" />
+                <span>Today</span>
+              </div>
             </div>
 
             {/* Footer Buttons */}
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
-                onClick={handleCancel}
-                className="px-4 py-1.5 rounded-[6px] border border-[#e5e7eb] dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                onClick={handleClear}
+                className="px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white cursor-pointer"
               >
-                Cancel
+                Reset
               </button>
-              <button
-                type="button"
-                onClick={handleApply}
-                className="px-4 py-1.5 rounded-[6px] bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
-              >
-                Apply
-              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleApply}
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-colors cursor-pointer"
+                >
+                  Apply
+                </button>
+              </div>
             </div>
           </div>
         </div>

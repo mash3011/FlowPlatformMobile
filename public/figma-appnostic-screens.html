@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow Platform - Figma AppNostic Mobile Screens & Pop-Ups Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #0b0f17;
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Top Header */
+    .top-bar {
+      background: #111827;
+      border-bottom: 1px solid #1f2937;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: #10b981;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #0b0f17;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .figma-tag {
+      background: #1e293b;
+      color: #38bdf8;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    /* Main Container */
+    .main-layout {
+      flex: 1;
+      display: flex;
+      gap: 32px;
+      padding: 32px;
+      max-width: 1700px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Left: Screen Directory */
+    .screen-dir {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+    .screen-count {
+      font-size: 13px;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.12);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+
+    /* Grid of Screen Cards */
+    .screens-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 16px;
+    }
+    .screen-card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .screen-card:hover {
+      border-color: #334155;
+      background: #141e30;
+      transform: translateY(-2px);
+    }
+    .screen-card.active {
+      border-color: #10b981;
+      box-shadow: 0 0 0 1px #10b981, 0 10px 25px -5px rgba(16, 185, 129, 0.2);
+    }
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge-screen { background: #0284c7; color: #ffffff; }
+    .badge-modal { background: #d97706; color: #ffffff; }
+
+    .card-desc {
+      font-size: 12.5px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #1f2937;
+      padding-top: 12px;
+      font-size: 11px;
+      color: #64748b;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-action {
+      flex: 1;
+      height: 36px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .btn-preview {
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #e2e8f0;
+    }
+    .btn-preview:hover { background: #374151; }
+    .btn-copy {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #059669;
+      color: #34d399;
+    }
+    .btn-copy:hover { background: #10b981; color: #ffffff; }
+
+    /* Right: Interactive Live Phone Previewer */
+    .preview-sticky-wrap {
+      width: 440px;
+      position: sticky;
+      top: 104px;
+      height: calc(100vh - 136px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .preview-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .preview-title { font-size: 14px; font-weight: 700; color: #cbd5e1; }
+    .preview-ext {
+      font-size: 12px;
+      color: #38bdf8;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .device-shell {
+      width: 393px;
+      height: 780px;
+      background: #1e1e24;
+      border-radius: 46px;
+      padding: 10px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 0 1px #334155;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .dynamic-island {
+      width: 110px;
+      height: 26px;
+      background: #000000;
+      border-radius: 16px;
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      pointer-events: none;
+    }
+    .iframe-screen {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 38px;
+      background: #ffffff;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #10b981;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      display: none;
+      z-index: 1000;
+      animation: slideToast 0.3s ease;
+    }
+    @keyframes slideToast {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="top-bar">
+    <div class="brand-wrap">
+      <div class="brand-logo">FP</div>
+      <div>
+        <div class="brand-title">Flow Platform Mobile Screens &amp; Pop-Ups Hub</div>
+        <div class="brand-sub">
+          <span>Figma File: AppNostic</span>
+          <span class="figma-tag">node-id=0-1</span>
+          <span>• Exact Mobile Export Suite</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <a href="http://127.0.0.1:3000" target="_blank" class="figma-tag" style="text-decoration: none; padding: 6px 12px; color: #10b981; border: 1px solid #059669;">
+        Open Flow Web App ↗
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+    
+    <!-- Screen Directory -->
+    <div class="screen-dir">
+      
+      <div class="section-header">
+        <h1 class="section-title">Individual Mobile Screens &amp; Overlays</h1>
+        <span class="screen-count">10 Available Screens</span>
+      </div>
+
+      <div class="screens-grid">
+        
+        <!-- Screen 1: Landing Page / Impact Savings -->
+        <div class="screen-card active" onclick="loadPreview('mobile-stitch-export.html', 'Impact Savings (Figma 1123:8536)', this)">
+          <div class="card-top">
+            <h3 class="card-title">1. Impact Savings</h3>
+            <span class="badge badge-screen">Full Screen</span>
+          </div>
+          <p class="card-desc">
+            Carbon (46,212kg), Plastic (12,360kg), Reuse count, Footballs saved, and Carbon/Plastic D/W/M/Y bar chart with floating nav.
+          </p>
+          <div class="card-meta">
+            <span>Figma Frame: 1123:8536</span>
+            <span>393 × 852 px</span>
+          </div>
+          <div class="card-actions">
+            <a href="mobile-stitch-export.html" target="_blank" class="btn-action btn-preview">Open Tab ↗</a>
+            <button class="btn-action btn-copy" onclick="copyScreenHtml('mobile-stitch-export.html', event)">Copy for Stitch</button>
+          </div>
+        </div>
+
+        <!-- Screen 2: Invoice List -->
+        <div class="screen-card" onclick="loadPreview('mobile-invoice-list.html', 'Mobile Invoice List (Figma 1142:8727)', this)">
+          <div class="card-top">
+            <h3 class="card-title">2. Invoice List</h3>
+            <span class="badge badge-screen">Full Screen</span>
+          </div>
+          <p class="card-desc">
+            TopBar, 4 summary stat cards, emerald `+ Generate Invoice` CTA, 2-tier filters (Clients, Locations, Date range, status tabs), and invoice cards with item pills.
+          </p>
+          <div class="card-meta">
+            <span>Figma Frame: 1142:8727</span>
+            <span>359 × 1059 px</span>
+          </div>
+          <div class="card-actions">
+            <a href="mobile-invoice-list.html" target="_blank" class="btn-action btn-preview">Open Tab ↗</a>
+            <button class="btn-action btn-copy" onclick="copyScreenHtml('mobile-invoice-list.html', event)">Copy for Stitch</button>
+          </div>
+        </div>
+
+        <!-- Screen 3: Generate Invoice -->
+        <div class="screen-card" onclick="loadPreview('mobile-generate-invoice.html', 'Generate Invoice (Figma 1144:8991)', this)">
+          <div class="card-top">
+            <h3 class="card-title">3. Generate Invoice</h3>
+            <span class="badge badge-screen">Full Screen</span>
+          </div>
+          <p class="card-desc">
+            Criteria selection (Client, Location, Bill Cycle v1 &amp; v2, Services toggle), Line Items breakdown table/cards, financial totals, and CTA.
+          </p>
+          <div class="card-meta">
+            <span>Figma Frame: 1144:8991</span>
+            <span>359 × 1925 px</span>
+          </div>
+          <div class="card-actions">
+            <a href="mobile-generate-invoice.html" target="_blank" class="btn-action btn-preview">Open Tab ↗</a>
+            <button class="btn-action btn-copy" onclick="copyScreenHtml('mobile-generate-invoice.html', event)">Copy for Stitch</button>
+          </div>
+        </div>
+
+        <!-- Screen 4: Invoice Details Modal Pop-Up -->
+        <div class="screen-card" onclick="loadPreview('mobile-invoice-details-modal.html', 'Invoice Details Pop-Up (Figma 1018:10225)', this)">
+          <div class="card-top">
+            <h3 class="card-title">4. Invoice Details Pop-Up</h3>
+            <span class="badge badge-modal">Pop-Up Modal</span>
+          </div>
+          <p class="card-desc">
+            Modal overlay with INV-001 line items breakdown (Washed Cup, Damaged Replacement, Logistics, Platform Fee), VAT calculations, and Download PDF CTA.
+          </p>
+          <div class="card-meta">
+            <span>Figma Node: 1018:10225</span>
+            <span>Modal Sheet</span>
+          </div>
+          <div class="card-actions">
+            <a href="mobile-invoice-details-modal.html" target="_blank" class="btn-action btn-preview">Open Tab ↗</a>
+            <button class="btn-action btn-copy" onclick="copyScreenHtml('mobile-invoice-details-modal.html', event)">Copy for Stitch</button>
+          </div>
+        </div>
+
+        <!-- Screen 5: Calendar Date Picker Bottom Sheet Pop-Up -->
+        <div class="screen-card" onclick="loadPreview('mobile-calendar-picker.html', 'Calendar Date Picker (Figma 537:8173 / 1042:10611)', this)">
+          <div class="card-top">
+            <h3 class="card-title">5. Calendar Picker Sheet</h3>
+            <span class="badge badge-modal">Pop-Up Sheet</span>
+          </div>
+          <p class="card-desc">
+            Interactive bottom sheet modal date picker with preset chips (Today, Last 7d, This Month), 2-month grid with range highlight (01-30), and Reset/Apply.
+          </p>
+          <div class="card-meta">
+            <span>Figma Node: 537:8173</span>
+            <span>Bottom Sheet</span>
+          </div>
+          <div class="card-actions">
+            <a href="mobile-calendar-picker.html" target="_blank" class="btn-action btn-preview">Open Tab ↗</a>
+            <button class="btn-action btn-copy" onclick="copyScreenHtml('mobile-calendar-picker.html', event)">Copy for Stitch</button>
+          </div>
+        </div>
+
+        <!-- Screen 6: Navigation Drawer Pop-Up -->
+        <div class="screen-card" onclick="loadPreview('mobile-sidebar-drawer.html', 'Navigation Drawer Pop-Up (Figma 1123:8991)', this)">
+          <div class="card-top">
+            <h3 class="card-title">6. Navigation Drawer</h3>
+            <span class="badge badge-modal">Drawer Pop-Up</span>
+          </div>
+          <p class="card-desc">
+            Off-canvas slide-out sidebar drawer with user avatar, client badge, navigation links across all Flow Platform modules, and logout button.
+          </p>
+          <div class="card-meta">
+            <span>Figma Node: 1123:8991</span>
+            <span>Drawer Sheet</span>
+          </div>
+          <div class="card-actions">
+            <a href="mobile-sidebar-drawer.html" target="_blank" class="btn-action btn-preview">Open Tab ↗</a>
+            <button class="btn-action btn-copy" onclick="copyScreenHtml('mobile-sidebar-drawer.html', event)">Copy for Stitch</button>
+          </div>
+        </div>
+
+        <!-- Screen 7: Stock Check -->
+        <div class="screen-card" onclick="loadPreview('mobile-stock-check.html', 'Stock Check (Figma 523:8285)', this)">
+          <div class="card-top">
+            <h3 class="card-title">7. Stock Check</h3>
+            <span class="badge badge-screen">Full Screen</span>
+          </div>
+          <p class="card-desc">
+            Categories &amp; items counter (150 Total items, 6 categories), grid of cup types (Drinking Cups, Flute Glasses, Half Pint Rec, Pint GG), and filter chips.
+          </p>
+          <div class="card-meta">
+            <span>Figma Frame: 523:8285</span>
+            <span>393 × 852 px</span>
+          </div>
+          <div class="card-actions">
+            <a href="mobile-stock-check.html" target="_blank" class="btn-action btn-preview">Open Tab ↗</a>
+            <button class="btn-action btn-copy" onclick="copyScreenHtml('mobile-stock-check.html', event)">Copy for Stitch</button>
+          </div>
+        </div>
+
+        <!-- Screen 8: Performance Metrics -->
+        <div class="screen-card" onclick="loadPreview('mobile-performance-metrics.html', 'Performance Metrics (Figma 521:8062)', this)">
+          <div class="card-top">
+            <h3 class="card-title">8. Performance Metrics</h3>
+            <span class="badge badge-screen">Full Screen</span>
+          </div>
+          <p class="card-desc">
+            Stock number (57,285), Return Rate (86%), Product return bar chart (Pint, Half Pint, 2-Pint, Wine G.), Return vs Loss in Wash, and Engagement metrics.
+          </p>
+          <div class="card-meta">
+            <span>Figma Frame: 521:8062</span>
+            <span>393 × 1638 px</span>
+          </div>
+          <div class="card-actions">
+            <a href="mobile-performance-metrics.html" target="_blank" class="btn-action btn-preview">Open Tab ↗</a>
+            <button class="btn-action btn-copy" onclick="copyScreenHtml('mobile-performance-metrics.html', event)">Copy for Stitch</button>
+          </div>
+        </div>
+
+        <!-- Screen 9: Scan Product & Viewfinder -->
+        <div class="screen-card" onclick="loadPreview('mobile-scan-product.html', 'Scan Product (Figma 547:8318)', this)">
+          <div class="card-top">
+            <h3 class="card-title">9. Scan Product</h3>
+            <span class="badge badge-screen">Full Screen</span>
+          </div>
+          <p class="card-desc">
+            Product barcode camera scanner with targeting reticles, animated laser sweep line, Flash &amp; Gallery toggles, and manual entry bottom sheet.
+          </p>
+          <div class="card-meta">
+            <span>Figma Frame: 547:8318</span>
+            <span>394 × 852 px</span>
+          </div>
+          <div class="card-actions">
+            <a href="mobile-scan-product.html" target="_blank" class="btn-action btn-preview">Open Tab ↗</a>
+            <button class="btn-action btn-copy" onclick="copyScreenHtml('mobile-scan-product.html', event)">Copy for Stitch</button>
+          </div>
+        </div>
+
+        <!-- Screen 10: Reports & Batch Assign Modal -->
+        <div class="screen-card" onclick="loadPreview('mobile-reports-batch.html', 'Reports & Batch Assign (Figma 270:8560 & 270:8771)', this)">
+          <div class="card-top">
+            <h3 class="card-title">10. Reports &amp; Batches</h3>
+            <span class="badge badge-screen">Screen + Modal</span>
+          </div>
+          <p class="card-desc">
+            Reports list (July, Mid Season, Weekend, Partamine) with "+ Add Report" CTA and interactive modal pop-up with file dropzone and location selector.
+          </p>
+          <div class="card-meta">
+            <span>Figma Frames: 270:8560 / 8771</span>
+            <span>375 × 892 px</span>
+          </div>
+          <div class="card-actions">
+            <a href="mobile-reports-batch.html" target="_blank" class="btn-action btn-preview">Open Tab ↗</a>
+            <button class="btn-action btn-copy" onclick="copyScreenHtml('mobile-reports-batch.html', event)">Copy for Stitch</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Live Phone Frame Simulator -->
+    <div class="preview-sticky-wrap">
+      <div class="preview-header">
+        <span class="preview-title" id="previewTitle">Impact Savings (Figma 1123:8536)</span>
+        <a href="mobile-stitch-export.html" target="_blank" id="previewExtLink" class="preview-ext">
+          Open Fullscreen ↗
+        </a>
+      </div>
+
+      <div class="device-shell">
+        <div class="dynamic-island"></div>
+        <iframe src="mobile-stitch-export.html" id="previewFrame" class="iframe-screen" title="Live Mobile Preview"></iframe>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">HTML copied to clipboard! Ready to paste into Stitch.</div>
+
+  <script>
+    function loadPreview(url, title, cardEl) {
+      document.getElementById('previewFrame').src = url;
+      document.getElementById('previewTitle').innerText = title;
+      document.getElementById('previewExtLink').href = url;
+      
+      document.querySelectorAll('.screen-card').forEach(c => c.classList.remove('active'));
+      if (cardEl) cardEl.classList.add('active');
+    }
+
+    async function copyScreenHtml(filename, event) {
+      if (event) event.stopPropagation();
+      try {
+        const res = await fetch(filename);
+        const text = await res.text();
+        await navigator.clipboard.writeText(text);
+        showToast('✓ ' + filename + ' copied to clipboard for Stitch!');
+      } catch (err) {
+        showToast('Downloaded ' + filename);
+        window.open(filename, '_blank');
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    }
+  </script>
+
+</body>
+</html>

@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { Icon } from '../ui/Icon';
+import { getNavItemById } from '../../utils/navigationRegistry';
 
 interface FlowSidebarProps {
   activeTab: string;
   onSelectTab: (tabId: string) => void;
   apparentTheme?: boolean;
+  favorites?: string[];
 }
 
 export const FlowSidebar: React.FC<FlowSidebarProps> = ({
   activeTab,
   onSelectTab,
   apparentTheme = false,
+  favorites = [],
 }) => {
   const isSidebarDark = apparentTheme;
 
@@ -209,6 +212,42 @@ export const FlowSidebar: React.FC<FlowSidebarProps> = ({
             </button>
           )}
         </div>
+
+        {/* Pinned Favorites Section */}
+        {favorites.length > 0 && !navSearch && (
+          <div className="space-y-1 mb-3">
+            <div className="flex items-center gap-2 px-1 py-1 text-[10px] font-extrabold text-amber-500 uppercase tracking-wider">
+              <Icon name="Star" size={12} className="fill-amber-400 text-amber-500" />
+              <span>FAVORITES ({favorites.length})</span>
+              <span className="flex-1 h-[1px] bg-amber-500/20" />
+            </div>
+
+            <div className="space-y-0.5">
+              {favorites.map((favId) => {
+                const item = getNavItemById(favId);
+                const isActive = activeTab === favId;
+
+                return (
+                  <button
+                    key={favId}
+                    onClick={() => onSelectTab(favId)}
+                    className={`w-full px-2.5 py-1.5 rounded-lg text-left text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-amber-500 text-white shadow-2xs font-bold'
+                        : 'text-slate-700 dark:text-slate-200 hover:bg-amber-50 dark:hover:bg-amber-950/30 hover:text-amber-700 dark:hover:text-amber-400'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <Icon name={item.groupIcon} size={13} className={isActive ? 'text-white' : 'text-amber-500'} />
+                      <span className="truncate">{item.label}</span>
+                    </div>
+                    <Icon name="ChevronRight" size={12} className={isActive ? 'text-white' : 'text-slate-400'} />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Navigation Sections */}
         {navSections.map((section) => {

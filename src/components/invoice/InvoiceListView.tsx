@@ -784,7 +784,7 @@ export const InvoiceListView: React.FC<InvoiceListViewProps> = ({ activeTab, onS
                               handleUpdateStatus(inv.id, 'Paid');
                               setActiveMenuId(null);
                             }}
-                            className="w-full px-3 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 flex items-center gap-2 cursor-pointer"
+                            className="w-full px-3 py-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 flex items-center gap-2 cursor-pointer"
                           >
                             <span>Mark Paid</span>
                           </button>

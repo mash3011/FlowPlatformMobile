@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow Platform - Reports & Batch Assign (Figma 270:8560 & 270:8771)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0b0f17;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      color: #0f172a;
+    }
+    .phone-frame {
+      width: 393px;
+      height: 852px;
+      background-color: #f8f9ff;
+      border-radius: 48px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 10px #1e1e24, 0 0 0 12px #334155;
+    }
+    .top-header {
+      height: 56px;
+      background-color: #1e1e24;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+    .header-title { font-size: 17px; font-weight: 700; color: #ffffff; }
+    .icon-btn { background: none; border: none; cursor: pointer; color: #ffffff; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 8px; position: relative; }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .badge-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; background-color: #ef4444; border-radius: 50%; }
+
+    .screen-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 88px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background-color: #f8f9ff;
+    }
+    .screen-content::-webkit-scrollbar { display: none; }
+
+    /* Title & Action */
+    .title-row { display: flex; align-items: center; justify-content: space-between; }
+    .page-title { font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em; }
+    .add-btn {
+      background: #10b981;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+    }
+    .add-btn svg { width: 14px; height: 14px; }
+
+    /* Search Bar */
+    .search-box {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .search-box svg { width: 16px; height: 16px; color: #94a3b8; }
+    .search-input {
+      border: none;
+      outline: none;
+      background: none;
+      font-size: 13px;
+      color: #0f172a;
+      width: 100%;
+    }
+
+    /* Filter Chips */
+    .filter-chips { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+    .filter-chips::-webkit-scrollbar { display: none; }
+    .chip { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 6px 12px; font-size: 11.5px; font-weight: 600; color: #475569; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
+    .chip.active { background-color: #10b981; border-color: #10b981; color: #ffffff; }
+
+    /* Reports List matching Figma Frame 270:8560 */
+    .reports-list { display: flex; flex-direction: column; gap: 10px; }
+    .report-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .report-card:hover { border-color: #cbd5e1; transform: translateY(-1px); }
+    .report-left { display: flex; align-items: center; gap: 12px; }
+    .sn-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #2563eb;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .report-info { display: flex; flex-direction: column; gap: 2px; }
+    .report-title { font-size: 14px; font-weight: 700; color: #0f172a; }
+    .report-client { font-size: 12px; color: #64748b; font-weight: 500; }
+    .report-right { text-align: right; }
+    .report-date { font-size: 11px; font-weight: 600; color: #94a3b8; }
+    .report-status {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #10b981;
+      background: #ecfdf5;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    /* Assign Batch / Add Report Modal Overlay (Figma Frame 270:8771) */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      justify-content: flex-end;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .modal-sheet {
+      background: #ffffff;
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      max-height: 90%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
+    }
+    .sheet-handle { width: 44px; height: 5px; background: #cbd5e1; border-radius: 3px; margin: 12px auto 6px auto; }
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .sheet-title { font-size: 17px; font-weight: 800; color: #0f172a; }
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .close-btn svg { width: 16px; height: 16px; }
+
+    .modal-body {
+      overflow-y: auto;
+      padding: 16px 20px 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .modal-subtitle { font-size: 12px; color: #64748b; }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label { font-size: 11.5px; font-weight: 700; color: #334155; }
+    .form-input, .form-select {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0f172a;
+      outline: none;
+    }
+
+    /* Location multi-select chips matching Frame 270:8771 */
+    .chips-group { display: flex; flex-wrap: wrap; gap: 6px; }
+    .loc-chip {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+    }
+    .loc-chip.selected {
+      background: #ecfdf5;
+      border-color: #10b981;
+      color: #059669;
+    }
+
+    /* File Dropzone matching Frame 270:8771 */
+    .dropzone {
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 18px 12px;
+      text-align: center;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .dropzone svg { width: 28px; height: 28px; color: #10b981; }
+    .dropzone-text { font-size: 12px; font-weight: 600; color: #0f172a; }
+    .dropzone-sub { font-size: 10.5px; color: #94a3b8; }
+
+    /* Modal Action Buttons */
+    .modal-actions { display: flex; gap: 10px; margin-top: 6px; }
+    .btn-secondary {
+      flex: 1;
+      height: 42px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: #ffffff;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-primary {
+      flex: 1.2;
+      height: 42px;
+      border: none;
+      border-radius: 12px;
+      background: #10b981;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Floating Bottom Nav */
+    .bottom-nav {
+      position: absolute;
+      bottom: 12px;
+      left: 16px;
+      right: 16px;
+      height: 62px;
+      background-color: #1e1e24;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 8px;
+      z-index: 30;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 14px;
+      transition: all 0.15s;
+    }
+    .nav-item.active { color: #10b981; }
+    .nav-item svg { width: 20px; height: 20px; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+  <div class="phone-frame">
+    <!-- Top Header -->
+    <header class="top-header">
+      <button class="icon-btn" title="Open Navigation Drawer" onclick="window.location.href='mobile-sidebar-drawer.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      
+      <span class="header-title">Flow Platform</span>
+      
+      <button class="icon-btn" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span class="badge-dot"></span>
+      </button>
+    </header>
+
+    <!-- Main Screen Content matching Figma Frame 270:8560 -->
+    <main class="screen-content">
+      
+      <!-- Title & CTA -->
+      <div class="title-row">
+        <h1 class="page-title">Reports &amp; Batches</h1>
+        <button class="add-btn" onclick="openModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add Report
+        </button>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" class="search-input" placeholder="Search reports, clients, or locations...">
+      </div>
+
+      <!-- Filter Pills -->
+      <div class="filter-chips">
+        <span class="chip active">All</span>
+        <span class="chip">Derby County FC</span>
+        <span class="chip">Notts County</span>
+        <span class="chip">Pavestone Ralley</span>
+      </div>
+
+      <!-- Reports List from Frame 270:8560 -->
+      <div class="reports-list">
+        <!-- Report 1 -->
+        <div class="report-card" onclick="openModal()">
+          <div class="report-left">
+            <div class="sn-badge">1</div>
+            <div class="report-info">
+              <div class="report-title">July Report</div>
+              <div class="report-client">Derby County Football Club</div>
+            </div>
+          </div>
+          <div class="report-right">
+            <div class="report-date">20 Aug, 2025</div>
+            <div class="report-status">Verified</div>
+          </div>
+        </div>
+
+        <!-- Report 2 -->
+        <div class="report-card" onclick="openModal()">
+          <div class="report-left">
+            <div class="sn-badge">2</div>
+            <div class="report-info">
+              <div class="report-title">Mid Season Report</div>
+              <div class="report-client">Notts County Football Club</div>
+            </div>
+          </div>
+          <div class="report-right">
+            <div class="report-date">3 Aug, 2025</div>
+            <div class="report-status">Verified</div>
+          </div>
+        </div>
+
+        <!-- Report 3 -->
+        <div class="report-card" onclick="openModal()">
+          <div class="report-left">
+            <div class="sn-badge">3</div>
+            <div class="report-info">
+              <div class="report-title">Weekend Report</div>
+              <div class="report-client">The North Leeds Food Festival</div>
+            </div>
+          </div>
+          <div class="report-right">
+            <div class="report-date">18 Jul, 2025</div>
+            <div class="report-status">Verified</div>
+          </div>
+        </div>
+
+        <!-- Report 4 -->
+        <div class="report-card" onclick="openModal()">
+          <div class="report-left">
+            <div class="sn-badge">4</div>
+            <div class="report-info">
+              <div class="report-title">Partamine Jun-Jul Report</div>
+              <div class="report-client">Derby LIVE</div>
+            </div>
+          </div>
+          <div class="report-right">
+            <div class="report-date">15 Jul, 2025</div>
+            <div class="report-status">Verified</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <a href="mobile-stitch-export.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Home</span>
+      </a>
+      <a href="mobile-stock-check.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+          <path d="m3.3 7 8.7 5 8.7-5"></path>
+          <path d="M12 22V12"></path>
+        </svg>
+        <span>Stock</span>
+      </a>
+      <a href="mobile-invoice-list.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <span>Invoice</span>
+      </a>
+      <a href="mobile-performance-metrics.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        <span>Metrics</span>
+      </a>
+      <a href="mobile-reports-batch.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+        <span>Reports</span>
+      </a>
+    </nav>
+
+    <!-- Add Report / Assign Batch Modal Pop-Up matching Figma Frame 270:8771 -->
+    <div class="modal-overlay" id="addReportModal">
+      <div class="modal-sheet">
+        <div class="sheet-handle"></div>
+
+        <div class="sheet-header">
+          <span class="sheet-title">Add Report / Assign Batch</span>
+          <button class="close-btn" onclick="closeModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="modal-subtitle">Fill the appropriate details below</div>
+
+          <div class="form-group">
+            <label class="form-label">Report Name</label>
+            <input type="text" class="form-input" value="May Impact" placeholder="Enter report name...">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Client</label>
+            <select class="form-select">
+              <option>Notts County Football Club</option>
+              <option>Derby County Football Club</option>
+              <option>The North Leeds Food Festival</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Location (Selected: 5 items)</label>
+            <div class="chips-group">
+              <span class="loc-chip selected">All</span>
+              <span class="loc-chip selected">Away Stand</span>
+              <span class="loc-chip selected">Family Stand</span>
+              <span class="loc-chip selected">Hospitality</span>
+              <span class="loc-chip selected">Lawton</span>
+              <span class="loc-chip">Main Cellar</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Date Range</label>
+            <input type="text" class="form-input" value="1st May, 2025 - 31st May, 2025" readonly onclick="window.location.href='mobile-calendar-picker.html'">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Upload File</label>
+            <div class="dropzone" onclick="alert('File picker opened')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <div class="dropzone-text">Drop your file here, or choose a file</div>
+              <div class="dropzone-sub">File (max 50MB)</div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+            <button class="btn-primary" onclick="alert('Report Added and Batch Assigned Successfully!'); closeModal();">Assign Batch</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function openModal() {
+      document.getElementById('addReportModal').style.display = 'flex';
+    }
+    function closeModal() {
+      document.getElementById('addReportModal').style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>

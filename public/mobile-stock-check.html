@@ -1,0 +1,2498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow Platform - Stock Check Variations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0b0f17;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+      color: #0f172a;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top switcher toolbar above the phone */
+    .showcase-toolbar {
+      width: 100%;
+      max-width: 440px;
+      background: #18202d;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+    }
+    .toolbar-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #34d399;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .var-buttons-track {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .var-buttons-track::-webkit-scrollbar { height: 4px; }
+    .var-buttons-track::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .var-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .var-btn:hover { background: #334155; color: #ffffff; }
+    .var-btn.active { background: #10b981; color: #ffffff; border-color: #10b981; font-weight: 700; }
+
+    /* Phone Simulator Frame */
+    .phone-frame {
+      width: 393px;
+      height: 852px;
+      background-color: #f4f7f6;
+      border-radius: 48px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 10px #1e1e24, 0 0 0 12px #334155;
+    }
+
+    /* Top Bar */
+    .top-header {
+      height: 56px;
+      background-color: #1f2937;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+      flex-shrink: 0;
+      z-index: 20;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .header-title { font-size: 17px; font-weight: 700; color: #ffffff; letter-spacing: -0.01em; }
+    .icon-btn { background: none; border: none; cursor: pointer; color: #ffffff; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 8px; position: relative; }
+    .icon-btn svg { width: 20px; height: 20px; display: block; }
+    .badge-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; background-color: #ef4444; border-radius: 50%; border: 1.5px solid #1f2937; }
+
+    /* Screen Views Container */
+    .screen-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 88px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background-color: #f4f7f6;
+    }
+    .screen-content::-webkit-scrollbar { display: none; }
+    
+    .title-row { display: flex; align-items: center; justify-content: space-between; }
+    .page-title { font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em; }
+    .filter-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e2e8f0; background: #ffffff; color: #334155; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .filter-btn svg { width: 16px; height: 16px; }
+
+    /* Chips */
+    .filter-chips { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+    .filter-chips::-webkit-scrollbar { display: none; }
+    .chip { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #475569; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
+    .chip.active { background-color: #1a5140; border-color: #1a5140; color: #ffffff; }
+
+    /* Segmented status capsule */
+    .capsule-group { background: #e4ece7; padding: 4px; border-radius: 14px; display: flex; align-items: center; justify-content: space-between; }
+    .capsule-item { flex: 1; text-align: center; font-size: 12px; font-weight: 700; color: #334155; padding: 6px 0; border-radius: 10px; cursor: pointer; border: none; background: transparent; }
+    .capsule-item.active { background: #1a5140; color: #ffffff; }
+
+    /* Summary Stat Cards */
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .summary-card { background: #1b5141; border-radius: 16px; padding: 14px; display: flex; align-items: center; justify-content: space-between; color: #ffffff; }
+    .summary-label { font-size: 11px; font-weight: 600; color: #a3c9bd; display: block; }
+    .summary-val { font-size: 24px; font-weight: 900; color: #ffffff; margin-top: 2px; display: block; line-height: 1; }
+    .summary-icon-box { width: 36px; height: 36px; border-radius: 10px; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; color: #a3c9bd; }
+    .summary-icon-box svg { width: 20px; height: 20px; }
+
+    /* Cards */
+    .cards-row-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .item-card { position: relative; background: #e1eae6; border-radius: 16px; height: 106px; overflow: hidden; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+    .item-card.full-width { width: 100%; }
+    .badge-top-left { position: absolute; top: 0; left: 0; width: 44px; height: 44px; border-top-left-radius: 16px; border-bottom-right-radius: 16px; display: flex; align-items: center; justify-content: center; color: #ffffff; }
+    .badge-top-right { position: absolute; top: 0; right: 0; width: 44px; height: 44px; border-top-right-radius: 16px; border-bottom-left-radius: 16px; display: flex; align-items: center; justify-content: center; color: #ffffff; }
+    .badge-top-left svg, .badge-top-right svg { width: 20px; height: 20px; }
+    .badge-ocean { background-color: #006891; }
+    .badge-teal { background-color: #1e878e; }
+    .badge-slate { background-color: #35393d; }
+    .badge-forest-teal { background-color: #1d7566; }
+    .title-left-indented { padding-left: 38px; }
+    .title-left-normal { padding-right: 38px; }
+    .item-title { font-size: 13.5px; font-weight: 700; color: #0f172a; }
+    .item-count { font-size: 24px; font-weight: 800; color: #0f172a; line-height: 1; }
+    .count-bottom-right { align-self: flex-end; }
+    .count-bottom-left { align-self: flex-start; }
+
+    /* Accordion styles */
+    .acc-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; cursor: pointer; border: none; background: transparent; width: 100%; text-align: left; }
+    .acc-title-group { display: flex; align-items: baseline; gap: 8px; }
+    .acc-title { font-size: 16px; font-weight: 700; color: #0f172a; }
+    .acc-subtitle { font-size: 12px; color: #64748b; font-weight: 500; }
+    .acc-chevron { color: #64748b; font-size: 14px; font-weight: bold; }
+
+    /* Left rail styles */
+    .rail-layout { display: flex; height: 100%; overflow: hidden; }
+    .rail-sidebar { width: 68px; background: #e7eee9; border-right: 1px solid #cbd5e1; display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 14px; flex-shrink: 0; }
+    .rail-circle { width: 44px; height: 44px; border-radius: 50%; background: #ffffff; color: #334155; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .rail-circle.active { background: #1a5140; color: #ffffff; }
+    .rail-label { font-size: 10px; color: #64748b; font-weight: 600; text-align: center; margin-top: 2px; }
+
+    /* Horizontal carousel track */
+    .h-carousel { display: flex; gap: 12px; overflow-x: auto; padding: 4px 0; -webkit-overflow-scrolling: touch; }
+    .h-carousel::-webkit-scrollbar { display: none; }
+    .carousel-card { width: 160px; height: 106px; flex-shrink: 0; position: relative; background: #e1eae6; border-radius: 16px; overflow: hidden; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; }
+
+    /* Bottom Nav Bar */
+    .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 66px; background-color: #1f2937; display: flex; align-items: center; justify-content: space-around; padding: 0 6px 6px 6px; z-index: 30; box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25); }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #94a3b8; font-size: 10px; font-weight: 600; text-decoration: none; cursor: pointer; flex: 1; }
+    .nav-item.active { color: #10b981; }
+    .nav-item svg { width: 19px; height: 19px; }
+    .nav-center-action { position: relative; top: -16px; width: 52px; height: 52px; border-radius: 50%; background-color: #10b981; color: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); border: 4px solid #1f2937; cursor: pointer; flex-shrink: 0; }
+    .nav-center-action svg { width: 26px; height: 26px; }
+
+    /* View toggles */
+    .view-pane { display: none; }
+    .view-pane.active { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Variation Control Bar -->
+  <div class="showcase-toolbar">
+    <div class="toolbar-label">
+      <span>Layout Variations Preview</span>
+      <span style="color: #94a3b8; font-size: 10px;">Select to switch view</span>
+    </div>
+    <div class="var-buttons-track">
+      <button class="var-btn active" onclick="switchView('v-circulayo', this)" style="border-color: #10b981; font-weight: 700;">👥 1. Circulayo Teams</button>
+      <button class="var-btn" onclick="switchView('v-clients', this)" style="border-color: #10b981; font-weight: 700;">🏢 2. Clients View</button>
+      <button class="var-btn" onclick="switchView('v1', this)">1. Exact Figma</button>
+      <button class="var-btn" onclick="switchView('v2', this)">2. Dual Filter</button>
+      <button class="var-btn" onclick="switchView('v3', this)">3. Accordion</button>
+      <button class="var-btn" onclick="switchView('v4', this)">4. Left Rail</button>
+      <button class="var-btn" onclick="switchView('v5', this)">5. Swipe Carousel</button>
+      <button class="var-btn" onclick="switchView('v6', this)">6. Capsule & Search</button>
+        <button class="var-btn" onclick="switchView('v7', this)">7. Stat Chips</button>
+        <button class="var-btn" onclick="switchView('v8', this)">8. Venue Sheet</button>
+        <button class="var-btn" onclick="switchView('v9', this)">9. Compact Floor</button>
+    </div>
+  </div>
+
+  <div class="phone-frame">
+    <!-- Header -->
+    <header class="top-header">
+      <button class="icon-btn" title="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <span class="header-title">Flow Platform</span>
+      <button class="icon-btn" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+        <span class="badge-dot"></span>
+      </button>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW: CIRCULAYO TEAMS VIEW -->
+    <!-- Filter Order: 1. All (Stock Available & Low Stock) -> 2. Client -> 3. Location (by Client) -->
+    <!-- ========================================================================= -->
+    <div id="v-circulayo" class="view-pane screen-content active">
+
+
+      <!-- Header -->
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <h1 class="page-title" style="margin: 0;">Stock Check</h1>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button onclick="resetCtFilters()" style="font-size: 11px; font-weight: 700; color: #047857; background: #e7eee9; border: 1px solid #c4dcce; padding: 4px 10px; border-radius: 9999px; cursor: pointer;">Reset</button>
+          <button onclick="toggleFilterSheet()" style="width: 36px; height: 36px; border-radius: 50%; background: #e7eee9; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #164e3f;" title="Filters" aria-label="Filters">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#164e3f" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3.5 2 3.5 10 12.5 10 20.5 14 20.5 14 12.5 22 3.5"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Capsule Controls: Side by Side (Client Selector + Merged Location & All) -->
+      <div style="display: flex; align-items: center; gap: 8px; position: relative;">
+        <!-- Capsule 1: Client Selector -->
+        <div style="position: relative; flex: 1; min-width: 0;">
+          <div onclick="toggleCtClientMenu()" style="height: 42px; padding: 0 12px; border-radius: 9999px; background: #ffffff; border: 1px solid #c4dcce; display: flex; align-items: center; justify-content: space-between; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; min-width: 0;">
+              <div id="ct-client-logo" style="width: 22px; height: 22px; border-radius: 6px; background: #004f32; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"><span style="font-size: 10px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px;">D<span style="color: #f59e0b;">N</span></span></div>
+              <span id="ct-client-label" style="font-size: 13px; font-weight: 700; color: #244e3f; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Delaware North UK</span>
+            </div>
+            <button onclick="event.stopPropagation(); setCtClient('delaware-north', 'Delaware North UK');" style="width: 20px; height: 20px; border-radius: 50%; background: transparent; border: none; color: #164e3f; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">✕</button>
+          </div>
+
+          <!-- Client Picker Dropdown Popover -->
+          <div id="ct-client-menu" style="display: none; position: absolute; top: 48px; left: 0; width: 280px; background: #ffffff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; padding: 12px; z-index: 50;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Select Client</span>
+              <span onclick="toggleCtClientMenu()" style="font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer;">Close</span>
+            </div>
+
+            <!-- Search Bar -->
+            <div style="margin-bottom: 8px; position: relative;">
+              <div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #f4f7f6; border-radius: 12px; border: 1.5px solid #10b981;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" style="width: 14px; height: 14px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input id="ct-client-search" oninput="filterCtClients()" type="text" placeholder="Search clients..." style="width: 100%; border: none; background: transparent; font-size: 12px; font-weight: 600; color: #0f172a; outline: none;">
+              </div>
+            </div>
+
+            <!-- Client Options List -->
+            <div id="ct-client-options" style="display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto;">
+              <button onclick="setCtClient('delaware-north', 'Delaware North UK')" class="ct-c-opt" data-name="Delaware North UK" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 12px; border: none; background: #e7eee9; color: #164e3f; font-weight: 700; font-size: 12px; cursor: pointer; text-align: left;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="width: 22px; height: 22px; border-radius: 6px; background: #004f32; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><span style="font-size: 10px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px;">D<span style="color: #f59e0b;">N</span></span></div>
+                  <span>Delaware North UK</span>
+                </div>
+                <span style="font-size: 10px; color: #047857;">5 locations</span>
+              </button>
+              <button onclick="setCtClient('compass-group', 'Compass / Levy')" class="ct-c-opt" data-name="Compass Group / Levy" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 12px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="width: 22px; height: 22px; border-radius: 6px; background: #002d62; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="9" stroke="#00a3e0" stroke-width="2"/><polygon points="12,5 14,10 19,12 14,14 12,19 10,14 5,12 10,10" fill="#ffffff"/><circle cx="12" cy="12" r="2" fill="#c41230"/></svg></div>
+                  <span>Compass Group / Levy</span>
+                </div>
+                <span style="font-size: 10px; color: #64748b;">2 locations</span>
+              </button>
+              <button onclick="setCtClient('elior-uk', 'Elior UK')" class="ct-c-opt" data-name="Elior UK" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 12px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="width: 22px; height: 22px; border-radius: 6px; background: #5c1d3f; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><span style="font-size: 9px; font-weight: 900; color: #fcd34d;">elior</span></div>
+                  <span>Elior UK Sports</span>
+                </div>
+                <span style="font-size: 10px; color: #64748b;">2 locations</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capsule 2: Location Selector -->
+        <div style="position: relative; flex: 1; min-width: 0;">
+          <div onclick="toggleCtLocMenu()" style="height: 42px; padding: 0 12px; border-radius: 9999px; background: #ffffff; border: 1px solid #c4dcce; display: flex; align-items: center; justify-content: space-between; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; min-width: 0;">
+              <div id="ct-loc-badge" style="width: 22px; height: 22px; border-radius: 50%; background: #164e3f; color: #ffffff; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; letter-spacing: -0.5px;">AL</div>
+              <span id="ct-loc-label" style="font-size: 13px; font-weight: 700; color: #244e3f; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">All Locations</span>
+              <span id="ct-loc-fav" onclick="event.stopPropagation(); toggleFavLocation(ctLocationLabel())" style="cursor: pointer; display: flex; align-items: center; padding: 2px;">
+                <svg id="ct-loc-fav-svg" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" style="width: 13px; height: 13px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </span>
+            </div>
+            <div id="ct-loc-action-icon" style="flex-shrink: 0;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#164e3f" stroke-width="2.6" style="width: 13px; height: 13px;"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+
+          <!-- Location Picker Dropdown Popover -->
+          <div id="ct-loc-menu" style="display: none; position: absolute; top: 48px; right: 0; width: 280px; background: #ffffff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; padding: 12px; z-index: 50;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <span id="ct-loc-menu-header" style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Select Venue</span>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <button id="ct-fav-filter-btn" type="button" onclick="toggleCtFavFilter()" style="border: none; background: transparent; padding: 3px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #94a3b8;" title="Filter favorites only">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </button>
+                <span onclick="toggleCtLocMenu()" style="font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer;">Close</span>
+              </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div style="margin-bottom: 8px; position: relative;">
+              <div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #f4f7f6; border-radius: 12px; border: 1.5px solid #10b981;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" style="width: 14px; height: 14px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input id="ct-loc-search" oninput="filterCtLocations()" type="text" placeholder="Search venues..." style="width: 100%; border: none; background: transparent; font-size: 12px; font-weight: 600; color: #0f172a; outline: none;">
+              </div>
+            </div>
+
+            <!-- Location Options List (Merged All & Location) -->
+            <div id="ct-loc-options" style="display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto;">
+              <!-- Dynamically populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Metric Cards -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div>
+            <span class="summary-label">Total Items</span>
+            <span id="ct-total-val" class="summary-val">385</span>
+          </div>
+          <div class="summary-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 20px; height: 20px;"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div>
+            <span class="summary-label">Categories</span>
+            <span id="ct-cats-val" class="summary-val">4</span>
+          </div>
+          <div class="summary-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 20px; height: 20px;"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Cards Grid -->
+      <div class="cards-grid">
+        <div class="item-card ct-card" data-stock="Available" data-title="Strongbow Original Cider Can">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Strongbow Original Cider Can</h3></div>
+          <div class="item-count count-bottom-right">100</div>
+        </div>
+        <div class="item-card ct-card" data-stock="Available" data-title="Coors Light 24x330ml Bottles">
+          <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l-2 15a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3L6 3Z"></path></svg></div>
+          <div class="title-left-normal"><h3 class="item-title">Coors Light 24x330ml Bottles</h3></div>
+          <div class="item-count count-bottom-left">240</div>
+        </div>
+        <div class="item-card ct-card" data-stock="Available" data-title="Heineken 0.0% 24x330ml Bottles">
+          <div class="badge-top-left badge-slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Heineken 0.0% 24x330ml Bottles</h3></div>
+          <div class="item-count count-bottom-right">36</div>
+        </div>
+        <div class="item-card ct-card" data-stock="Low Stock" data-title="Pravha Keg 50L">
+          <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"></path></svg></div>
+          <div class="title-left-normal"><h3 class="item-title">Pravha Keg 50L</h3></div>
+          <div class="item-count count-bottom-left" style="color: #b45309;">0</div>
+        </div>
+      </div>
+      <div id="ct-pint-container" style="margin-top: 12px;">
+        <div class="item-card full-width ct-card" data-stock="Available" data-title="Pint GG">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l-2 15a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3L6 3Z"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Pint GG</h3></div>
+          <div class="item-count count-bottom-right">9</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW: CLIENTS VIEW (Customer View) -->
+    <!-- EXACT 1:1 REPLICATION OF USER IMAGE: [ All ▾ ] and [ Derby County FC ✕ ] -->
+    <!-- ========================================================================= -->
+    <div id="v-clients" class="view-pane screen-content">
+
+
+      <!-- Customer Header Row -->
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <h1 class="page-title" style="margin: 0;">Stock Check</h1>
+        <button onclick="toggleFilterSheet()" style="width: 36px; height: 36px; border-radius: 50%; background: #e7eee9; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #164e3f;" title="Filters" aria-label="Filters">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#164e3f" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3.5 2 3.5 10 12.5 10 20.5 14 20.5 14 12.5 22 3.5"></polygon>
+          </svg>
+        </button>
+      </div>
+
+      <!-- MERGED ALL & LOCATION CAPSULE (1:1 UNIFIED DROPDOWN) -->
+      <div style="position: relative;">
+        <div onclick="toggleCvLocMenu()" style="height: 42px; padding: 0 16px; border-radius: 9999px; background: #ffffff; border: 1px solid #c4dcce; display: flex; align-items: center; justify-content: space-between; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); cursor: pointer;">
+          <div style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+            <div id="cv-loc-badge" style="width: 24px; height: 24px; border-radius: 50%; background: #164e3f; color: #ffffff; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; letter-spacing: -0.5px;">AL</div>
+            <span id="cv-loc-label" style="font-size: 13.5px; font-weight: 700; color: #244e3f; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">All Locations</span>
+            <span id="cv-loc-fav" onclick="event.stopPropagation(); toggleFavLocation(clientLocation)" style="cursor: pointer; display: flex; align-items: center; padding: 2px;">
+              <svg id="cv-loc-fav-svg" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" style="width: 13px; height: 13px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </span>
+          </div>
+          <div id="cv-loc-icon-area">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#164e3f" stroke-width="2.6" style="width: 14px; height: 14px;"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+
+        <!-- Location Picker Dropdown (EXACT SCREENSHOT MATCH) -->
+        <div id="cv-loc-menu" style="display: none; position: absolute; top: 48px; left: 0; right: 0; background: #ffffff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; padding: 12px; z-index: 50;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Select Venue</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <button id="cv-fav-filter-btn" type="button" onclick="toggleCvFavFilter()" style="border: none; background: transparent; padding: 3px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #94a3b8;" title="Filter favorites only">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </button>
+              <span onclick="toggleCvLocMenu()" style="font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer;">Close</span>
+            </div>
+          </div>
+
+          <!-- Integrated Venue Search Bar with Emerald Border Ring -->
+          <div style="margin-bottom: 8px; position: relative;">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: #f4f7f6; border-radius: 12px; border: 1.5px solid #10b981;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" style="width: 14px; height: 14px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input id="cv-venue-search" oninput="filterCvVenues()" type="text" placeholder="Search venues..." style="width: 100%; border: none; background: transparent; font-size: 12px; font-weight: 600; color: #0f172a; outline: none;">
+            </div>
+          </div>
+
+          <!-- Venue Options (With Location Initials Badges) -->
+          <div id="cv-venue-options" style="display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto;">
+            <button onclick="setCvLoc('All Locations')" class="cv-v-opt" data-name="All Locations" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 12px; border: none; background: #e7eee9; color: #164e3f; font-weight: 700; font-size: 12px; cursor: pointer; text-align: left;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="cv-v-badge" style="width: 24px; height: 24px; border-radius: 50%; background: #164e3f; color: #ffffff; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">AL</div>
+                <span>All Locations</span>
+                <span class="opt-fav-btn" data-name="All Locations" onclick="event.stopPropagation(); toggleFavLocation('All Locations')" style="cursor: pointer; display: flex; align-items: center; padding: 2px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" style="width: 12px; height: 12px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </span>
+              </div>
+              <span style="font-size: 10px; color: #047857; font-weight: 700;">150 items</span>
+            </button>
+            <button onclick="setCvLoc('Location 1')" class="cv-v-opt" data-name="Location 1" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 12px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="cv-v-badge" style="width: 24px; height: 24px; border-radius: 50%; background: #d8e6df; color: #164e3f; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">L1</div>
+                <span>Location 1</span>
+                <span class="opt-fav-btn" data-name="Location 1" onclick="event.stopPropagation(); toggleFavLocation('Location 1')" style="cursor: pointer; display: flex; align-items: center; padding: 2px;">
+                  <svg viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" style="width: 12px; height: 12px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </span>
+              </div>
+              <span style="font-size: 10px; color: #047857; font-weight: 700;">4 categories • 385 items</span>
+            </button>
+            <button onclick="setCvLoc('Location 2')" class="cv-v-opt" data-name="Location 2" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 12px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="cv-v-badge" style="width: 24px; height: 24px; border-radius: 50%; background: #d8e6df; color: #164e3f; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">L2</div>
+                <span>Location 2</span>
+                <span class="opt-fav-btn" data-name="Location 2" onclick="event.stopPropagation(); toggleFavLocation('Location 2')" style="cursor: pointer; display: flex; align-items: center; padding: 2px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" style="width: 12px; height: 12px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </span>
+              </div>
+              <span style="font-size: 10px; color: #64748b;">1 category • 9 items</span>
+            </button>
+            <button onclick="setCvLoc('Location 3')" class="cv-v-opt" data-name="Location 3" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 12px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="cv-v-badge" style="width: 24px; height: 24px; border-radius: 50%; background: #d8e6df; color: #164e3f; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">L3</div>
+                <span>Location 3</span>
+                <span class="opt-fav-btn" data-name="Location 3" onclick="event.stopPropagation(); toggleFavLocation('Location 3')" style="cursor: pointer; display: flex; align-items: center; padding: 2px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" style="width: 12px; height: 12px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </span>
+              </div>
+              <span style="font-size: 10px; color: #64748b;">1 category • 42 items</span>
+            </button>
+            <button onclick="setCvLoc('Location 4')" class="cv-v-opt" data-name="Location 4" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 12px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="cv-v-badge" style="width: 24px; height: 24px; border-radius: 50%; background: #d8e6df; color: #164e3f; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">L4</div>
+                <span>Location 4</span>
+                <span class="opt-fav-btn" data-name="Location 4" onclick="event.stopPropagation(); toggleFavLocation('Location 4')" style="cursor: pointer; display: flex; align-items: center; padding: 2px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" style="width: 12px; height: 12px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </span>
+              </div>
+              <span style="font-size: 10px; color: #64748b;">1 category • 18 items</span>
+            </button>
+            <button onclick="setCvLoc('Location 5')" class="cv-v-opt" data-name="Location 5" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 12px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="cv-v-badge" style="width: 24px; height: 24px; border-radius: 50%; background: #d8e6df; color: #164e3f; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">L5</div>
+                <span>Location 5</span>
+                <span class="opt-fav-btn" data-name="Location 5" onclick="event.stopPropagation(); toggleFavLocation('Location 5')" style="cursor: pointer; display: flex; align-items: center; padding: 2px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" style="width: 12px; height: 12px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </span>
+              </div>
+              <span style="font-size: 10px; color: #64748b;">1 category • 12 items</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Metric Cards -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div>
+            <span class="summary-label">Total Items</span>
+            <span id="cv-total-val" class="summary-val">385</span>
+          </div>
+          <div class="summary-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 20px; height: 20px;"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div>
+            <span class="summary-label">Categories</span>
+            <span class="summary-val">4</span>
+          </div>
+          <div class="summary-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 20px; height: 20px;"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Cards Grid -->
+      <div class="cards-grid">
+        <div class="item-card cv-card" data-stock="Available" data-title="Strongbow Original Cider Can">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Strongbow Original Cider Can</h3></div>
+          <div class="item-count count-bottom-right">100</div>
+        </div>
+        <div class="item-card cv-card" data-stock="Available" data-title="Coors Light 24x330ml Bottles">
+          <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l-2 15a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3L6 3Z"></path></svg></div>
+          <div class="title-left-normal"><h3 class="item-title">Coors Light 24x330ml Bottles</h3></div>
+          <div class="item-count count-bottom-left">240</div>
+        </div>
+        <div class="item-card cv-card" data-stock="Available" data-title="Heineken 0.0% 24x330ml Bottles">
+          <div class="badge-top-left badge-slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Heineken 0.0% 24x330ml Bottles</h3></div>
+          <div class="item-count count-bottom-right">36</div>
+        </div>
+        <div class="item-card cv-card" data-stock="Low Stock" data-title="Pravha Keg 50L">
+          <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"></path></svg></div>
+          <div class="title-left-normal"><h3 class="item-title">Pravha Keg 50L</h3></div>
+          <div class="item-count count-bottom-left" style="color: #b45309;">0</div>
+        </div>
+      </div>
+      <div id="cv-pint-container" style="margin-top: 12px;">
+        <div class="item-card full-width cv-card" data-stock="Available" data-title="Pint GG">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l-2 15a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3L6 3Z"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Pint GG</h3></div>
+          <div class="item-count count-bottom-right">9</div>
+        </div>
+      </div>
+    </div>
+        <!-- ==================== VIEW 1: EXACT FIGMA ==================== -->
+    <div id="v1" class="view-pane screen-content">
+      <div class="title-row">
+        <h1 class="page-title">Stock Check</h1>
+        <button class="filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg></button>
+      </div>
+
+      <div class="filter-chips">
+        <button class="chip active">All</button>
+        <button class="chip">Available Stock</button>
+        <button class="chip">Derby County FC</button>
+        <button class="chip">Notts County</button>
+        <button class="chip">Pavestone Ralley</button>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div><span class="summary-label">Total Items</span><span class="summary-val">150</span></div>
+          <div class="summary-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"></path><path d="M6 18h12"></path><path d="M6 14h12"></path></svg></div>
+        </div>
+        <div class="summary-card">
+          <div><span class="summary-label">Categories</span><span class="summary-val">6</span></div>
+          <div class="summary-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg></div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="cards-row-2col">
+          <div class="item-card">
+            <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path></svg></div>
+            <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-right">65</div>
+          </div>
+          <div class="item-card">
+            <div class="badge-top-right badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg></div>
+            <div class="title-left-normal"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-left">233</div>
+          </div>
+        </div>
+
+        <div class="cards-row-2col">
+          <div class="item-card">
+            <div class="badge-top-left badge-slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+            <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-right">9</div>
+          </div>
+          <div class="item-card">
+            <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path></svg></div>
+            <div class="title-left-normal"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-left">78</div>
+          </div>
+        </div>
+
+        <div class="item-card full-width">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l-2 15a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3L6 3Z"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Pint GG</h3></div>
+          <div class="item-count count-bottom-right">9</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 2: DUAL FILTER ==================== -->
+    <div id="v2" class="view-pane screen-content">
+      <div class="title-row">
+        <h1 class="page-title">Stock Check</h1>
+        <button class="filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg></button>
+      </div>
+
+      <div class="capsule-group">
+        <button class="capsule-item active">All</button>
+        <button class="capsule-item">Available</button>
+        <button class="capsule-item">Low stock</button>
+      </div>
+
+      <div class="filter-chips">
+        <button class="chip">All venues</button>
+        <button class="chip active">Derby County FC</button>
+        <button class="chip">Notts County</button>
+        <button class="chip">Venue 4</button>
+      </div>
+
+      <div style="font-size: 12px; color: #64748b; font-weight: 600;">150 items • 6 categories</div>
+
+      <div class="cards-row-2col">
+        <div class="item-card">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+          <div class="item-count count-bottom-right">65</div>
+        </div>
+        <div class="item-card">
+          <div class="badge-top-right badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+          <div class="title-left-normal"><h3 class="item-title">Flute Glasses</h3></div>
+          <div class="item-count count-bottom-left">233</div>
+        </div>
+        <div class="item-card">
+          <div class="badge-top-left badge-slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+          <div class="item-count count-bottom-right">9</div>
+        </div>
+        <div class="item-card">
+          <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+          <div class="title-left-normal"><h3 class="item-title">Flute Glasses</h3></div>
+          <div class="item-count count-bottom-left">78</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 3: ACCORDION ==================== -->
+    <div id="v3" class="view-pane screen-content">
+      <div class="title-row">
+        <h1 class="page-title">Stock Check</h1>
+        <button class="filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg></button>
+      </div>
+
+      <div class="filter-chips">
+        <button class="chip active">All</button>
+        <button class="chip">Available Stock</button>
+      </div>
+
+      <!-- Accordion 1 -->
+      <div class="acc-group">
+        <button class="acc-header" onclick="toggleAcc('acc1-content')">
+          <div class="acc-title-group">
+            <span class="acc-title">Derby County FC</span>
+            <span class="acc-subtitle">4 categories</span>
+          </div>
+          <span class="acc-chevron">▲</span>
+        </button>
+        <div id="acc1-content" class="cards-row-2col" style="padding-top: 8px;">
+          <div class="item-card">
+            <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+            <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-right">65</div>
+          </div>
+          <div class="item-card">
+            <div class="badge-top-right badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+            <div class="title-left-normal"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-left">233</div>
+          </div>
+          <div class="item-card">
+            <div class="badge-top-left badge-slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+            <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-right">9</div>
+          </div>
+          <div class="item-card">
+            <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+            <div class="title-left-normal"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-left">78</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion 2 -->
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 10px;">
+        <button class="acc-header">
+          <div class="acc-title-group">
+            <span class="acc-title">Notts County</span>
+            <span class="acc-subtitle">1 category</span>
+          </div>
+          <span class="acc-chevron">▼</span>
+        </button>
+      </div>
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 10px;">
+        <button class="acc-header"><span class="acc-title">Venue 4</span><span class="acc-chevron">▼</span></button>
+      </div>
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 10px;">
+        <button class="acc-header"><span class="acc-title">Venue 5</span><span class="acc-chevron">▼</span></button>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 4: LEFT RAIL ==================== -->
+    <div id="v4" class="view-pane rail-layout" style="position: relative;">
+      <!-- Left Rail Sidebar with Close Button -->
+      <div id="v4-sidebar" class="rail-sidebar">
+        <button onclick="toggleV4Rail()" style="width: 28px; height: 28px; border-radius: 50%; background: #ffffff; border: 1px solid #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);" title="Close locations panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 15px; height: 15px; color: #475569;"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div><button class="rail-circle" onclick="selectV4Venue('All', 'All Venues')">All</button><div class="rail-label">All</div></div>
+        <div><button class="rail-circle active" onclick="selectV4Venue('DC', 'Derby FC')">DC</button><div class="rail-label">Derby</div></div>
+        <div><button class="rail-circle" onclick="selectV4Venue('NC', 'Notts')">NC</button><div class="rail-label">Notts</div></div>
+        <div><button class="rail-circle" onclick="selectV4Venue('V4', 'Venue 4')">V4</button><div class="rail-label">Venue 4</div></div>
+        <div><button class="rail-circle" onclick="selectV4Venue('V5', 'Venue 5')">V5</button><div class="rail-label">Venue 5</div></div>
+      </div>
+
+      <!-- Right Main Content -->
+      <div style="flex: 1; padding: 16px 16px 88px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: #f4f7f6;">
+        <!-- Clean Header Row: Title on Left, Location Pill + Filter on Right -->
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <h1 class="page-title" style="margin: 0; font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;">Stock Check</h1>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button id="v4-location-pill" onclick="toggleV4Rail()" style="padding: 6px 12px; border-radius: 12px; background: #1a5140; color: #ffffff; border: 1px solid #1a5140; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);" title="Toggle locations panel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 13px; height: 13px; color: #a7f3d0;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span id="v4-venue-label">Derby FC</span>
+              <span id="v4-chevron" style="font-size: 11px;">◀</span>
+            </button>
+            <button class="filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg></button>
+          </div>
+        </div>
+
+        <!-- Clean Segmented Pill Filters (All / Available / Low Stock with Embedded Count Badges) -->
+        <div style="display: flex; align-items: center; gap: 8px; overflow-x: auto; padding: 2px 0;">
+          <button id="v4-pill-all" class="capsule-item active" style="border-radius: 9999px; padding: 5px 12px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; margin: 0; border: 1px solid #1a5140; background: #1a5140; color: #ffffff; cursor: pointer;" onclick="filterV4('all')">
+            <span>All</span>
+            <span style="font-size: 10px; padding: 1px 6px; border-radius: 9999px; background: rgba(255,255,255,0.25); color: #fff; font-weight: 700;">4</span>
+          </button>
+          <button id="v4-pill-avail" class="capsule-item" style="border-radius: 9999px; padding: 5px 12px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; margin: 0; border: 1px solid #e2e8f0; background: #ffffff; color: #334155; cursor: pointer;" onclick="filterV4('available')">
+            <span>Available</span>
+            <span style="font-size: 10px; padding: 1px 6px; border-radius: 9999px; background: #f1f5f9; color: #475569; font-weight: 700;">3</span>
+          </button>
+          <button id="v4-pill-low" class="capsule-item" style="border-radius: 9999px; padding: 5px 12px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; margin: 0; border: 1px solid #e2e8f0; background: #ffffff; color: #334155; cursor: pointer;" onclick="filterV4('low-stock')">
+            <span>Low stock</span>
+            <span style="font-size: 10px; padding: 1px 6px; border-radius: 9999px; background: #ffe4e6; color: #be123c; font-weight: 800;">1</span>
+          </button>
+        </div>
+
+        <!-- Full width single col stacked cards -->
+        <div id="v4-cards-list" style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="item-card full-width v4-item" data-stock="available">
+            <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+            <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-right">65</div>
+          </div>
+          <div class="item-card full-width v4-item" data-stock="available">
+            <div class="badge-top-left badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+            <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-right">233</div>
+          </div>
+          <div class="item-card full-width v4-item" data-stock="low-stock">
+            <div class="badge-top-left badge-slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+            <div class="title-left-indented" style="display: flex; align-items: center; justify-content: space-between; padding-right: 8px;">
+              <h3 class="item-title">Flute Glasses</h3>
+              <span style="font-size: 10px; font-weight: 700; color: #e11d48; background: #ffe4e6; padding: 2px 6px; border-radius: 9999px;">● Low Stock</span>
+            </div>
+            <div class="item-count count-bottom-right">9</div>
+          </div>
+          <div class="item-card full-width v4-item" data-stock="available">
+            <div class="badge-top-left badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+            <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-right">78</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 5: SWIPE CAROUSEL ==================== -->
+    <div id="v5" class="view-pane screen-content">
+      <div class="title-row">
+        <h1 class="page-title">Stock Check</h1>
+        <button class="filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg></button>
+      </div>
+
+      <div class="filter-chips">
+        <button class="chip active">All</button>
+        <button class="chip">Available Stock</button>
+        <button class="chip">Low stock</button>
+      </div>
+
+      <!-- Venue 1: Derby County FC (Collapsible) -->
+      <div>
+        <button onclick="toggleV5Collapse('v5-derby', this)" style="display: flex; align-items: center; justify-content: space-between; width: 100%; border: none; background: transparent; cursor: pointer; padding: 4px 0; text-align: left;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-weight: 700; font-size: 16px; color: #0f172a;">Derby County FC</span>
+            <span class="v5-hint" style="font-size: 11px; color: #64748b;">swipe →</span>
+          </div>
+          <span class="v5-chevron" style="color: #64748b; font-size: 12px;">▲</span>
+        </button>
+
+        <div id="v5-derby" class="v5-content" style="margin-top: 6px;">
+          <div class="h-carousel">
+            <div class="carousel-card">
+              <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+              <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+              <div class="item-count count-bottom-right">65</div>
+            </div>
+            <div class="carousel-card">
+              <div class="badge-top-right badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+              <div class="title-left-normal"><h3 class="item-title">Flute Glasses</h3></div>
+              <div class="item-count count-bottom-left">233</div>
+            </div>
+            <div class="carousel-card">
+              <div class="badge-top-left badge-slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+              <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+              <div class="item-count count-bottom-right">9</div>
+            </div>
+            <div class="carousel-card">
+              <div class="badge-top-left badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+              <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+              <div class="item-count count-bottom-right">78</div>
+            </div>
+          </div>
+          <div style="width: 60px; height: 3px; background: #cbd5e1; border-radius: 9999px; margin-top: 8px;"></div>
+        </div>
+      </div>
+
+      <!-- Venue 2: Notts County (Collapsible) -->
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 10px;">
+        <button onclick="toggleV5Collapse('v5-notts', this)" style="display: flex; align-items: center; justify-content: space-between; width: 100%; border: none; background: transparent; cursor: pointer; padding: 4px 0; text-align: left;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-weight: 700; font-size: 16px; color: #0f172a;">Notts County</span>
+            <span class="v5-hint" style="font-size: 11px; color: #64748b; display: none;">swipe →</span>
+          </div>
+          <span class="v5-chevron" style="color: #64748b; font-size: 12px;">▼</span>
+        </button>
+        <div id="v5-notts" class="v5-content" style="display: none; margin-top: 6px;">
+          <div class="h-carousel">
+            <div class="carousel-card">
+              <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+              <div class="title-left-indented"><h3 class="item-title">Pint GG</h3></div>
+              <div class="item-count count-bottom-right">9</div>
+            </div>
+          </div>
+          <div style="width: 60px; height: 3px; background: #cbd5e1; border-radius: 9999px; margin-top: 8px;"></div>
+        </div>
+      </div>
+
+      <!-- Venue 3: Venue 4 (Collapsible) -->
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 10px;">
+        <button onclick="toggleV5Collapse('v5-venue4', this)" style="display: flex; align-items: center; justify-content: space-between; width: 100%; border: none; background: transparent; cursor: pointer; padding: 4px 0; text-align: left;">
+          <span style="font-weight: 700; font-size: 16px; color: #0f172a;">Venue 4</span>
+          <span class="v5-chevron" style="color: #64748b; font-size: 12px;">▼</span>
+        </button>
+        <div id="v5-venue4" class="v5-content" style="display: none; margin-top: 6px;">
+          <div class="h-carousel">
+            <div class="carousel-card">
+              <div class="badge-top-left badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+              <div class="title-left-indented"><h3 class="item-title">Wine Glass</h3></div>
+              <div class="item-count count-bottom-right">42</div>
+            </div>
+          </div>
+          <div style="width: 60px; height: 3px; background: #cbd5e1; border-radius: 9999px; margin-top: 8px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 6: CAPSULE DROPDOWN & SEARCH ==================== -->
+    <div id="v6" class="view-pane screen-content">
+      <div class="title-row">
+        <h1 class="page-title">Stock Check</h1>
+      </div>
+
+      <!-- Exact Capsule Controls: [ All ▾ ] and [ Location 🔍 ] -->
+      <div style="display: flex; align-items: center; gap: 10px; position: relative;">
+        <!-- Capsule 1: Dark Green Capsule "All ▾" -->
+        <div style="position: relative;">
+          <button id="v6-capsule-status-btn" onclick="toggleV6StatusDropdown()" style="height: 42px; padding: 0 20px; border-radius: 9999px; background: #164e3f; color: #ffffff; font-size: 14.5px; font-weight: 700; border: none; display: flex; align-items: center; gap: 14px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); white-space: nowrap;">
+            <span id="v6-status-label">All</span>
+            <svg id="v6-status-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" style="width: 15px; height: 15px;"><path d="m6 9 6 6 6-6"></path></svg>
+          </button>
+
+          <!-- Status Dropdown Menu -->
+          <div id="v6-status-menu" style="display: none; position: absolute; top: 48px; left: 0; width: 175px; background: #ffffff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; padding: 6px; z-index: 50;">
+            <button onclick="setV6Status('All')" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 10px; border: none; background: #e7eee9; color: #164e3f; font-weight: 700; font-size: 12.5px; cursor: pointer; text-align: left;">
+              <span>All Items</span>
+              <span style="font-size: 10px; background: rgba(22,78,63,0.15); color: #164e3f; padding: 1px 6px; border-radius: 9999px;">4</span>
+            </button>
+            <button onclick="setV6Status('Available')" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 10px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12.5px; cursor: pointer; text-align: left;">
+              <span>Available Stock</span>
+              <span style="font-size: 10px; background: #f1f5f9; color: #475569; padding: 1px 6px; border-radius: 9999px;">3</span>
+            </button>
+            <button onclick="setV6Status('Low Stock')" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 10px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12.5px; cursor: pointer; text-align: left;">
+              <span>Low Stock</span>
+              <span style="font-size: 10px; background: #ffe4e6; color: #be123c; font-weight: 800; padding: 1px 6px; border-radius: 9999px;">1</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Capsule 2: Light Mint/White Pill with "Location" text and Search icon -->
+        <div style="position: relative; flex: 1;">
+          <div style="height: 42px; padding: 0 16px; border-radius: 9999px; background: #ffffff; border: 1px solid #c4dcce; display: flex; align-items: center; justify-content: space-between; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+            <input id="v6-loc-input" type="text" placeholder="Location" oninput="onV6SearchInput()" onclick="openV6LocationMenu()" style="width: 100%; border: none; outline: none; background: transparent; font-size: 14.5px; font-weight: 700; color: #244e3f;" />
+            <button onclick="clearV6Location(event)" style="width: 26px; height: 26px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #164e3f; padding: 0;" title="Clear Location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="width: 17px; height: 17px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+
+          <!-- Location Picker Dropdown -->
+          <div id="v6-location-menu" style="display: none; position: absolute; top: 48px; left: 0; right: 0; background: #ffffff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; padding: 10px; z-index: 50;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 2px 4px 6px 4px; border-bottom: 1px solid #f1f5f9;">
+              <span style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Select Venue</span>
+              <button onclick="closeV6LocationMenu()" style="border: none; background: transparent; font-size: 11px; font-weight: 700; color: #64748b; cursor: pointer;">Close</button>
+            </div>
+
+            <!-- Search bar inside dropdown -->
+            <div style="margin: 8px 0 6px 0;">
+              <div style="display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #f4f7f6; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 14px; height: 14px; color: #94a3b8;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                <input id="v6-dropdown-search" type="text" placeholder="Search venues..." oninput="filterV6DropdownVenues()" style="width: 100%; border: none; background: transparent; outline: none; font-size: 12px; font-weight: 600; color: #1e293b;" />
+              </div>
+            </div>
+
+            <div id="v6-venue-list" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;">
+              <button class="v6-venue-option" data-name="All Locations" onclick="setV6Venue('')" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 10px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">
+                <span>All Locations</span>
+                <span style="font-size: 10px; color: #94a3b8;">150 items</span>
+              </button>
+              <button class="v6-venue-option" data-name="Derby County FC" onclick="setV6Venue('Derby County FC')" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 10px; border: none; background: #e7eee9; color: #164e3f; font-weight: 700; font-size: 12px; cursor: pointer; text-align: left;">
+                <span>Derby County FC</span>
+                <span style="font-size: 10px; color: #164e3f; font-weight: 700;">4 categories</span>
+              </button>
+              <button class="v6-venue-option" data-name="Notts County" onclick="setV6Venue('Notts County')" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 10px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">
+                <span>Notts County</span>
+                <span style="font-size: 10px; color: #94a3b8;">1 category</span>
+              </button>
+              <button class="v6-venue-option" data-name="Venue 4" onclick="setV6Venue('Venue 4')" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 10px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">
+                <span>Venue 4</span>
+                <span style="font-size: 10px; color: #94a3b8;">1 category</span>
+              </button>
+              <button class="v6-venue-option" data-name="Venue 5" onclick="setV6Venue('Venue 5')" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 10px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">
+                <span>Venue 5</span>
+                <span style="font-size: 10px; color: #94a3b8;">1 category</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Metric Cards: Total Items & Categories (Matching User Reference) -->
+      <div class="summary-grid" style="margin-top: 4px;">
+        <div class="summary-card">
+          <div><span class="summary-label">Total Items</span><span id="v6-total-items-val" class="summary-val">150</span></div>
+          <div class="summary-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"></path><path d="M6 18h12"></path><path d="M6 14h12"></path></svg></div>
+        </div>
+        <div class="summary-card">
+          <div><span class="summary-label">Categories</span><span id="v6-categories-val" class="summary-val">6</span></div>
+          <div class="summary-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg></div>
+        </div>
+      </div>
+
+      <!-- Subtitle Row -->
+      <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; color: #475569; font-weight: 700; margin-top: 2px;">
+        <span id="v6-venue-subtitle">Derby County FC • 4 categories</span>
+        <span id="v6-low-badge" style="display: none; font-size: 10px; font-weight: 800; color: #e11d48; background: #ffe4e6; padding: 2px 8px; border-radius: 9999px;">● Low Stock</span>
+      </div>
+
+      <!-- Item Cards (2 Rows of 2 Cols + 1 Full Width Row matching Exact Image 2) -->
+      <div id="v6-cards-container" style="display: flex; flex-direction: column; gap: 12px; padding-bottom: 30px;">
+        <div class="cards-row-2col">
+          <div class="item-card v6-item" data-stock="Available" data-venue="Derby County FC">
+            <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path></svg></div>
+            <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-right">65</div>
+          </div>
+          <div class="item-card v6-item" data-stock="Available" data-venue="Derby County FC">
+            <div class="badge-top-right badge-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg></div>
+            <div class="title-left-normal"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-left">233</div>
+          </div>
+        </div>
+
+        <div class="cards-row-2col">
+          <div class="item-card v6-item" data-stock="Low Stock" data-venue="Derby County FC">
+            <div class="badge-top-left badge-slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 22h8"></path><path d="M12 11v11"></path><path d="m19 3-4 8H9L5 3z"></path></svg></div>
+            <div class="title-left-indented"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-right">9</div>
+          </div>
+          <div class="item-card v6-item" data-stock="Available" data-venue="Derby County FC">
+            <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path></svg></div>
+            <div class="title-left-normal"><h3 class="item-title">Flute Glasses</h3></div>
+            <div class="item-count count-bottom-left">78</div>
+          </div>
+        </div>
+
+        <div class="item-card full-width v6-item" data-stock="Available" data-venue="Notts County">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l-2 15a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3L6 3Z"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Pint GG</h3></div>
+          <div class="item-count count-bottom-right">9</div>
+        </div>
+      </div>
+    </div>
+
+    
+    <!-- ========================================================================= -->
+    <!-- VARIATION 7: STAT CHIPS (Smart Tappable KPI Pills) -->
+    <!-- ========================================================================= -->
+    <div id="v7" class="view-pane screen-content">
+      <!-- Header with Location Pill -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+        <div>
+          <h1 class="page-title" style="margin-bottom: 2px;">Stock Check</h1>
+          <p style="font-size: 11px; font-weight: 600; color: #94a3b8; margin: 0;">Inventory Status</p>
+        </div>
+        <div style="position: relative;">
+          <button id="v7-venue-btn" onclick="toggleV7VenueMenu()" style="padding: 6px 14px; border-radius: 9999px; background: #ffffff; border: 1px solid #cbd5e1; color: #164e3f; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2.2" style="width: 13px; height: 13px;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            <span id="v7-venue-label">Derby FC</span>
+            <svg id="v7-venue-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 12px; height: 12px;"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div id="v7-venue-menu" style="display: none; position: absolute; top: 38px; right: 0; width: 180px; background: #ffffff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; padding: 6px; z-index: 50;">
+            <button onclick="setV7Venue('All Locations', 'All Venues')" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 10px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">All Venues</button>
+            <button onclick="setV7Venue('Derby County FC', 'Derby FC')" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 10px; border: none; background: #e7eee9; color: #164e3f; font-weight: 700; font-size: 12px; cursor: pointer; text-align: left;">Derby FC</button>
+            <button onclick="setV7Venue('Notts County', 'Notts County')" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 10px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">Notts County</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tappable Smart KPI Chips Row -->
+      <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px;">
+        <button id="v7-chip-all" onclick="setV7Chip('All')" style="flex: 1; padding: 9px 12px; border-radius: 14px; background: #164e3f; color: #ffffff; border: 1.5px solid #164e3f; display: flex; align-items: center; justify-content: space-between; cursor: pointer; box-shadow: 0 2px 4px rgba(22,78,63,0.15); transition: all 0.15s;">
+          <span style="font-size: 12px; font-weight: 700;">All Items</span>
+          <span id="v7-count-all" style="font-size: 11px; font-weight: 800; background: rgba(255,255,255,0.22); padding: 1px 7px; border-radius: 9999px;">4</span>
+        </button>
+        <button id="v7-chip-avail" onclick="setV7Chip('Available')" style="flex: 1; padding: 9px 12px; border-radius: 14px; background: #ffffff; color: #164e3f; border: 1.5px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.15s;">
+          <span style="font-size: 12px; font-weight: 700;">Available</span>
+          <span id="v7-count-avail" style="font-size: 11px; font-weight: 800; background: #e7eee9; color: #164e3f; padding: 1px 7px; border-radius: 9999px;">3</span>
+        </button>
+        <button id="v7-chip-low" onclick="setV7Chip('Low Stock')" style="flex: 1; padding: 9px 12px; border-radius: 14px; background: #ffffff; color: #b45309; border: 1.5px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.15s;">
+          <span style="font-size: 12px; font-weight: 700;">Low Stock</span>
+          <span id="v7-count-low" style="font-size: 11px; font-weight: 800; background: #fef3c7; color: #b45309; padding: 1px 7px; border-radius: 9999px;">1</span>
+        </button>
+      </div>
+
+      <!-- Minimal Search Input -->
+      <div style="position: relative;">
+        <input id="v7-search" oninput="onV7Search()" type="text" placeholder="Search products..." style="width: 100%; height: 42px; border-radius: 14px; background: #ffffff; border: 1px solid #cbd5e1; padding: 0 38px 0 36px; font-size: 13.5px; font-weight: 600; color: #0f172a; box-sizing: border-box; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" style="position: absolute; left: 12px; top: 12px; width: 17px; height: 17px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <button id="v7-clear-btn" onclick="clearV7Search()" style="display: none; position: absolute; right: 10px; top: 11px; width: 20px; height: 20px; border-radius: 50%; background: #e2e8f0; border: none; color: #64748b; font-size: 11px; font-weight: 700; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+      </div>
+
+      <!-- Active Filter Pill Subtitle -->
+      <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; font-weight: 600; color: #64748b; padding: 0 2px;">
+        <span id="v7-venue-sub">Derby FC • 4 categories</span>
+        <span id="v7-filter-sub" style="font-size: 10px; background: #e7eee9; color: #164e3f; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">Showing All</span>
+      </div>
+
+      <!-- Item Cards Feed -->
+      <div class="cards-grid">
+        <div class="item-card v7-item" data-stock="Available" data-title="Strongbow Original Cider Can">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Strongbow Original Cider Can</h3></div>
+          <div class="item-count count-bottom-right">100</div>
+        </div>
+        <div class="item-card v7-item" data-stock="Available" data-title="Coors Light 24x330ml Bottles">
+          <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l-2 15a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3L6 3Z"></path></svg></div>
+          <div class="title-left-normal"><h3 class="item-title">Coors Light 24x330ml Bottles</h3></div>
+          <div class="item-count count-bottom-left">240</div>
+        </div>
+        <div class="item-card v7-item" data-stock="Available" data-title="Heineken 0.0% 24x330ml Bottles">
+          <div class="badge-top-left badge-slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Heineken 0.0% 24x330ml Bottles</h3></div>
+          <div class="item-count count-bottom-right">36</div>
+        </div>
+        <div class="item-card v7-item" data-stock="Low Stock" data-title="Pravha Keg 50L">
+          <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"></path></svg></div>
+          <div class="title-left-normal"><h3 class="item-title">Pravha Keg 50L</h3></div>
+          <div class="item-count count-bottom-left" style="color: #b45309;">0</div>
+        </div>
+      </div>
+      <div id="v7-pint-container" style="margin-top: 12px;">
+        <div class="item-card full-width v7-item" data-stock="Available" data-title="Pint GG">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l-2 15a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3L6 3Z"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Pint GG</h3></div>
+          <div class="item-count count-bottom-right">9</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- VARIATION 8: VENUE SHEET (Smart Venue Pill & iOS Bottom Sheet Modal) -->
+    <!-- ========================================================================= -->
+    <div id="v8" class="view-pane screen-content">
+      <!-- Header with Live Audit Indicator -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
+        <h1 class="page-title" style="margin: 0;">Stock Check</h1>
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: #164e3f; background: #e7eee9; padding: 5px 12px; border-radius: 9999px;">
+          <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+          <span>Live Audit</span>
+        </div>
+      </div>
+
+      <!-- Hero Venue Capsule Selector (Opens iOS Bottom Sheet) -->
+      <button onclick="openV8VenueSheet()" style="width: 100%; height: 50px; padding: 0 16px; border-radius: 16px; background: #ffffff; border: 1.5px solid #c4dcce; display: flex; align-items: center; justify-content: space-between; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: all 0.15s;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 34px; height: 34px; border-radius: 10px; background: #e7eee9; display: flex; align-items: center; justify-content: center; color: #164e3f;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 17px; height: 17px;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div style="text-align: left;">
+            <div style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Active Location</div>
+            <div id="v8-venue-display" style="font-size: 13.5px; font-weight: 800; color: #0f172a;">Derby County FC</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: #164e3f;">
+          <span>Change</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 13px; height: 13px;"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
+      </button>
+
+      <!-- Clean Metric Cards -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div>
+            <span class="summary-label">Total Items</span>
+            <span id="v8-total-items-val" class="summary-val">385</span>
+          </div>
+          <div class="summary-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 20px; height: 20px;"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div>
+            <span class="summary-label">Categories</span>
+            <span id="v8-categories-val" class="summary-val">4</span>
+          </div>
+          <div class="summary-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 20px; height: 20px;"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Status Filter Pills -->
+      <div style="display: flex; gap: 8px;">
+        <button id="v8-pill-all" onclick="setV8Status('All')" style="flex: 1; padding: 7px 10px; border-radius: 9999px; background: #164e3f; color: #ffffff; border: none; font-size: 11.5px; font-weight: 700; cursor: pointer;">All</button>
+        <button id="v8-pill-avail" onclick="setV8Status('Available')" style="flex: 1; padding: 7px 10px; border-radius: 9999px; background: #ffffff; color: #475569; border: 1px solid #cbd5e1; font-size: 11.5px; font-weight: 600; cursor: pointer;">Available (3)</button>
+        <button id="v8-pill-low" onclick="setV8Status('Low Stock')" style="flex: 1; padding: 7px 10px; border-radius: 9999px; background: #ffffff; color: #b45309; border: 1px solid #cbd5e1; font-size: 11.5px; font-weight: 600; cursor: pointer;">Low Stock (1)</button>
+      </div>
+
+      <!-- Item Cards Feed -->
+      <div class="cards-grid">
+        <div class="item-card v8-item" data-stock="Available">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Strongbow Original Cider Can</h3></div>
+          <div class="item-count count-bottom-right">100</div>
+        </div>
+        <div class="item-card v8-item" data-stock="Available">
+          <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l-2 15a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3L6 3Z"></path></svg></div>
+          <div class="title-left-normal"><h3 class="item-title">Coors Light 24x330ml Bottles</h3></div>
+          <div class="item-count count-bottom-left">240</div>
+        </div>
+        <div class="item-card v8-item" data-stock="Available">
+          <div class="badge-top-left badge-slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Heineken 0.0% 24x330ml Bottles</h3></div>
+          <div class="item-count count-bottom-right">36</div>
+        </div>
+        <div class="item-card v8-item" data-stock="Low Stock">
+          <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"></path></svg></div>
+          <div class="title-left-normal"><h3 class="item-title">Pravha Keg 50L</h3></div>
+          <div class="item-count count-bottom-left" style="color: #b45309;">0</div>
+        </div>
+      </div>
+      <div id="v8-pint-container" style="margin-top: 12px;">
+        <div class="item-card full-width v8-item" data-stock="Available">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l-2 15a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3L6 3Z"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Pint GG</h3></div>
+          <div class="item-count count-bottom-right">9</div>
+        </div>
+      </div>
+
+      </div>
+
+    <!-- ========================================================================= -->
+    <!-- VARIATION 9: COMPACT FLOOR / FIELD MODE (Ultra-Clean Single-Row Header) -->
+    <!-- ========================================================================= -->
+    <div id="v9" class="view-pane screen-content">
+      <!-- Minimal Header Row with Integrated Venue -->
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <h1 class="page-title" style="margin: 0;">Stock Check</h1>
+        <div style="position: relative;">
+          <button id="v9-venue-btn" onclick="toggleV9VenueMenu()" style="padding: 5px 12px; border-radius: 9999px; background: #ffffff; border: 1px solid #cbd5e1; color: #164e3f; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2.2" style="width: 12px; height: 12px;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            <span id="v9-venue-label">All</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 11px; height: 11px;"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div id="v9-venue-menu" style="display: none; position: absolute; top: 34px; right: 0; width: 170px; background: #ffffff; border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; padding: 5px; z-index: 50;">
+            <button onclick="setV9Venue('All Locations', 'All')" style="width: 100%; padding: 7px 10px; border-radius: 8px; border: none; background: #e7eee9; color: #164e3f; font-weight: 700; font-size: 12px; cursor: pointer; text-align: left;">All</button>
+            <button onclick="setV9Venue('Derby County FC', 'Derby FC')" style="width: 100%; padding: 7px 10px; border-radius: 8px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">Derby FC</button>
+            <button onclick="setV9Venue('Notts County', 'Notts FC')" style="width: 100%; padding: 7px 10px; border-radius: 8px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">Notts FC</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Capsule & Inline Search Strip -->
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="position: relative;">
+          <button id="v9-status-btn" onclick="toggleV9StatusMenu()" style="height: 38px; padding: 0 14px; border-radius: 9999px; background: #164e3f; color: #ffffff; font-size: 12.5px; font-weight: 700; border: none; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap;">
+            <span id="v9-status-label">All</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 13px; height: 13px;"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div id="v9-status-menu" style="display: none; position: absolute; top: 44px; left: 0; width: 160px; background: #ffffff; border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; padding: 5px; z-index: 50;">
+            <button onclick="setV9Status('All')" style="width: 100%; padding: 7px 10px; border-radius: 8px; border: none; background: #e7eee9; color: #164e3f; font-weight: 700; font-size: 12px; cursor: pointer; text-align: left;">All Items</button>
+            <button onclick="setV9Status('Available')" style="width: 100%; padding: 7px 10px; border-radius: 8px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">Available</button>
+            <button onclick="setV9Status('Low Stock')" style="width: 100%; padding: 7px 10px; border-radius: 8px; border: none; background: transparent; color: #334155; font-weight: 600; font-size: 12px; cursor: pointer; text-align: left;">Low Stock</button>
+          </div>
+        </div>
+
+        <div style="flex: 1; position: relative;">
+          <input id="v9-search" oninput="onV9Search()" type="text" placeholder="Quick find product..." style="width: 100%; height: 38px; border-radius: 9999px; background: #ffffff; border: 1px solid #cbd5e1; padding: 0 32px 0 34px; font-size: 12.5px; font-weight: 600; color: #0f172a; box-sizing: border-box; outline: none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" style="position: absolute; left: 11px; top: 11px; width: 15px; height: 15px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <button id="v9-clear-btn" onclick="clearV9Search()" style="display: none; position: absolute; right: 9px; top: 10px; width: 18px; height: 18px; border-radius: 50%; background: #e2e8f0; border: none; color: #64748b; font-size: 10px; font-weight: 700; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+        </div>
+      </div>
+
+      <!-- High-Density Micro-Metric Ribbon -->
+      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 7px 12px; display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; font-weight: 700; color: #334155;">
+        <span id="v9-ribbon-text">4 items • 2 categories</span>
+        <span style="font-size: 10px; background: #fef3c7; color: #b45309; padding: 2px 7px; border-radius: 9999px;">1 Low Stock</span>
+      </div>
+
+      <!-- Item Cards Feed -->
+      <div class="cards-grid">
+        <div class="item-card v9-item" data-stock="Available" data-title="Strongbow Original Cider Can">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Strongbow Original Cider Can</h3></div>
+          <div class="item-count count-bottom-right">100</div>
+        </div>
+        <div class="item-card v9-item" data-stock="Available" data-title="Coors Light 24x330ml Bottles">
+          <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l-2 15a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3L6 3Z"></path></svg></div>
+          <div class="title-left-normal"><h3 class="item-title">Coors Light 24x330ml Bottles</h3></div>
+          <div class="item-count count-bottom-left">240</div>
+        </div>
+        <div class="item-card v9-item" data-stock="Available" data-title="Heineken 0.0% 24x330ml Bottles">
+          <div class="badge-top-left badge-slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Heineken 0.0% 24x330ml Bottles</h3></div>
+          <div class="item-count count-bottom-right">36</div>
+        </div>
+        <div class="item-card v9-item" data-stock="Low Stock" data-title="Pravha Keg 50L">
+          <div class="badge-top-right badge-forest-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M3 12h18M3 18h18"></path></svg></div>
+          <div class="title-left-normal"><h3 class="item-title">Pravha Keg 50L</h3></div>
+          <div class="item-count count-bottom-left" style="color: #b45309;">0</div>
+        </div>
+      </div>
+      <div id="v9-pint-container" style="margin-top: 12px;">
+        <div class="item-card full-width v9-item" data-stock="Available" data-title="Pint GG">
+          <div class="badge-top-left badge-ocean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12l-2 15a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3L6 3Z"></path></svg></div>
+          <div class="title-left-indented"><h3 class="item-title">Pint GG</h3></div>
+          <div class="item-count count-bottom-right">9</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>Home</span>
+      </a>
+      <a class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+          <circle cx="6" cy="19" r="2"></circle><path d="M6 17V4a1 1 0 0 1 1-1h1"></path><path d="M6 19h12"></path><rect x="9" y="8" width="9" height="9" rx="1.5"></rect><line x1="9" y1="12.5" x2="18" y2="12.5"></line>
+        </svg>
+        <span>Stock Check</span>
+      </a>
+      <button class="nav-center-action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <span>Calendar</span>
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg>
+        <span>Batch</span>
+      </a>
+    </nav>
+
+    <!-- Filters Bottom Sheet Modal (Triggered by Filter icon) -->
+    <div id="filter-sheet-backdrop" onclick="closeFilterSheet()" style="display: none; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(2px); z-index: 100; opacity: 0; transition: opacity 0.2s;"></div>
+    <div id="filter-sheet-modal" style="display: none; position: absolute; left: 0; right: 0; bottom: 0; background: #ffffff; border-top-left-radius: 28px; border-top-right-radius: 28px; padding: 14px 20px 28px 20px; z-index: 101; box-shadow: 0 -10px 40px rgba(0,0,0,0.25); transform: translateY(100%); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); max-height: 88%; overflow-y: auto;">
+      <!-- Drag Handle -->
+      <div onclick="closeFilterSheet()" style="width: 48px; height: 4px; background: #cbd5e1; border-radius: 9999px; margin: 0 auto 16px auto; cursor: pointer;"></div>
+      
+      <!-- Title -->
+      <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; text-align: center; margin: 0 0 20px 0; letter-spacing: -0.3px;">Filters</h3>
+
+      <!-- Field 1: Who's the Customer -->
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; font-size: 13.5px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Who’s the Customer</label>
+        <div style="position: relative;">
+          <div onclick="toggleFilterCustMenu()" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+            <span id="filter-cust-val" style="font-size: 13.5px; font-weight: 600; color: #0f172a;">Derby County FC</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2" style="width: 17px; height: 17px;"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+          <!-- Dropdown Options -->
+          <div id="filter-cust-dropdown" style="display: none; position: absolute; top: 52px; left: 0; right: 0; background: #ffffff; border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; padding: 6px; z-index: 105;">
+            <div onclick="selectFilterCust('Derby County FC')" style="padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #0f172a; cursor: pointer;">Derby County FC</div>
+            <div onclick="selectFilterCust('Delaware North UK')" style="padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #0f172a; cursor: pointer;">Delaware North UK</div>
+            <div onclick="selectFilterCust('Compass Group')" style="padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #0f172a; cursor: pointer;">Compass Group</div>
+            <div onclick="selectFilterCust('Elior UK')" style="padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #0f172a; cursor: pointer;">Elior UK</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Field 2: Where's the Location -->
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-size: 13.5px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Where’s the Location</label>
+        <div style="position: relative;">
+          <div onclick="toggleFilterLocMenu()" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+            <span id="filter-loc-val" style="font-size: 13.5px; font-weight: 600; color: #0f172a;">Select Location</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2" style="width: 17px; height: 17px;"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+          <!-- Dropdown Options -->
+          <div id="filter-loc-dropdown" style="display: none; position: absolute; top: 52px; left: 0; right: 0; background: #ffffff; border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; padding: 6px; z-index: 105;">
+            <div onclick="selectFilterLoc('Select Location')" style="padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #0f172a; cursor: pointer;">Select Location</div>
+            <div onclick="selectFilterLoc('All Locations')" style="padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #0f172a; cursor: pointer;">All Locations</div>
+            <div onclick="selectFilterLoc('Location 1')" style="padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #0f172a; cursor: pointer;">Location 1</div>
+            <div onclick="selectFilterLoc('Location 2')" style="padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #0f172a; cursor: pointer;">Location 2</div>
+            <div onclick="selectFilterLoc('Location 3')" style="padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #0f172a; cursor: pointer;">Location 3</div>
+            <div onclick="selectFilterLoc('Location 4')" style="padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #0f172a; cursor: pointer;">Location 4</div>
+            <div onclick="selectFilterLoc('Location 5')" style="padding: 10px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #0f172a; cursor: pointer;">Location 5</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Field 3: Status -->
+      <div style="margin-bottom: 24px;">
+        <span style="display: block; font-size: 13px; font-weight: 800; color: #0f172a; margin-bottom: 10px;">Status</span>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div onclick="selectFilterStatus('Current Stock')" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <div id="stat-opt-1" style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #0f172a; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <div id="stat-opt-1-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #0f172a;"></div>
+            </div>
+            <span style="font-size: 13px; font-weight: 600; color: #0f172a;">Current Stock</span>
+          </div>
+
+          <div onclick="selectFilterStatus('Tote Boxes')" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <div id="stat-opt-2" style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #94a3b8; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <div id="stat-opt-2-dot" style="display: none; width: 10px; height: 10px; border-radius: 50%; background: #0f172a;"></div>
+            </div>
+            <span style="font-size: 13px; font-weight: 600; color: #0f172a;">Tote Boxes</span>
+          </div>
+
+          <div onclick="selectFilterStatus('Appnostic Card Clicks')" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <div id="stat-opt-3" style="width: 18px; height: 18px; border-radius: 50%; border: 2px solid #94a3b8; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <div id="stat-opt-3-dot" style="display: none; width: 10px; height: 10px; border-radius: 50%; background: #0f172a;"></div>
+            </div>
+            <span style="font-size: 13px; font-weight: 600; color: #0f172a;">Appnostic Card Clicks</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button onclick="applyFilterSheet()" style="flex: 1; height: 48px; border-radius: 14px; background: #1c242c; color: #ffffff; font-size: 14px; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Apply</button>
+        <button onclick="clearFilterSheet()" style="flex: 1; height: 48px; border-radius: 14px; background: #ffffff; color: #334155; font-size: 14px; font-weight: 800; border: 1.5px solid #cbd5e1; cursor: pointer;">Clear</button>
+      </div>
+    </div>
+
+    <!-- iOS Bottom Sheet Modal (Constrained inside phone-frame) -->
+    <div id="v8-sheet-backdrop" onclick="closeV8VenueSheet()" style="display: none; position: absolute; inset: 0; background: rgba(15,23,42,0.45); backdrop-filter: blur(4px); z-index: 90; opacity: 0; transition: opacity 0.2s;"></div>
+    <div id="v8-sheet-modal" style="display: none; position: absolute; left: 0; right: 0; bottom: 0; background: #ffffff; border-top-left-radius: 28px; border-top-right-radius: 28px; padding: 16px 20px 28px 20px; z-index: 91; box-shadow: 0 -10px 35px rgba(0,0,0,0.2); transform: translateY(100%); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); max-height: 82%; overflow-y: auto;">
+      <!-- iOS Drag Handle -->
+      <div onclick="closeV8VenueSheet()" style="width: 38px; height: 4px; background: #cbd5e1; border-radius: 9999px; margin: 0 auto 16px auto; cursor: pointer;"></div>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+        <div>
+          <h3 style="font-size: 17px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.3px;">Select Venue</h3>
+          <p style="font-size: 11.5px; font-weight: 600; color: #94a3b8; margin: 2px 0 0 0;">Choose a location to audit inventory</p>
+        </div>
+        <button onclick="closeV8VenueSheet()" style="width: 28px; height: 28px; border-radius: 50%; background: #f1f5f9; border: none; font-size: 12px; font-weight: 700; color: #64748b; cursor: pointer;">✕</button>
+      </div>
+
+      <!-- Search in Sheet -->
+      <div style="margin-bottom: 12px; position: relative;">
+        <input type="text" placeholder="Search locations..." style="width: 100%; height: 38px; border-radius: 12px; background: #f1f5f9; border: 1px solid #e2e8f0; padding: 0 12px 0 34px; font-size: 12px; font-weight: 600; color: #0f172a; box-sizing: border-box; outline: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.2" style="position: absolute; left: 10px; top: 11px; width: 15px; height: 15px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </div>
+
+      <!-- Venues List -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div onclick="selectV8Venue('Derby County FC', '385', '4', '85%')" style="padding: 12px 14px; border-radius: 16px; background: #e7eee9; border: 1.5px solid #164e3f; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 10px; background: #164e3f; display: flex; align-items: center; justify-content: center; color: #ffffff;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 16px; height: 16px;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <div style="font-size: 13.5px; font-weight: 800; color: #164e3f;">Derby County FC</div>
+              <div style="font-size: 11px; font-weight: 600; color: #047857; margin-top: 1px;">4 categories • 385 items</div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 10.5px; font-weight: 800; background: #164e3f; color: #ffffff; padding: 2px 8px; border-radius: 9999px;">85% Audited</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#164e3f" stroke-width="2.5" style="width: 16px; height: 16px;"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+
+        <div onclick="selectV8Venue('Notts County', '9', '1', '100%')" style="padding: 12px 14px; border-radius: 16px; background: #ffffff; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 10px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #64748b;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 16px; height: 16px;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <div style="font-size: 13.5px; font-weight: 700; color: #0f172a;">Notts County</div>
+              <div style="font-size: 11px; font-weight: 500; color: #64748b; margin-top: 1px;">1 category • 9 items</div>
+            </div>
+          </div>
+          <span style="font-size: 10.5px; font-weight: 700; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 9999px;">100% Audited</span>
+        </div>
+
+        <div onclick="selectV8Venue('Venue 4', '42', '1', '60%')" style="padding: 12px 14px; border-radius: 16px; background: #ffffff; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 10px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #64748b;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 16px; height: 16px;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <div style="font-size: 13.5px; font-weight: 700; color: #0f172a;">Venue 4</div>
+              <div style="font-size: 11px; font-weight: 500; color: #64748b; margin-top: 1px;">1 category • 42 items</div>
+            </div>
+          </div>
+          <span style="font-size: 10.5px; font-weight: 700; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 9999px;">60% Audited</span>
+        </div>
+
+        <div onclick="selectV8Venue('All Locations', '150', '6', 'In Progress')" style="padding: 12px 14px; border-radius: 16px; background: #ffffff; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 32px; height: 32px; border-radius: 10px; background: #fef3c7; display: flex; align-items: center; justify-content: center; color: #b45309;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 16px; height: 16px;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <div style="font-size: 13.5px; font-weight: 700; color: #0f172a;">All Venues</div>
+              <div style="font-size: 11px; font-weight: 500; color: #64748b; margin-top: 1px;">6 categories • 150 items</div>
+            </div>
+          </div>
+          <span style="font-size: 10.5px; font-weight: 700; background: #fef3c7; color: #b45309; padding: 2px 8px; border-radius: 9999px;">In Progress</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // CIRCULAYO TEAMS LOGIC
+    // 1. All (Stock Available & Low Stock) -> 2. Client -> 3. Location (by Client)
+    // =========================================================================
+    let ctClient = 'delaware-north';
+    let ctLocation = 'all';
+    let clientLocation = 'All Locations';
+    let favoriteLocations = ['Location 1'];
+
+    function ctLocationLabel() {
+      const client = CLIENT_LOCATION_DATA[ctClient];
+      const loc = client?.locations.find(l => l.id === ctLocation);
+      return loc ? loc.name : 'All Locations';
+    }
+
+    function updateFavIcons() {
+      const ctName = ctLocationLabel();
+      const ctFavSvg = document.getElementById('ct-loc-fav-svg');
+      if (ctFavSvg) {
+        const isFav = favoriteLocations.includes(ctName);
+        ctFavSvg.setAttribute('fill', isFav ? '#fbbf24' : 'none');
+        ctFavSvg.setAttribute('stroke', isFav ? '#fbbf24' : '#cbd5e1');
+      }
+
+      const cvFavSvg = document.getElementById('cv-loc-fav-svg');
+      if (cvFavSvg) {
+        const isFav = favoriteLocations.includes(clientLocation);
+        cvFavSvg.setAttribute('fill', isFav ? '#fbbf24' : 'none');
+        cvFavSvg.setAttribute('stroke', isFav ? '#fbbf24' : '#cbd5e1');
+      }
+
+      document.querySelectorAll('.opt-fav-btn').forEach(btn => {
+        const name = btn.getAttribute('data-name');
+        const isFav = favoriteLocations.includes(name);
+        const svg = btn.querySelector('svg');
+        if (svg) {
+          svg.setAttribute('fill', isFav ? '#fbbf24' : 'none');
+          svg.setAttribute('stroke', isFav ? '#fbbf24' : '#cbd5e1');
+        }
+      });
+    }
+
+    function toggleFavLocation(name) {
+      if (!name) return;
+      if (favoriteLocations.includes(name)) {
+        favoriteLocations = favoriteLocations.filter(l => l !== name);
+      } else {
+        favoriteLocations.push(name);
+      }
+      updateFavIcons();
+      renderCtLocationOptions();
+      filterCtLocations();
+      filterCvVenues();
+    }
+
+    const CLIENT_LOCATION_DATA = {
+      'delaware-north': {
+        name: 'Delaware North UK',
+        locations: [
+          { id: 'all', name: 'All Locations', items: 466, cats: 4 },
+          { id: 'loc-1', name: 'Location 1', items: 385, cats: 4 },
+          { id: 'loc-2', name: 'Location 2', items: 9, cats: 1 },
+          { id: 'loc-3', name: 'Location 3', items: 42, cats: 1 },
+          { id: 'loc-4', name: 'Location 4', items: 18, cats: 1 },
+          { id: 'loc-5', name: 'Location 5', items: 12, cats: 1 },
+        ]
+      },
+      'compass-group': {
+        name: 'Compass Group / Levy',
+        locations: [
+          { id: 'all', name: 'All Locations', items: 68, cats: 2 },
+          { id: 'loc-1', name: 'Location 1', items: 50, cats: 2 },
+          { id: 'loc-2', name: 'Location 2', items: 18, cats: 1 },
+        ]
+      },
+      'elior-uk': {
+        name: 'Elior UK Sports',
+        locations: [
+          { id: 'all', name: 'All Locations', items: 33, cats: 2 },
+          { id: 'loc-1', name: 'Location 1', items: 25, cats: 1 },
+          { id: 'loc-2', name: 'Location 2', items: 8, cats: 1 },
+        ]
+      }
+    };
+
+    function hideOtherCtMenus(currentId) {
+      ['ct-client-menu', 'ct-loc-menu', 'cv-loc-menu'].forEach(id => {
+        if (id !== currentId) {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        }
+      });
+    }
+
+    function toggleCtClientMenu() {
+      const menu = document.getElementById('ct-client-menu');
+      if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      hideOtherCtMenus('ct-client-menu');
+    }
+
+    function setCtClient(clientId, label) {
+      ctClient = clientId;
+      const lbl = document.getElementById('ct-client-label');
+      if (lbl) lbl.textContent = label;
+      
+      const logos = {
+        'delaware-north': '<span style="font-size: 10px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px;">D<span style="color: #f59e0b;">N</span></span>',
+        'compass-group': '<svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;"><circle cx="12" cy="12" r="9" stroke="#00a3e0" stroke-width="2"/><polygon points="12,5 14,10 19,12 14,14 12,19 10,14 5,12 10,10" fill="#ffffff"/><circle cx="12" cy="12" r="2" fill="#c41230"/></svg>',
+        'elior-uk': '<span style="font-size: 9px; font-weight: 900; color: #fcd34d;">elior</span>'
+      };
+      const logoBgs = {
+        'delaware-north': '#004f32',
+        'compass-group': '#002d62',
+        'elior-uk': '#5c1d3f'
+      };
+      const logoEl = document.getElementById('ct-client-logo');
+      if (logoEl) {
+        logoEl.innerHTML = logos[clientId] || '';
+        logoEl.style.background = logoBgs[clientId] || '#004f32';
+      }
+
+      document.getElementById('ct-client-menu').style.display = 'none';
+
+      // Re-render locations for this client
+      renderCtLocationOptions();
+      setCtLocation('all', 'All Locations');
+    }
+
+    function toggleCtLocMenu() {
+      const menu = document.getElementById('ct-loc-menu');
+      if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      hideOtherCtMenus('ct-loc-menu');
+    }
+
+    function setCtLocation(locId, label) {
+      ctLocation = locId;
+      const lbl = document.getElementById('ct-loc-label');
+      if (lbl) lbl.textContent = label;
+
+      const badge = document.getElementById('ct-loc-badge');
+      if (badge) badge.textContent = getLocInitials(label);
+      
+      const iconArea = document.getElementById('ct-loc-action-icon');
+      if (iconArea) {
+        if (locId === 'all') {
+          iconArea.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#164e3f" stroke-width="2.6" style="width: 14px; height: 14px;"><path d="m6 9 6 6 6-6"/></svg>';
+        } else {
+          iconArea.innerHTML = '<button onclick="event.stopPropagation(); setCtLocation(\'all\', \'All Locations\');" style="width: 24px; height: 24px; border-radius: 50%; background: transparent; border: none; color: #164e3f; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>';
+        }
+      }
+
+      // Highlight selected option and badge
+      document.querySelectorAll('#ct-loc-options .ct-l-opt').forEach(btn => {
+        const isMatch = btn.getAttribute('data-name') === label;
+        btn.style.background = isMatch ? '#e7eee9' : 'transparent';
+        btn.style.color = isMatch ? '#164e3f' : '#334155';
+        btn.style.fontWeight = isMatch ? '700' : '600';
+        const b = btn.querySelector('.ct-v-badge');
+        if (b) {
+          b.style.background = isMatch ? '#164e3f' : '#d8e6df';
+          b.style.color = isMatch ? '#ffffff' : '#164e3f';
+        }
+      });
+
+      document.getElementById('ct-loc-menu').style.display = 'none';
+      filterCtFeed();
+      updateFavIcons();
+    }
+
+    function renderCtLocationOptions() {
+      const client = CLIENT_LOCATION_DATA[ctClient];
+      const header = document.getElementById('ct-loc-menu-header');
+      if (header) header.textContent = 'Locations for ' + (client ? client.name : 'Client');
+      const container = document.getElementById('ct-loc-options');
+      if (!container || !client) return;
+
+      container.innerHTML = client.locations.map(loc => {
+        const isSel = ctLocation === loc.id;
+        const isFav = favoriteLocations.includes(loc.name);
+        return `
+          <button onclick="setCtLocation('${loc.id}', '${loc.name}')" class="ct-l-opt" data-name="${loc.name}" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 12px; border: none; background: ${isSel ? '#e7eee9' : 'transparent'}; color: ${isSel ? '#164e3f' : '#334155'}; font-weight: ${isSel ? '700' : '600'}; font-size: 12px; cursor: pointer; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="ct-v-badge" style="width: 22px; height: 22px; border-radius: 50%; background: ${isSel ? '#164e3f' : '#d8e6df'}; color: ${isSel ? '#ffffff' : '#164e3f'}; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">${getLocInitials(loc.name)}</div>
+              <span>${loc.name}</span>
+              <span class="opt-fav-btn" data-name="${loc.name}" onclick="event.stopPropagation(); toggleFavLocation('${loc.name}')" style="cursor: pointer; display: flex; align-items: center; padding: 2px;">
+                <svg viewBox="0 0 24 24" fill="${isFav ? '#fbbf24' : 'none'}" stroke="${isFav ? '#fbbf24' : '#cbd5e1'}" stroke-width="2" style="width: 12px; height: 12px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </span>
+            </div>
+            <span style="font-size: 10px; color: ${isSel ? '#164e3f' : '#64748b'};">${loc.cats ? loc.cats + ' cats • ' : ''}${loc.items} items</span>
+          </button>
+        `;
+      }).join('');
+      filterCtLocations();
+    }
+
+    function resetCtFilters() {
+      ctClient = 'delaware-north';
+      const cLbl = document.getElementById('ct-client-label');
+      if (cLbl) cLbl.textContent = 'Delaware North UK';
+      renderCtLocationOptions();
+      setCtLocation('all', 'All Locations');
+    }
+
+    function filterCtFeed() {
+      const client = CLIENT_LOCATION_DATA[ctClient];
+      const locObj = client?.locations.find(l => l.id === ctLocation) || client?.locations[0];
+      const totalCount = locObj ? locObj.items : 385;
+      const catsCount = locObj ? (locObj.cats || 1) : 4;
+
+      const statTot = document.getElementById('ct-total-val');
+      if (statTot) statTot.textContent = totalCount;
+      const statCat = document.getElementById('ct-cats-val');
+      if (statCat) statCat.textContent = catsCount;
+
+      const feedSub = document.getElementById('ct-feed-subtitle');
+      if (feedSub) feedSub.textContent = locObj ? locObj.name : 'All Locations';
+    }
+
+    function toggleCvLocMenu() {
+      const menu = document.getElementById('cv-loc-menu');
+      if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      hideOtherCtMenus('cv-loc-menu');
+    }
+
+    function getLocInitials(name) {
+      if (!name || name === 'All Locations') return 'AL';
+      const m = name.match(/location\s*(\d+)/i);
+      if (m) return 'L' + m[1];
+      const words = name.trim().split(/\s+/);
+      if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+
+    function setCvLoc(locName) {
+      clientLocation = locName;
+      const lbl = document.getElementById('cv-loc-label');
+      if (lbl) lbl.textContent = locName;
+
+      const badge = document.getElementById('cv-loc-badge');
+      if (badge) badge.textContent = getLocInitials(locName);
+
+      const iconArea = document.getElementById('cv-loc-icon-area');
+      if (iconArea) {
+        if (locName === 'All Locations') {
+          iconArea.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#164e3f" stroke-width="2.6" style="width: 14px; height: 14px;"><path d="m6 9 6 6 6-6"/></svg>';
+        } else {
+          iconArea.innerHTML = '<button onclick="event.stopPropagation(); setCvLoc(\'All Locations\');" style="width: 24px; height: 24px; border-radius: 50%; background: transparent; border: none; color: #164e3f; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>';
+        }
+      }
+
+      // Highlight selected option and badge
+      document.querySelectorAll('#cv-venue-options .cv-v-opt').forEach(btn => {
+        const isMatch = btn.getAttribute('data-name') === locName;
+        btn.style.background = isMatch ? '#e7eee9' : 'transparent';
+        btn.style.color = isMatch ? '#164e3f' : '#334155';
+        btn.style.fontWeight = isMatch ? '700' : '600';
+        const b = btn.querySelector('.cv-v-badge');
+        if (b) {
+          b.style.background = isMatch ? '#164e3f' : '#d8e6df';
+          b.style.color = isMatch ? '#ffffff' : '#164e3f';
+        }
+      });
+
+      document.getElementById('cv-loc-menu').style.display = 'none';
+      filterCvFeed();
+      updateFavIcons();
+    }
+
+    function filterCvFeed() {
+      const counts = {
+        'All Locations': 150,
+        'Location 1': 385,
+        'Location 2': 9,
+        'Location 3': 42,
+        'Location 4': 18,
+        'Location 5': 12
+      };
+      const cats = {
+        'All Locations': 4,
+        'Location 1': 4,
+        'Location 2': 1,
+        'Location 3': 1,
+        'Location 4': 1,
+        'Location 5': 1
+      };
+
+      const count = counts[clientLocation] || 385;
+      const catCount = cats[clientLocation] || 4;
+
+      const statTot = document.getElementById('cv-total-val');
+      if (statTot) statTot.textContent = count;
+      const statCat = document.getElementById('cv-cats-val');
+      if (statCat) statCat.textContent = catCount;
+
+      const feedSub = document.getElementById('cv-feed-subtitle');
+      if (feedSub) feedSub.textContent = clientLocation;
+    }
+
+    // Filter Bottom Sheet Logic
+    let selectedFilterCust = 'Derby County FC';
+    let selectedFilterLoc = 'Select Location';
+    let selectedFilterStatus = 'Current Stock';
+
+    function toggleFilterSheet() {
+      const backdrop = document.getElementById('filter-sheet-backdrop');
+      const modal = document.getElementById('filter-sheet-modal');
+      if (!backdrop || !modal) return;
+      if (modal.style.display === 'block') {
+        closeFilterSheet();
+      } else {
+        backdrop.style.display = 'block';
+        modal.style.display = 'block';
+        requestAnimationFrame(() => {
+          backdrop.style.opacity = '1';
+          modal.style.transform = 'translateY(0)';
+        });
+      }
+    }
+
+    function closeFilterSheet() {
+      const backdrop = document.getElementById('filter-sheet-backdrop');
+      const modal = document.getElementById('filter-sheet-modal');
+      const cDrop = document.getElementById('filter-cust-dropdown');
+      const lDrop = document.getElementById('filter-loc-dropdown');
+      if (cDrop) cDrop.style.display = 'none';
+      if (lDrop) lDrop.style.display = 'none';
+      if (!backdrop || !modal) return;
+      backdrop.style.opacity = '0';
+      modal.style.transform = 'translateY(100%)';
+      setTimeout(() => {
+        backdrop.style.display = 'none';
+        modal.style.display = 'none';
+      }, 250);
+    }
+
+    function toggleFilterCustMenu() {
+      const d = document.getElementById('filter-cust-dropdown');
+      const l = document.getElementById('filter-loc-dropdown');
+      if (l) l.style.display = 'none';
+      if (d) d.style.display = d.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function toggleFilterLocMenu() {
+      const d = document.getElementById('filter-loc-dropdown');
+      const c = document.getElementById('filter-cust-dropdown');
+      if (c) c.style.display = 'none';
+      if (d) d.style.display = d.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function selectFilterCust(cust) {
+      selectedFilterCust = cust;
+      const el = document.getElementById('filter-cust-val');
+      if (el) el.textContent = cust;
+      const d = document.getElementById('filter-cust-dropdown');
+      if (d) d.style.display = 'none';
+    }
+
+    function selectFilterLoc(loc) {
+      selectedFilterLoc = loc;
+      const el = document.getElementById('filter-loc-val');
+      if (el) el.textContent = loc;
+      const d = document.getElementById('filter-loc-dropdown');
+      if (d) d.style.display = 'none';
+    }
+
+    function selectFilterStatus(stat) {
+      selectedFilterStatus = stat;
+      const opt1Dot = document.getElementById('stat-opt-1-dot');
+      const opt2Dot = document.getElementById('stat-opt-2-dot');
+      const opt3Dot = document.getElementById('stat-opt-3-dot');
+      const opt1 = document.getElementById('stat-opt-1');
+      const opt2 = document.getElementById('stat-opt-2');
+      const opt3 = document.getElementById('stat-opt-3');
+
+      if (opt1Dot) opt1Dot.style.display = stat === 'Current Stock' ? 'block' : 'none';
+      if (opt2Dot) opt2Dot.style.display = stat === 'Tote Boxes' ? 'block' : 'none';
+      if (opt3Dot) opt3Dot.style.display = stat === 'Appnostic Card Clicks' ? 'block' : 'none';
+
+      if (opt1) opt1.style.borderColor = stat === 'Current Stock' ? '#0f172a' : '#94a3b8';
+      if (opt2) opt2.style.borderColor = stat === 'Tote Boxes' ? '#0f172a' : '#94a3b8';
+      if (opt3) opt3.style.borderColor = stat === 'Appnostic Card Clicks' ? '#0f172a' : '#94a3b8';
+    }
+
+    function applyFilterSheet() {
+      if (selectedFilterLoc && selectedFilterLoc !== 'Select Location') {
+        if (selectedFilterLoc === 'All Locations') {
+          setCtLocation('all', 'All Locations');
+          setCvLoc('All Locations');
+        } else {
+          setCtLocation('loc-1', selectedFilterLoc);
+          setCvLoc(selectedFilterLoc);
+        }
+      }
+      closeFilterSheet();
+    }
+
+    function clearFilterSheet() {
+      selectFilterCust('Derby County FC');
+      selectFilterLoc('Select Location');
+      selectFilterStatus('Current Stock');
+      setCtLocation('all', 'All Locations');
+      setCvLoc('All Locations');
+      closeFilterSheet();
+    }
+
+    function filterCtClients() {
+      const q = (document.getElementById('ct-client-search')?.value || '').toLowerCase();
+      document.querySelectorAll('#ct-client-options .ct-c-opt').forEach(el => {
+        const name = (el.getAttribute('data-name') || '').toLowerCase();
+        el.style.display = name.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    let ctOnlyFavorites = false;
+    let cvOnlyFavorites = false;
+
+    function toggleCtFavFilter() {
+      ctOnlyFavorites = !ctOnlyFavorites;
+      const btn = document.getElementById('ct-fav-filter-btn');
+      if (btn) {
+        if (ctOnlyFavorites) {
+          btn.style.background = '#fef3c7';
+          btn.style.color = '#f59e0b';
+          const svg = btn.querySelector('svg');
+          if (svg) {
+            svg.setAttribute('fill', '#f59e0b');
+            svg.setAttribute('stroke', '#f59e0b');
+          }
+        } else {
+          btn.style.background = 'transparent';
+          btn.style.color = '#94a3b8';
+          const svg = btn.querySelector('svg');
+          if (svg) {
+            svg.setAttribute('fill', 'none');
+            svg.setAttribute('stroke', 'currentColor');
+          }
+        }
+      }
+      filterCtLocations();
+    }
+
+    function toggleCvFavFilter() {
+      cvOnlyFavorites = !cvOnlyFavorites;
+      const btn = document.getElementById('cv-fav-filter-btn');
+      if (btn) {
+        if (cvOnlyFavorites) {
+          btn.style.background = '#fef3c7';
+          btn.style.color = '#f59e0b';
+          const svg = btn.querySelector('svg');
+          if (svg) {
+            svg.setAttribute('fill', '#f59e0b');
+            svg.setAttribute('stroke', '#f59e0b');
+          }
+        } else {
+          btn.style.background = 'transparent';
+          btn.style.color = '#94a3b8';
+          const svg = btn.querySelector('svg');
+          if (svg) {
+            svg.setAttribute('fill', 'none');
+            svg.setAttribute('stroke', 'currentColor');
+          }
+        }
+      }
+      filterCvVenues();
+    }
+
+    function filterCtLocations() {
+      const q = (document.getElementById('ct-loc-search')?.value || '').toLowerCase();
+      let matchCount = 0;
+      document.querySelectorAll('#ct-loc-options .ct-l-opt').forEach(el => {
+        const name = (el.getAttribute('data-name') || '');
+        const matchesSearch = name.toLowerCase().includes(q);
+        const matchesFav = !ctOnlyFavorites || favoriteLocations.includes(name);
+        if (matchesSearch && matchesFav) {
+          el.style.display = 'flex';
+          matchCount++;
+        } else {
+          el.style.display = 'none';
+        }
+      });
+      let emptyMsg = document.getElementById('ct-loc-empty');
+      if (matchCount === 0) {
+        if (!emptyMsg) {
+          emptyMsg = document.createElement('div');
+          emptyMsg.id = 'ct-loc-empty';
+          emptyMsg.style.cssText = 'padding: 24px 12px; text-align: center; font-size: 12px; color: #94a3b8; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 6px;';
+          document.getElementById('ct-loc-options')?.appendChild(emptyMsg);
+        }
+        emptyMsg.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" style="width: 20px; height: 20px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>' + (ctOnlyFavorites ? 'No favorite venues found' : 'No venues match search') + '</span>';
+        emptyMsg.style.display = 'flex';
+      } else if (emptyMsg) {
+        emptyMsg.style.display = 'none';
+      }
+    }
+
+    function filterCvVenues() {
+      const q = (document.getElementById('cv-venue-search')?.value || '').toLowerCase();
+      let matchCount = 0;
+      document.querySelectorAll('#cv-venue-options .cv-v-opt').forEach(el => {
+        const name = (el.getAttribute('data-name') || '');
+        const matchesSearch = name.toLowerCase().includes(q);
+        const matchesFav = !cvOnlyFavorites || favoriteLocations.includes(name);
+        if (matchesSearch && matchesFav) {
+          el.style.display = 'flex';
+          matchCount++;
+        } else {
+          el.style.display = 'none';
+        }
+      });
+      let emptyMsg = document.getElementById('cv-venue-empty');
+      if (matchCount === 0) {
+        if (!emptyMsg) {
+          emptyMsg = document.createElement('div');
+          emptyMsg.id = 'cv-venue-empty';
+          emptyMsg.style.cssText = 'padding: 24px 12px; text-align: center; font-size: 12px; color: #94a3b8; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 6px;';
+          document.getElementById('cv-venue-options')?.appendChild(emptyMsg);
+        }
+        emptyMsg.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" style="width: 20px; height: 20px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>' + (cvOnlyFavorites ? 'No favorite venues found' : 'No venues match search') + '</span>';
+        emptyMsg.style.display = 'flex';
+      } else if (emptyMsg) {
+        emptyMsg.style.display = 'none';
+      }
+    }
+
+    // Initialize locations on load
+    setTimeout(() => {
+      renderCtLocationOptions();
+      updateFavIcons();
+    }, 100);
+
+    function switchView(viewId, btn) {
+      document.querySelectorAll('.view-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.var-btn').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(viewId);
+      if (target) target.classList.add('active');
+      if (btn) btn.classList.add('active');
+    }
+
+    function toggleAcc(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = el.style.display === 'none' ? 'grid' : 'none';
+    }
+
+    let isV4RailOpen = true;
+    function toggleV4Rail() {
+      isV4RailOpen = !isV4RailOpen;
+      const sidebar = document.getElementById('v4-sidebar');
+      const pill = document.getElementById('v4-location-pill');
+      const chevron = document.getElementById('v4-chevron');
+      if (sidebar) sidebar.style.display = isV4RailOpen ? 'flex' : 'none';
+      if (pill) {
+        if (isV4RailOpen) {
+          pill.style.background = '#1a5140';
+          pill.style.color = '#ffffff';
+          pill.style.borderColor = '#1a5140';
+        } else {
+          pill.style.background = '#ffffff';
+          pill.style.color = '#334155';
+          pill.style.borderColor = '#cbd5e1';
+        }
+      }
+      if (chevron) chevron.textContent = isV4RailOpen ? '◀' : '▶';
+    }
+
+    function selectV4Venue(id, name) {
+      document.querySelectorAll('#v4-sidebar .rail-circle').forEach(btn => btn.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      const label = document.getElementById('v4-venue-label');
+      if (label) label.textContent = name;
+    }
+
+    function filterV4(type) {
+      const pills = [
+        { id: 'v4-pill-all', type: 'all' },
+        { id: 'v4-pill-avail', type: 'available' },
+        { id: 'v4-pill-low', type: 'low-stock' }
+      ];
+
+      pills.forEach(p => {
+        const btn = document.getElementById(p.id);
+        const countBadge = btn ? btn.querySelector('span:nth-child(2)') : null;
+        if (btn) {
+          if (p.type === type) {
+            btn.classList.add('active');
+            btn.style.background = '#1a5140';
+            btn.style.color = '#ffffff';
+            btn.style.borderColor = '#1a5140';
+            if (countBadge) {
+              countBadge.style.background = 'rgba(255,255,255,0.25)';
+              countBadge.style.color = '#ffffff';
+            }
+          } else {
+            btn.classList.remove('active');
+            btn.style.background = '#ffffff';
+            btn.style.color = '#334155';
+            btn.style.borderColor = '#e2e8f0';
+            if (countBadge) {
+              if (p.type === 'low-stock') {
+                countBadge.style.background = '#ffe4e6';
+                countBadge.style.color = '#be123c';
+              } else {
+                countBadge.style.background = '#f1f5f9';
+                countBadge.style.color = '#475569';
+              }
+            }
+          }
+        }
+      });
+
+      const items = document.querySelectorAll('.v4-item');
+      items.forEach(item => {
+        const stock = item.getAttribute('data-stock');
+        if (type === 'all' || stock === type) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    function toggleV5Collapse(id, btn) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const isHidden = el.style.display === 'none';
+      el.style.display = isHidden ? 'block' : 'none';
+      const chevron = btn.querySelector('.v5-chevron');
+      if (chevron) chevron.textContent = isHidden ? '▲' : '▼';
+      const hint = btn.querySelector('.v5-hint');
+      if (hint) hint.style.display = isHidden ? 'inline' : 'none';
+    }
+
+    let v6Status = 'All';
+    let v6Venue = 'Derby County FC';
+
+    function toggleV6StatusDropdown() {
+      const menu = document.getElementById('v6-status-menu');
+      if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      const locMenu = document.getElementById('v6-location-menu');
+      if (locMenu) locMenu.style.display = 'none';
+    }
+
+    function setV6Status(status) {
+      v6Status = status;
+      const label = document.getElementById('v6-status-label');
+      if (label) label.textContent = status;
+      const menu = document.getElementById('v6-status-menu');
+      if (menu) menu.style.display = 'none';
+      filterV6();
+    }
+
+    function toggleV6LocationMenu() {
+      const menu = document.getElementById('v6-location-menu');
+      if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      const statusMenu = document.getElementById('v6-status-menu');
+      if (statusMenu) statusMenu.style.display = 'none';
+    }
+
+    function openV6LocationMenu() {
+      const menu = document.getElementById('v6-location-menu');
+      if (menu) menu.style.display = 'block';
+      const statusMenu = document.getElementById('v6-status-menu');
+      if (statusMenu) statusMenu.style.display = 'none';
+    }
+
+    function closeV6LocationMenu() {
+      const menu = document.getElementById('v6-location-menu');
+      if (menu) menu.style.display = 'none';
+      const searchInput = document.getElementById('v6-dropdown-search');
+      if (searchInput) {
+        searchInput.value = '';
+        filterV6DropdownVenues();
+      }
+    }
+
+    function filterV6DropdownVenues() {
+      const q = document.getElementById('v6-dropdown-search')?.value.toLowerCase() || '';
+      document.querySelectorAll('.v6-venue-option').forEach(opt => {
+        const name = opt.getAttribute('data-name')?.toLowerCase() || '';
+        opt.style.display = name.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    function setV6Venue(venue) {
+      v6Venue = venue;
+      const input = document.getElementById('v6-loc-input');
+      if (input) {
+        input.value = '';
+        input.placeholder = venue || 'Location';
+      }
+      closeV6LocationMenu();
+      filterV6();
+    }
+
+    function onV6SearchInput() {
+      filterV6();
+    }
+
+    function clearV6Location(e) {
+      if (e) e.stopPropagation();
+      setV6Venue('');
+      const input = document.getElementById('v6-loc-input');
+      if (input) {
+        input.value = '';
+        input.placeholder = 'Location';
+      }
+      closeV6LocationMenu();
+      filterV6();
+    }
+
+    function resetV6Filters() {
+      v6Status = 'All';
+      v6Venue = 'Derby County FC';
+      const label = document.getElementById('v6-status-label');
+      if (label) label.textContent = 'All';
+      const input = document.getElementById('v6-loc-input');
+      if (input) {
+        input.value = '';
+        input.placeholder = 'Derby County FC';
+      }
+      filterV6();
+    }
+
+    function filterV6() {
+      const input = document.getElementById('v6-loc-input');
+      const searchVal = input ? input.value.trim().toLowerCase() : '';
+      const items = document.querySelectorAll('.v6-item');
+
+      items.forEach(item => {
+        const stock = item.getAttribute('data-stock');
+        const venue = item.getAttribute('data-venue') || '';
+        const title = item.querySelector('.item-title')?.textContent.toLowerCase() || '';
+
+        const matchesStatus = v6Status === 'All' || stock === v6Status;
+        const matchesVenue = !v6Venue || venue.toLowerCase().includes(v6Venue.toLowerCase());
+        const matchesSearch = !searchVal || venue.toLowerCase().includes(searchVal) || title.includes(searchVal);
+
+        if (matchesStatus && matchesVenue && matchesSearch) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+
+      const sub = document.getElementById('v6-venue-subtitle');
+      if (sub) {
+        sub.textContent = (v6Venue || 'All Locations') + ' • ' + (v6Status === 'Low Stock' ? '1 low stock item' : (v6Venue === 'Notts County' ? '1 category' : '4 categories'));
+      }
+      const lowBadge = document.getElementById('v6-low-badge');
+      if (lowBadge) {
+        lowBadge.style.display = v6Status === 'Low Stock' ? 'inline-block' : 'none';
+      }
+
+      const totalItemsEl = document.getElementById('v6-total-items-val');
+      const categoriesEl = document.getElementById('v6-categories-val');
+      if (totalItemsEl) {
+        if (!v6Venue || v6Venue === 'All Locations') {
+          totalItemsEl.textContent = v6Status === 'Low Stock' ? '9' : (v6Status === 'Available' ? '141' : '150');
+        } else if (v6Venue.includes('Derby')) {
+          totalItemsEl.textContent = v6Status === 'Low Stock' ? '9' : (v6Status === 'Available' ? '376' : '385');
+        } else if (v6Venue.includes('Notts')) {
+          totalItemsEl.textContent = '9';
+        } else if (v6Venue.includes('Venue 4')) {
+          totalItemsEl.textContent = '42';
+        } else {
+          totalItemsEl.textContent = '18';
+        }
+      }
+      if (categoriesEl) {
+        if (!v6Venue || v6Venue === 'All Locations') {
+          categoriesEl.textContent = v6Status === 'Low Stock' ? '1' : '6';
+        } else if (v6Venue.includes('Derby')) {
+          categoriesEl.textContent = v6Status === 'Low Stock' ? '1' : '4';
+        } else {
+          categoriesEl.textContent = '1';
+        }
+      }
+    }
+  
+    // =========================================================================
+    // VARIATION 7 LOGIC
+    // =========================================================================
+    let v7Status = 'All';
+    let v7Venue = 'Derby County FC';
+
+    function toggleV7VenueMenu() {
+      const menu = document.getElementById('v7-venue-menu');
+      if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function setV7Venue(venueVal, label) {
+      v7Venue = venueVal;
+      const lbl = document.getElementById('v7-venue-label');
+      if (lbl) lbl.textContent = label;
+      const sub = document.getElementById('v7-venue-sub');
+      if (sub) sub.textContent = label + ' • 4 categories';
+      const menu = document.getElementById('v7-venue-menu');
+      if (menu) menu.style.display = 'none';
+      filterV7();
+    }
+
+    function setV7Chip(status) {
+      v7Status = status;
+      const chips = [
+        { id: 'v7-chip-all', status: 'All', countId: 'v7-count-all' },
+        { id: 'v7-chip-avail', status: 'Available', countId: 'v7-count-avail' },
+        { id: 'v7-chip-low', status: 'Low Stock', countId: 'v7-count-low' }
+      ];
+
+      chips.forEach(c => {
+        const btn = document.getElementById(c.id);
+        const count = document.getElementById(c.countId);
+        if (btn && count) {
+          if (c.status === status) {
+            btn.style.background = '#164e3f';
+            btn.style.color = '#ffffff';
+            btn.style.borderColor = '#164e3f';
+            btn.style.boxShadow = '0 2px 4px rgba(22,78,63,0.15)';
+            count.style.background = 'rgba(255,255,255,0.22)';
+            count.style.color = '#ffffff';
+          } else {
+            btn.style.background = '#ffffff';
+            btn.style.borderColor = '#e2e8f0';
+            btn.style.boxShadow = 'none';
+            if (c.status === 'Low Stock') {
+              btn.style.color = '#b45309';
+              count.style.background = '#fef3c7';
+              count.style.color = '#b45309';
+            } else {
+              btn.style.color = '#164e3f';
+              count.style.background = '#e7eee9';
+              count.style.color = '#164e3f';
+            }
+          }
+        }
+      });
+
+      const sub = document.getElementById('v7-filter-sub');
+      if (sub) {
+        sub.textContent = status === 'All' ? 'Showing All' : 'Filter: ' + status;
+      }
+      filterV7();
+    }
+
+    function onV7Search() {
+      const q = document.getElementById('v7-search')?.value.trim();
+      const clearBtn = document.getElementById('v7-clear-btn');
+      if (clearBtn) clearBtn.style.display = q ? 'flex' : 'none';
+      filterV7();
+    }
+
+    function clearV7Search() {
+      const input = document.getElementById('v7-search');
+      if (input) input.value = '';
+      const clearBtn = document.getElementById('v7-clear-btn');
+      if (clearBtn) clearBtn.style.display = 'none';
+      filterV7();
+    }
+
+    function filterV7() {
+      const q = document.getElementById('v7-search')?.value.toLowerCase().trim() || '';
+      const items = document.querySelectorAll('.v7-item');
+      items.forEach(item => {
+        const stock = item.getAttribute('data-stock');
+        const title = item.getAttribute('data-title')?.toLowerCase() || '';
+        const matchesStatus = v7Status === 'All' || stock === v7Status;
+        const matchesSearch = !q || title.includes(q);
+        item.style.display = (matchesStatus && matchesSearch) ? 'flex' : 'none';
+      });
+      const pint = document.getElementById('v7-pint-container');
+      if (pint) {
+        const matches = (v7Status === 'All' || v7Status === 'Available') && (!q || 'pint gg'.includes(q));
+        pint.style.display = matches ? 'block' : 'none';
+      }
+    }
+
+    // =========================================================================
+    // VARIATION 8 LOGIC (iOS Bottom Sheet)
+    // =========================================================================
+    let v8Status = 'All';
+
+    function openV8VenueSheet() {
+      const bd = document.getElementById('v8-sheet-backdrop');
+      const modal = document.getElementById('v8-sheet-modal');
+      if (bd && modal) {
+        bd.style.display = 'block';
+        modal.style.display = 'block';
+        setTimeout(() => {
+          bd.style.opacity = '1';
+          modal.style.transform = 'translateY(0)';
+        }, 10);
+      }
+    }
+
+    function closeV8VenueSheet() {
+      const bd = document.getElementById('v8-sheet-backdrop');
+      const modal = document.getElementById('v8-sheet-modal');
+      if (bd && modal) {
+        bd.style.opacity = '0';
+        modal.style.transform = 'translateY(100%)';
+        setTimeout(() => {
+          bd.style.display = 'none';
+          modal.style.display = 'none';
+        }, 220);
+      }
+    }
+
+    function selectV8Venue(name, items, cats, auditStatus) {
+      const disp = document.getElementById('v8-venue-display');
+      if (disp) disp.textContent = name;
+      const totalEl = document.getElementById('v8-total-items-val');
+      if (totalEl) totalEl.textContent = items;
+      const catsEl = document.getElementById('v8-categories-val');
+      if (catsEl) catsEl.textContent = cats;
+      closeV8VenueSheet();
+    }
+
+    function setV8Status(status) {
+      v8Status = status;
+      const pills = [
+        { id: 'v8-pill-all', status: 'All' },
+        { id: 'v8-pill-avail', status: 'Available' },
+        { id: 'v8-pill-low', status: 'Low Stock' }
+      ];
+
+      pills.forEach(p => {
+        const btn = document.getElementById(p.id);
+        if (btn) {
+          if (p.status === status) {
+            btn.style.background = '#164e3f';
+            btn.style.color = '#ffffff';
+            btn.style.border = 'none';
+          } else {
+            btn.style.background = '#ffffff';
+            btn.style.color = p.status === 'Low Stock' ? '#b45309' : '#475569';
+            btn.style.border = '1px solid #cbd5e1';
+          }
+        }
+      });
+
+      const items = document.querySelectorAll('.v8-item');
+      items.forEach(item => {
+        const stock = item.getAttribute('data-stock');
+        item.style.display = (status === 'All' || stock === status) ? 'flex' : 'none';
+      });
+      const pint = document.getElementById('v8-pint-container');
+      if (pint) {
+        pint.style.display = (status === 'All' || status === 'Available') ? 'block' : 'none';
+      }
+    }
+
+    // =========================================================================
+    // VARIATION 9 LOGIC (Compact Floor)
+    // =========================================================================
+    let v9Status = 'All';
+
+    function toggleV9VenueMenu() {
+      const menu = document.getElementById('v9-venue-menu');
+      if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function setV9Venue(venueVal, label) {
+      const lbl = document.getElementById('v9-venue-label');
+      if (lbl) lbl.textContent = label;
+      const menu = document.getElementById('v9-venue-menu');
+      if (menu) menu.style.display = 'none';
+    }
+
+    function toggleV9StatusMenu() {
+      const menu = document.getElementById('v9-status-menu');
+      if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function setV9Status(status) {
+      v9Status = status;
+      const lbl = document.getElementById('v9-status-label');
+      if (lbl) lbl.textContent = status;
+      const menu = document.getElementById('v9-status-menu');
+      if (menu) menu.style.display = 'none';
+      filterV9();
+    }
+
+    function onV9Search() {
+      const q = document.getElementById('v9-search')?.value.trim();
+      const clearBtn = document.getElementById('v9-clear-btn');
+      if (clearBtn) clearBtn.style.display = q ? 'flex' : 'none';
+      filterV9();
+    }
+
+    function clearV9Search() {
+      const input = document.getElementById('v9-search');
+      if (input) input.value = '';
+      const clearBtn = document.getElementById('v9-clear-btn');
+      if (clearBtn) clearBtn.style.display = 'none';
+      filterV9();
+    }
+
+    function filterV9() {
+      const q = document.getElementById('v9-search')?.value.toLowerCase().trim() || '';
+      const items = document.querySelectorAll('.v9-item');
+      items.forEach(item => {
+        const stock = item.getAttribute('data-stock');
+        const title = item.getAttribute('data-title')?.toLowerCase() || '';
+        const matchesStatus = v9Status === 'All' || stock === v9Status;
+        const matchesSearch = !q || title.includes(q);
+        item.style.display = (matchesStatus && matchesSearch) ? 'flex' : 'none';
+      });
+      const pint = document.getElementById('v9-pint-container');
+      if (pint) {
+        const matches = (v9Status === 'All' || v9Status === 'Available') && (!q || 'pint gg'.includes(q));
+        pint.style.display = matches ? 'block' : 'none';
+      }
+    }
+
+  </script>
+</body>
+</html>

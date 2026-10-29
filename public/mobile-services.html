@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow Platform - Mobile Services</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0b0f17;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      color: #0f172a;
+    }
+    .phone-frame {
+      width: 393px;
+      height: 852px;
+      background-color: #f8f9ff;
+      border-radius: 48px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 10px #1e1e24, 0 0 0 12px #334155;
+    }
+    /* Top Header matching Figma Frame 1142:8764 */
+    .top-header {
+      height: 56px;
+      background-color: #1e1e24;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+      flex-shrink: 0;
+      z-index: 20;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .header-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border-radius: 8px;
+      position: relative;
+    }
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+    .badge-dot {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 7px;
+      height: 7px;
+      background-color: #ef4444;
+      border-radius: 50%;
+      border: 1.5px solid #1e1e24;
+    }
+
+    /* Scrollable Screen Content */
+    .screen-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 88px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background-color: #f8f9ff;
+    }
+    .screen-content::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Title & CTA Row */
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .page-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .add-service-btn {
+      background-color: #10b981;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 12px;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+      transition: background-color 0.15s;
+    }
+    .add-service-btn:hover {
+      background-color: #059669;
+    }
+    .add-service-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Segmented Tab Bar */
+    .subtabs-row {
+      display: flex;
+      align-items: center;
+      background-color: #e2e8f0;
+      padding: 2.5px;
+      border-radius: 10px;
+      width: fit-content;
+      gap: 4px;
+    }
+    .subtab-btn {
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+      background: none;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .subtab-btn.active {
+      background-color: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+    }
+
+    /* 4 Stat Summary Cards matching media_1789721848799.png */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .stat-card {
+      background-color: #f0fdf4;
+      border: 1px solid #d1fae5;
+      border-radius: 16px;
+      padding: 13px;
+      height: 102px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 1px 2px rgba(16, 185, 129, 0.05);
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+    }
+    .stat-bottom {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .stat-icon {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      min-height: 22px;
+      color: #10b981;
+    }
+
+    /* Search Bar matching media_1789721848799.png */
+    .search-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .search-input-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 8px 12px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+    .search-input-box svg {
+      width: 14px;
+      height: 14px;
+      color: #94a3b8;
+    }
+    .search-input {
+      border: none;
+      outline: none;
+      font-size: 12px;
+      color: #0f172a;
+      font-family: inherit;
+      width: 100%;
+      background: transparent;
+    }
+    .search-input::placeholder {
+      color: #94a3b8;
+    }
+    .service-count {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+
+    /* Services List */
+    .service-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .service-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+    .service-card:hover {
+      border-color: #cbd5e1;
+    }
+    .service-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .service-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .service-name {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .xero-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background-color: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #dbeafe;
+      font-family: monospace;
+    }
+    .service-desc {
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+    .service-footer {
+      border-top: 1px solid #f1f5f9;
+      padding-top: 8px;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cost-info {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .cost-val {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .vat-rate {
+      font-size: 10.5px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+    .actions-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .action-btn {
+      background: none;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+    }
+    .action-btn:hover {
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    /* Bottom Navigation Dock */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 66px;
+      background-color: #1e1e24;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 6px 10px 6px;
+      z-index: 30;
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      color: #94a3b8;
+      font-size: 9.5px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      flex: 1;
+    }
+    .nav-item.active {
+      color: #10b981;
+    }
+    .nav-item svg {
+      width: 19px;
+      height: 19px;
+    }
+    .nav-center-action {
+      position: relative;
+      top: -14px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: #10b981;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+      border: 3.5px solid #1e1e24;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .nav-center-action svg {
+      width: 22px;
+      height: 22px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone-frame">
+    <!-- Top Dark Header -->
+    <header class="top-header">
+      <button class="icon-btn" onclick="location.href='mobile-invoice-list.html'" title="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <span class="header-title">Flow Platform</span>
+      <button class="icon-btn" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+        <span class="badge-dot"></span>
+      </button>
+    </header>
+
+    <!-- Main Scrollable Screen Content -->
+    <main class="screen-content">
+      <!-- Title & CTA Row -->
+      <div class="title-row">
+        <h1 class="page-title">Services</h1>
+        <button class="add-service-btn" onclick="alert('Open Add Service Modal');">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Add Service</span>
+        </button>
+      </div>
+
+      <!-- Segmented Subtabs: Invoices | Services -->
+      <div class="subtabs-row">
+        <button class="subtab-btn" onclick="location.href='mobile-invoice-list.html'">Invoices</button>
+        <button class="subtab-btn active" onclick="location.href='mobile-services.html'">Services</button>
+      </div>
+
+      <!-- Search Input & Count matching media_1789721848799.png -->
+      <section class="search-row">
+        <div class="search-input-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input class="search-input" type="text" placeholder="Search service name, Xero ID..." />
+        </div>
+        <span class="service-count">6 services</span>
+      </section>
+
+      <!-- Services List (6 Services) -->
+      <section class="service-cards">
+        <!-- Service 1: Lost Cup -->
+        <div class="service-card">
+          <div class="service-top-row">
+            <div class="service-title-group">
+              <strong class="service-name">Lost Cup</strong>
+              <span class="xero-pill">XERO-001</span>
+            </div>
+            <div class="actions-group">
+              <button class="action-btn">Edit</button>
+              <button class="action-btn" style="color: #ef4444;">Delete</button>
+            </div>
+          </div>
+          <p class="service-desc">Charges for lost reusable cups during events</p>
+          <div class="service-footer">
+            <div class="cost-info">
+              <span class="cost-val">£1.50</span>
+              <span class="vat-rate">VAT 20%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service 2: Washed Cup -->
+        <div class="service-card">
+          <div class="service-top-row">
+            <div class="service-title-group">
+              <strong class="service-name">Washed Cup</strong>
+              <span class="xero-pill">XERO-002</span>
+            </div>
+            <div class="actions-group">
+              <button class="action-btn">Edit</button>
+              <button class="action-btn" style="color: #ef4444;">Delete</button>
+            </div>
+          </div>
+          <p class="service-desc">Professional cleaning and washing service per cup</p>
+          <div class="service-footer">
+            <div class="cost-info">
+              <span class="cost-val">£0.50</span>
+              <span class="vat-rate">VAT 20%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service 3: Damaged -->
+        <div class="service-card">
+          <div class="service-top-row">
+            <div class="service-title-group">
+              <strong class="service-name">Damaged</strong>
+              <span class="xero-pill">XERO-003</span>
+            </div>
+            <div class="actions-group">
+              <button class="action-btn">Edit</button>
+              <button class="action-btn" style="color: #ef4444;">Delete</button>
+            </div>
+          </div>
+          <p class="service-desc">Replacement fees for damaged cups or equipment</p>
+          <div class="service-footer">
+            <div class="cost-info">
+              <span class="cost-val">£2.00</span>
+              <span class="vat-rate">VAT 20%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service 4: Tote Lost -->
+        <div class="service-card">
+          <div class="service-top-row">
+            <div class="service-title-group">
+              <strong class="service-name">Tote Lost</strong>
+              <span class="xero-pill">XERO-004</span>
+            </div>
+            <div class="actions-group">
+              <button class="action-btn">Edit</button>
+              <button class="action-btn" style="color: #ef4444;">Delete</button>
+            </div>
+          </div>
+          <p class="service-desc">Missing tote storage box replacement fee</p>
+          <div class="service-footer">
+            <div class="cost-info">
+              <span class="cost-val">£15.00</span>
+              <span class="vat-rate">VAT 20%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service 5: Wheely Bins -->
+        <div class="service-card">
+          <div class="service-top-row">
+            <div class="service-title-group">
+              <strong class="service-name">Wheely Bins</strong>
+              <span class="xero-pill">XERO-005</span>
+            </div>
+            <div class="actions-group">
+              <button class="action-btn">Edit</button>
+              <button class="action-btn" style="color: #ef4444;">Delete</button>
+            </div>
+          </div>
+          <p class="service-desc">Wheely bin collection and rental service</p>
+          <div class="service-footer">
+            <div class="cost-info">
+              <span class="cost-val">£25.00</span>
+              <span class="vat-rate">VAT 20%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service 6: DRS Bins -->
+        <div class="service-card">
+          <div class="service-top-row">
+            <div class="service-title-group">
+              <strong class="service-name">DRS Bins</strong>
+              <span class="xero-pill">XERO-006</span>
+            </div>
+            <div class="actions-group">
+              <button class="action-btn">Edit</button>
+              <button class="action-btn" style="color: #ef4444;">Delete</button>
+            </div>
+          </div>
+          <p class="service-desc">Deposit Return Scheme bin setup and collection</p>
+          <div class="service-footer">
+            <div class="cost-info">
+              <span class="cost-val">£30.00</span>
+              <span class="vat-rate">VAT 20%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <a href="mobile-stitch-export.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>Home</span>
+      </a>
+      <a href="mobile-services.html" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+        <span>Stock Check</span>
+      </a>
+      <button class="nav-center-action" onclick="location.href='mobile-generate-invoice.html'" title="Generate Invoice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+      <a href="mobile-calendar-picker.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <span>Calendar</span>
+      </a>
+      <a href="mobile-invoice-list.html" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg>
+        <span>Batch</span>
+      </a>
+    </nav>
+  </div>
+
+</body>
+</html>

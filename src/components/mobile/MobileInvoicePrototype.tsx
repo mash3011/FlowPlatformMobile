@@ -1,0 +1,167 @@
+import React, { useState } from 'react';
+import { MobileDeviceFrame, MobileOSType } from './MobileDeviceFrame';
+import { MobileLandingPage } from './MobileLandingPage';
+import { MobileSidebarDrawer } from './MobileSidebarDrawer';
+import { MobileInvoiceListView } from './MobileInvoiceListView';
+import { MobileStockCheckView } from './MobileStockCheckView';
+import { Icon } from '../ui/Icon';
+
+interface MobileInvoicePrototypeProps {
+  onBackToDesktop?: () => void;
+}
+
+export const MobileInvoicePrototype: React.FC<MobileInvoicePrototypeProps> = ({
+  onBackToDesktop,
+}) => {
+  const [selectedOS, setSelectedOS] = useState<MobileOSType>('ios');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('stock-check');
+  const [stockCheckPersona, setStockCheckPersona] = useState<'circulayo-teams' | 'clients-view'>('circulayo-teams');
+
+  return (
+    <div className="h-screen w-screen bg-slate-100 text-slate-800 flex flex-col justify-between p-3 sm:px-6 sm:py-3 select-none font-sans overflow-hidden">
+      {/* Top Prototype Controls Bar - Clean Light Mode Styling */}
+      <header className="w-full flex items-center justify-start gap-4 bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-200/90 shadow-sm shrink-0">
+        {/* Left: Branding & Back Button */}
+        <div className="flex items-center gap-3">
+          {onBackToDesktop && (
+            <button
+              onClick={onBackToDesktop}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-200"
+            >
+              <Icon name="Monitor" size={14} />
+              <span className="hidden sm:inline">Desktop View</span>
+            </button>
+          )}
+
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <h1 className="text-sm font-extrabold tracking-tight text-slate-900">
+              Flow Platform Mobile Prototype
+            </h1>
+          </div>
+        </div>
+
+        {/* OS & Device Switcher: iPhone | Android */}
+        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+          <button
+            onClick={() => setSelectedOS('ios')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              selectedOS === 'ios'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Icon name="Apple" size={14} />
+            <span>Apple iPhone</span>
+          </button>
+          <button
+            onClick={() => setSelectedOS('android')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              selectedOS === 'android'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Icon name="Smartphone" size={14} />
+            <span>Google Android</span>
+          </button>
+        </div>
+
+        {/* View Switcher: Circulayo Teams | Clients View (Beside Apple iPhone and Google Android) */}
+        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+          <button
+            onClick={() => {
+              setStockCheckPersona('circulayo-teams');
+              if (activeTab !== 'stock-check') setActiveTab('stock-check');
+            }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeTab === 'stock-check' && stockCheckPersona === 'circulayo-teams'
+                ? 'bg-[#164e3f] text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Icon name="Users" size={14} />
+            <span>Circulayo Teams</span>
+          </button>
+          <button
+            onClick={() => {
+              setStockCheckPersona('clients-view');
+              if (activeTab !== 'stock-check') setActiveTab('stock-check');
+            }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeTab === 'stock-check' && stockCheckPersona === 'clients-view'
+                ? 'bg-[#164e3f] text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Icon name="Building2" size={14} />
+            <span>Clients View</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Main Interactive Mobile Simulator - CENTERED */}
+      <main className="flex-1 flex items-center justify-center py-1 overflow-hidden">
+        <MobileDeviceFrame os={selectedOS}>
+          {/* Main Screen Router */}
+          {activeTab === 'impact-savings' || activeTab === 'home' ? (
+            /* EXACT FIGMA 1123-8536 LANDING PAGE */
+            <MobileLandingPage
+              onOpenSidebar={() => setIsSidebarOpen(true)}
+              activeNavTab="home"
+              onSelectNavTab={(tab) => {
+                if (tab === 'calendar') setActiveTab('calendar');
+                else if (tab === 'batch') setActiveTab('batch');
+                else if (tab === 'stock-check') setActiveTab('stock-check');
+                else if (tab === 'add') setIsSidebarOpen(true);
+              }}
+            />
+          ) : activeTab === 'stock-check' ? (
+            /* EXACT FIGMA 526:8085 STOCK CHECK VIEW */
+            <MobileStockCheckView
+              onOpenSidebar={() => setIsSidebarOpen(true)}
+              persona={stockCheckPersona}
+              onPersonaChange={setStockCheckPersona}
+              onSelectNavTab={(tab) => {
+                if (tab === 'home') setActiveTab('home');
+                else if (tab === 'calendar') setActiveTab('calendar');
+                else if (tab === 'batch') setActiveTab('batch');
+                else if (tab === 'stock-check') setActiveTab('stock-check');
+                else if (tab === 'add') setIsSidebarOpen(true);
+              }}
+            />
+          ) : (
+            /* Invoice Module matching Impact Savings design language */
+            <MobileInvoiceListView
+              currentTab={activeTab}
+              onOpenSidebar={() => setIsSidebarOpen(true)}
+              onSelectNavTab={(tab) => {
+                if (tab === 'home') setActiveTab('impact-savings');
+                else if (tab === 'calendar') setActiveTab('calendar');
+                else if (tab === 'batch') setActiveTab('batch');
+                else if (tab === 'stock-check') setActiveTab('stock-check');
+              }}
+            />
+          )}
+
+          {/* EXACT FIGMA 1123-8991 SIDEBAR DRAWER */}
+          <MobileSidebarDrawer
+            isOpen={isSidebarOpen}
+            onClose={() => setIsSidebarOpen(false)}
+            activeTab={activeTab}
+            onSelectTab={(tabId) => {
+              setActiveTab(tabId);
+              setIsSidebarOpen(false);
+            }}
+          />
+        </MobileDeviceFrame>
+      </main>
+
+      {/* Bottom Hint Bar */}
+      <footer className="text-left pl-2 sm:pl-8 text-[11px] text-slate-500 py-0.5 shrink-0">
+        Tap hamburger menu (☰) to open sidebar • Toggle iOS / Android above
+      </footer>
+    </div>
+  );
+};

@@ -1097,147 +1097,193 @@ export const FlowCalendarView: React.FC<FlowCalendarViewProps> = ({ onSelectTab 
                 </div>
 
                 {/* Dual Month Calendar View */}
+                {/* Dual Month Calendar View */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
-                  {/* Month 1: September 2026 */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between px-1">
-                      <button
-                        type="button"
-                        onClick={() => setPickerMonth1(new Date(pickerMonth1.getFullYear(), pickerMonth1.getMonth() - 1, 1))}
-                        className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-sm font-bold cursor-pointer"
-                      >
-                        ‹
-                      </button>
-                      <span className="text-xs font-bold text-slate-800 dark:text-white">
-                        {pickerMonth1.toLocaleString('default', { month: 'long', year: 'numeric' })}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setPickerMonth1(new Date(pickerMonth1.getFullYear(), pickerMonth1.getMonth() + 1, 1))}
-                        className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-sm font-bold cursor-pointer"
-                      >
-                        ›
-                      </button>
-                    </div>
+                  {[
+                    {
+                      monthObj: pickerMonth1,
+                      onPrev: () => setPickerMonth1(new Date(pickerMonth1.getFullYear(), pickerMonth1.getMonth() - 1, 1)),
+                      onNext: () => setPickerMonth1(new Date(pickerMonth1.getFullYear(), pickerMonth1.getMonth() + 1, 1)),
+                    },
+                    {
+                      monthObj: pickerMonth2,
+                      onPrev: () => setPickerMonth2(new Date(pickerMonth2.getFullYear(), pickerMonth2.getMonth() - 1, 1)),
+                      onNext: () => setPickerMonth2(new Date(pickerMonth2.getFullYear(), pickerMonth2.getMonth() + 1, 1)),
+                    },
+                  ].map(({ monthObj, onPrev, onNext }, mIdx) => {
+                    const year = monthObj.getFullYear();
+                    const month = monthObj.getMonth();
+                    const firstDayOfMonth = new Date(year, month, 1);
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    const daysInPrev = new Date(year, month, 0).getDate();
+                    const startDayOfWeek = (firstDayOfMonth.getDay() + 6) % 7; // Monday start
 
-                    {/* Days Header */}
-                    <div className="grid grid-cols-7 text-center text-[11px] font-semibold text-slate-400">
-                      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-                    </div>
+                    const cells = [];
+                    // Prev month padding
+                    for (let i = startDayOfWeek - 1; i >= 0; i--) {
+                      const d = daysInPrev - i;
+                      cells.push(
+                        <div
+                          key={`prev-${mIdx}-${d}`}
+                          className="h-8 w-8 mx-auto flex items-center justify-center text-[12px] font-medium text-slate-300 dark:text-slate-600 select-none"
+                        >
+                          {String(d).padStart(2, '0')}
+                        </div>
+                      );
+                    }
 
-                    {/* Month 1 Grid */}
-                    <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium">
-                      {Array.from({ length: new Date(pickerMonth1.getFullYear(), pickerMonth1.getMonth(), 1).getDay() }).map((_, i) => (
-                        <div key={`empty-m1-${i}`} />
-                      ))}
+                    // Current month days
+                    for (let d = 1; d <= daysInMonth; d++) {
+                      const dayStr = `${String(d).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+                      const isStart = pickerStartDate === dayStr;
+                      const isEnd = pickerEndDate === dayStr;
 
-                      {Array.from({ length: new Date(pickerMonth1.getFullYear(), pickerMonth1.getMonth() + 1, 0).getDate() }).map((_, i) => {
-                        const dayNum = i + 1;
-                        const dayStr = `${String(dayNum).padStart(2, '0')}/${String(pickerMonth1.getMonth() + 1).padStart(2, '0')}/${pickerMonth1.getFullYear()}`;
-                        const isStart = pickerStartDate === dayStr;
-                        const isEnd = pickerEndDate === dayStr;
+                      // Check in range
+                      let inRange = false;
+                      if (pickerStartDate && pickerEndDate) {
+                        const pStartParts = pickerStartDate.split('/');
+                        const pEndParts = pickerEndDate.split('/');
+                        if (pStartParts.length === 3 && pEndParts.length === 3) {
+                          const sDate = new Date(parseInt(pStartParts[2]), parseInt(pStartParts[1]) - 1, parseInt(pStartParts[0]));
+                          const eDate = new Date(parseInt(pEndParts[2]), parseInt(pEndParts[1]) - 1, parseInt(pEndParts[0]));
+                          const cDate = new Date(year, month, d);
+                          if (cDate > sDate && cDate < eDate) {
+                            inRange = true;
+                          }
+                        }
+                      }
 
-                        return (
+                      let cellClass =
+                        'h-8 w-8 mx-auto flex items-center justify-center text-xs transition-all cursor-pointer select-none ';
+                      if (isStart || isEnd) {
+                        cellClass += 'bg-blue-600 text-white font-bold rounded-full shadow-xs z-10';
+                      } else if (inRange) {
+                        cellClass += 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 font-bold rounded-xl';
+                      } else {
+                        cellClass += 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full font-semibold';
+                      }
+
+                      cells.push(
+                        <button
+                          key={`curr-${mIdx}-${d}`}
+                          type="button"
+                          onClick={() => handlePickerDayClick(d, monthObj)}
+                          className={cellClass}
+                        >
+                          {String(d).padStart(2, '0')}
+                        </button>
+                      );
+                    }
+
+                    // Next month padding
+                    const rem = (7 - (cells.length % 7)) % 7;
+                    for (let d = 1; d <= rem; d++) {
+                      cells.push(
+                        <div
+                          key={`next-${mIdx}-${d}`}
+                          className="h-8 w-8 mx-auto flex items-center justify-center text-[12px] font-medium text-slate-300 dark:text-slate-600 select-none"
+                        >
+                          {String(d).padStart(2, '0')}
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div key={mIdx} className="space-y-3">
+                        <div className="flex items-center justify-between px-1">
                           <button
-                            key={`m1-day-${dayNum}`}
                             type="button"
-                            onClick={() => handlePickerDayClick(dayNum, pickerMonth1)}
-                            className={`h-7 w-7 mx-auto rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer ${
-                              isStart || isEnd
-                                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold'
-                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                            }`}
+                            onClick={onPrev}
+                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 cursor-pointer"
                           >
-                            {dayNum}
+                            <Icon name="ChevronLeft" size={16} />
                           </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Month 2: October 2026 */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between px-1">
-                      <button
-                        type="button"
-                        onClick={() => setPickerMonth2(new Date(pickerMonth2.getFullYear(), pickerMonth2.getMonth() - 1, 1))}
-                        className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-sm font-bold cursor-pointer"
-                      >
-                        ‹
-                      </button>
-                      <span className="text-xs font-bold text-slate-800 dark:text-white">
-                        {pickerMonth2.toLocaleString('default', { month: 'long', year: 'numeric' })}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setPickerMonth2(new Date(pickerMonth2.getFullYear(), pickerMonth2.getMonth() + 1, 1))}
-                        className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-sm font-bold cursor-pointer"
-                      >
-                        ›
-                      </button>
-                    </div>
-
-                    {/* Days Header */}
-                    <div className="grid grid-cols-7 text-center text-[11px] font-semibold text-slate-400">
-                      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-                    </div>
-
-                    {/* Month 2 Grid */}
-                    <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium">
-                      {Array.from({ length: new Date(pickerMonth2.getFullYear(), pickerMonth2.getMonth(), 1).getDay() }).map((_, i) => (
-                        <div key={`empty-m2-${i}`} />
-                      ))}
-
-                      {Array.from({ length: new Date(pickerMonth2.getFullYear(), pickerMonth2.getMonth() + 1, 0).getDate() }).map((_, i) => {
-                        const dayNum = i + 1;
-                        const dayStr = `${String(dayNum).padStart(2, '0')}/${String(pickerMonth2.getMonth() + 1).padStart(2, '0')}/${pickerMonth2.getFullYear()}`;
-                        const isStart = pickerStartDate === dayStr;
-                        const isEnd = pickerEndDate === dayStr;
-
-                        return (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-extrabold text-slate-900 dark:text-white">
+                              {monthObj.toLocaleString('default', { month: 'long' })}
+                            </span>
+                            <span className="text-xs font-semibold text-slate-400">
+                              {year}
+                            </span>
+                          </div>
                           <button
-                            key={`m2-day-${dayNum}`}
                             type="button"
-                            onClick={() => handlePickerDayClick(dayNum, pickerMonth2)}
-                            className={`h-7 w-7 mx-auto rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer ${
-                              isStart || isEnd
-                                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold'
-                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                            }`}
+                            onClick={onNext}
+                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 cursor-pointer"
                           >
-                            {dayNum}
+                            <Icon name="ChevronRight" size={16} />
                           </button>
-                        );
-                      })}
-                    </div>
-                  </div>
+                        </div>
+
+                        {/* Days Header */}
+                        <div className="grid grid-cols-7 text-center text-[11px] font-bold text-slate-400 py-1.5 border-b border-slate-100 dark:border-slate-800/80">
+                          <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+                        </div>
+
+                        {/* Grid */}
+                        <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium">
+                          {cells}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
+            {/* Legend Row matching Figma */}
+            <div className="flex items-center justify-center gap-5 py-2 text-[10px] text-slate-500 border-t border-slate-100 dark:border-slate-800 mt-2">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />
+                <span>Selected</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-100 dark:bg-blue-950/50 border border-blue-600" />
+                <span>In Range</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full border border-amber-400" />
+                <span>Today</span>
+              </div>
+            </div>
+
             {/* Bottom Actions Bar */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800 mt-2">
-              <button
-                type="button"
-                onClick={() => setIsDatePickerOpen(false)}
-                className="px-6 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-              >
-                Cancel
-              </button>
+            <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => {
-                  if (pickerStartDate && pickerEndDate) {
-                    setNewEventPeriod(`${pickerStartDate} - ${pickerEndDate}`);
-                  } else if (pickerStartDate) {
-                    setNewEventPeriod(pickerStartDate);
-                  }
-                  setIsDatePickerOpen(false);
+                  setPickerStartDate('');
+                  setPickerEndDate('');
+                  setSelectedPreset('Custom');
                 }}
-                className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold cursor-pointer shadow-xs transition-colors"
+                className="px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white cursor-pointer"
               >
-                Apply
+                Reset
               </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsDatePickerOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (pickerStartDate && pickerEndDate) {
+                      setNewEventPeriod(`${pickerStartDate} - ${pickerEndDate}`);
+                    } else if (pickerStartDate) {
+                      setNewEventPeriod(pickerStartDate);
+                    }
+                    setIsDatePickerOpen(false);
+                  }}
+                  className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer shadow-sm transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
             </div>
           </div>
         </div>

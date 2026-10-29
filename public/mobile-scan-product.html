@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow Platform - Scan Product (Figma 547:8318)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0b0f17;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      color: #0f172a;
+    }
+    .phone-frame {
+      width: 393px;
+      height: 852px;
+      background-color: #090d16;
+      border-radius: 48px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 10px #1e1e24, 0 0 0 12px #334155;
+    }
+
+    /* Top Camera Header */
+    .camera-header {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      color: #ffffff;
+      z-index: 20;
+    }
+    .back-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      border: none;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .header-title { font-size: 16px; font-weight: 700; color: #ffffff; }
+    .camera-tools { display: flex; align-items: center; gap: 10px; }
+    .tool-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.12);
+      border: none;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tool-btn.active {
+      background: #10b981;
+      color: #ffffff;
+    }
+
+    /* Camera Viewfinder Area matching Figma 547:8318 */
+    .viewfinder-area {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
+      overflow: hidden;
+    }
+
+    /* Scanner Viewfinder Box */
+    .scanner-box {
+      width: 250px;
+      height: 250px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 4 Corner Reticles */
+    .corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-color: #10b981;
+      border-style: solid;
+      border-width: 0;
+    }
+    .corner-tl { top: 0; left: 0; border-top-width: 3.5px; border-left-width: 3.5px; border-top-left-radius: 12px; }
+    .corner-tr { top: 0; right: 0; border-top-width: 3.5px; border-right-width: 3.5px; border-top-right-radius: 12px; }
+    .corner-bl { bottom: 0; left: 0; border-bottom-width: 3.5px; border-left-width: 3.5px; border-bottom-left-radius: 12px; }
+    .corner-br { bottom: 0; right: 0; border-bottom-width: 3.5px; border-right-width: 3.5px; border-bottom-right-radius: 12px; }
+
+    /* Animated Laser Scanner Line */
+    .scanner-laser {
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #10b981, #34d399, #10b981, transparent);
+      box-shadow: 0 0 14px #10b981;
+      animation: scanSweep 2.2s infinite ease-in-out;
+    }
+
+    /* Sample barcode representation */
+    .barcode-silhouette {
+      display: flex;
+      gap: 3px;
+      height: 80px;
+      opacity: 0.15;
+    }
+    .bar { width: 3px; height: 100%; background: #ffffff; border-radius: 1px; }
+
+    .scanner-hint {
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 24px;
+      text-align: center;
+      padding: 0 24px;
+    }
+
+    /* Bottom Entry Sheet matching Figma Frame 547:8318 */
+    .bottom-sheet {
+      background: #ffffff;
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      padding: 18px 20px 28px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      margin: 0 auto 4px auto;
+    }
+    .sheet-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .manual-input-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 10px 14px;
+    }
+    .manual-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .manual-input::placeholder { color: #94a3b8; font-weight: 400; }
+    
+    .manual-btn {
+      background: #10b981;
+      border: none;
+      border-radius: 10px;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 14px;
+      cursor: pointer;
+    }
+
+    /* Error / Zero State Indicator */
+    .empty-state-box {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .state-label { font-size: 12px; font-weight: 600; color: #64748b; }
+    .state-count { font-size: 12px; font-weight: 700; color: #0f172a; }
+
+    @keyframes scanSweep {
+      0% { top: 10px; }
+      50% { top: 230px; }
+      100% { top: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone-frame">
+    <!-- Camera Header -->
+    <header class="camera-header">
+      <a href="mobile-stock-check.html" class="back-btn" title="Back to Stock Check">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </a>
+
+      <span class="header-title">Scan Product</span>
+
+      <div class="camera-tools">
+        <button class="tool-btn" id="flashBtn" onclick="toggleFlash()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          Flash
+        </button>
+        <button class="tool-btn" onclick="alert('Open photo gallery')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          Gallery
+        </button>
+      </div>
+    </header>
+
+    <!-- Camera Viewfinder & Laser Scanner matching Figma Frame 547:8318 -->
+    <div class="viewfinder-area">
+      <div class="scanner-box">
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+        <div class="scanner-laser"></div>
+
+        <!-- Sample Barcode Lines inside Viewfinder -->
+        <div class="barcode-silhouette">
+          <div class="bar" style="width: 4px;"></div>
+          <div class="bar" style="width: 2px;"></div>
+          <div class="bar" style="width: 6px;"></div>
+          <div class="bar" style="width: 3px;"></div>
+          <div class="bar" style="width: 5px;"></div>
+          <div class="bar" style="width: 2px;"></div>
+          <div class="bar" style="width: 7px;"></div>
+          <div class="bar" style="width: 3px;"></div>
+          <div class="bar" style="width: 4px;"></div>
+          <div class="bar" style="width: 2px;"></div>
+          <div class="bar" style="width: 5px;"></div>
+        </div>
+      </div>
+
+      <div class="scanner-hint">
+        Position the QR code or RFID tag within the frame to scan automatically
+      </div>
+    </div>
+
+    <!-- Bottom Manual Entry Sheet -->
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Enter code manually</div>
+
+      <div class="manual-input-box">
+        <input type="text" class="manual-input" placeholder="e.g. CON-c128 or Cup S/N..." id="codeField">
+        <button class="manual-btn" onclick="submitCode()">Lookup</button>
+      </div>
+
+      <div class="empty-state-box">
+        <span class="state-label">Scanned Session Items</span>
+        <span class="state-count">0 items scanned</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleFlash() {
+      const btn = document.getElementById('flashBtn');
+      btn.classList.toggle('active');
+    }
+    function submitCode() {
+      const code = document.getElementById('codeField').value.trim();
+      if (!code) {
+        alert('Please enter a product or batch serial number');
+      } else {
+        alert('Verified product: ' + code + ' (Status: In Circulation)');
+      }
+    }
+  </script>
+
+</body>
+</html>

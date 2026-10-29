@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flow Platform - Invoice Details Pop-Up Modal (Figma 1018:10225)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0b0f17;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      color: #0f172a;
+    }
+    .phone-frame {
+      width: 393px;
+      height: 852px;
+      background-color: #f8f9ff;
+      border-radius: 48px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 10px #1e1e24, 0 0 0 12px #334155;
+    }
+
+    /* Background invoice list view (simulated underneath modal) */
+    .bg-view {
+      flex: 1;
+      padding: 16px;
+      opacity: 0.4;
+      pointer-events: none;
+      filter: blur(1px);
+    }
+    .fake-header {
+      height: 48px;
+      background: #1e1e24;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .fake-card {
+      height: 110px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      margin-bottom: 12px;
+    }
+
+    /* Modal Backdrop Overlay */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    /* Bottom Sheet Modal Container */
+    .modal-sheet {
+      background: #ffffff;
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      max-height: 90%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.25);
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Drag Handle */
+    .sheet-handle {
+      width: 44px;
+      height: 5px;
+      background: #cbd5e1;
+      border-radius: 3px;
+      margin: 12px auto 6px auto;
+      flex-shrink: 0;
+    }
+
+    /* Sheet Header */
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      flex-shrink: 0;
+    }
+    .sheet-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sheet-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .badge-paid {
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .close-btn:hover { background: #e2e8f0; color: #0f172a; }
+    .close-btn svg { width: 16px; height: 16px; }
+
+    /* Scrollable Modal Content */
+    .sheet-body {
+      overflow-y: auto;
+      padding: 18px 20px 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .sheet-body::-webkit-scrollbar { display: none; }
+
+    /* Client & Invoice Meta Card */
+    .meta-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+    .meta-label { color: #64748b; font-weight: 500; }
+    .meta-val { color: #0f172a; font-weight: 700; }
+    .meta-sub { color: #64748b; font-weight: 500; font-size: 11px; }
+
+    /* Section Heading */
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Line Items Breakdown Table/Cards */
+    .line-items-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .item-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .item-name { font-size: 13.5px; font-weight: 700; color: #0f172a; }
+    .item-calc { font-size: 11.5px; color: #64748b; margin-top: 3px; }
+    .item-total { text-align: right; }
+    .item-amount { font-size: 14px; font-weight: 800; color: #0f172a; }
+    .item-vat { font-size: 10.5px; color: #10b981; font-weight: 600; margin-top: 2px; }
+
+    /* Financial Summary Breakdown */
+    .summary-box {
+      background: #f0fdf4;
+      border: 1px solid #d1fae5;
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      color: #334155;
+    }
+    .summary-line.total {
+      border-top: 1px dashed #a7f3d0;
+      padding-top: 10px;
+      margin-top: 4px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #065f46;
+    }
+
+    /* Action Buttons in Modal */
+    .action-group {
+      display: flex;
+      gap: 10px;
+      padding-top: 6px;
+    }
+    .btn-secondary {
+      flex: 1;
+      height: 44px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: #ffffff;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-primary {
+      flex: 1.2;
+      height: 44px;
+      border: none;
+      border-radius: 12px;
+      background: #10b981;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+      text-decoration: none;
+    }
+    .btn-primary:hover { background: #059669; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <div class="phone-frame">
+    <!-- Dimmed Background Content for realism -->
+    <div class="bg-view">
+      <div class="fake-header"></div>
+      <div class="fake-card"></div>
+      <div class="fake-card"></div>
+      <div class="fake-card"></div>
+      <div class="fake-card"></div>
+    </div>
+
+    <!-- Active Pop-Up Modal (Figma Node 1018:10225) -->
+    <div class="modal-overlay" id="invoiceModal">
+      <div class="modal-sheet">
+        <!-- Top Drag Handle -->
+        <div class="sheet-handle"></div>
+
+        <!-- Sheet Header -->
+        <div class="sheet-header">
+          <div class="sheet-title-group">
+            <span class="sheet-title">INV-001</span>
+            <span class="badge-paid">Paid</span>
+          </div>
+          <button class="close-btn" title="Close Modal" onclick="toggleModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Sheet Body -->
+        <div class="sheet-body">
+          
+          <!-- Client & Metadata Card -->
+          <div class="meta-box">
+            <div class="meta-row">
+              <span class="meta-label">Client</span>
+              <span class="meta-val">Derby County Football Club</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Location</span>
+              <span class="meta-sub">Pride Park Stadium</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Billing Cycle</span>
+              <span class="meta-val">01/09/2026 - 30/09/2026</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Issued On</span>
+              <span class="meta-val">30 Sep 2026</span>
+            </div>
+          </div>
+
+          <!-- Section: Line Items -->
+          <div class="section-title">Invoice Line Items</div>
+
+          <div class="line-items-wrap">
+            <!-- Line Item 1: Washed Cup -->
+            <div class="item-card">
+              <div>
+                <div class="item-name">Washed Cups</div>
+                <div class="item-calc">14,200 units × £0.12</div>
+              </div>
+              <div class="item-total">
+                <div class="item-amount">£1,704.00</div>
+                <div class="item-vat">+£340.80 VAT (20%)</div>
+              </div>
+            </div>
+
+            <!-- Line Item 2: Damaged Cups -->
+            <div class="item-card">
+              <div>
+                <div class="item-name">Damaged Replacement</div>
+                <div class="item-calc">450 units × £0.85</div>
+              </div>
+              <div class="item-total">
+                <div class="item-amount">£382.50</div>
+                <div class="item-vat">+£76.50 VAT (20%)</div>
+              </div>
+            </div>
+
+            <!-- Line Item 3: Logistics Fee -->
+            <div class="item-card">
+              <div>
+                <div class="item-name">Transport &amp; Collection</div>
+                <div class="item-calc">Fixed logistics rate</div>
+              </div>
+              <div class="item-total">
+                <div class="item-amount">£120.00</div>
+                <div class="item-vat">+£24.00 VAT (20%)</div>
+              </div>
+            </div>
+
+            <!-- Line Item 4: Platform Fee -->
+            <div class="item-card">
+              <div>
+                <div class="item-name">Flow Platform System Fee</div>
+                <div class="item-calc">Monthly tier allowance</div>
+              </div>
+              <div class="item-total">
+                <div class="item-amount">£50.00</div>
+                <div class="item-vat">+£10.00 VAT (20%)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Financial Breakdown Box -->
+          <div class="summary-box">
+            <div class="summary-line">
+              <span>Subtotal Net</span>
+              <span style="font-weight: 700;">£2,256.50</span>
+            </div>
+            <div class="summary-line">
+              <span>VAT (20.0%)</span>
+              <span style="font-weight: 700;">£451.30</span>
+            </div>
+            <div class="summary-line total">
+              <span>Total Amount Paid</span>
+              <span>£2,707.80</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-group">
+            <a href="mobile-invoice-list.html" class="btn-secondary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              Back to List
+            </a>
+            <button class="btn-primary" onclick="alert('PDF invoice downloaded successfully!')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download PDF
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleModal() {
+      const modal = document.getElementById('invoiceModal');
+      if (modal.style.display === 'none') {
+        modal.style.display = 'flex';
+      } else {
+        window.location.href = 'mobile-invoice-list.html';
+      }
+    }
+  </script>
+
+</body>
+</html>

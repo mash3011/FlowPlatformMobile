@@ -22,6 +22,7 @@ export interface CustomSelectProps {
   className?: string;
   buttonClassName?: string;
   menuClassName?: string;
+  align?: 'left' | 'right';
   disabled?: boolean;
   id?: string;
   name?: string;
@@ -38,6 +39,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   className = '',
   buttonClassName = '',
   menuClassName = '',
+  align = 'left',
   disabled = false,
   icon,
   footerAction,
@@ -139,7 +141,9 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
       {/* Dropdown Menu Popup with Auto Drop-Up/Down Placement */}
       {isOpen && (
         <div
-          className={`absolute left-0 ${
+          className={`absolute ${
+            align === 'right' ? 'right-0' : 'left-0'
+          } ${
             dropUp ? 'bottom-full mb-1.5' : 'top-full mt-1.5'
           } z-[70] min-w-[220px] w-full bg-white dark:bg-[#0d131f] border border-[#EDEDED] dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-100 ${menuClassName}`}
         >
