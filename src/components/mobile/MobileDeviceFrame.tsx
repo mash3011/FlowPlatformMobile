@@ -15,7 +15,7 @@ export const MobileDeviceFrame: React.FC<MobileDeviceFrameProps> = ({
   theme = 'light',
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center p-2 select-none shrink-0 my-auto">
+    <div className="flex flex-col items-center justify-center p-0 select-none shrink-0 my-auto">
       {/* Phone Outer Shell - Exact 393w x 852h Figma Standard Design Size */}
       <div
         style={{ width: '393px', height: '852px' }}
