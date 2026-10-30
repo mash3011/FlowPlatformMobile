@@ -120,30 +120,66 @@ export const MobileCirculayoAppView: React.FC<MobileCirculayoAppViewProps> = ({
           </button>
         </div>
 
-        {/* 2x2 Solid Color Metric Cards (Styled in Rich Forest & Sage Greens) */}
+        {/* 2x2 Metric Cards with Consistent Flush Corner Badge Design */}
         <div className="grid grid-cols-2 gap-3">
           {/* Top-Left: Total Scans */}
-          <div className="bg-[#2e7d5b] text-white rounded-2xl p-3.5 flex flex-col justify-between h-[96px] shadow-sm relative overflow-hidden">
-            <span className="text-[26px] font-black tracking-tight leading-none">838</span>
-            <span className="text-[11px] font-bold text-white/90 text-right leading-none">Total Scans</span>
+          <div className="relative bg-[#e1eae6] rounded-2xl h-[106px] p-3.5 flex flex-col justify-between overflow-hidden shadow-xs">
+            <div className="absolute top-0 left-0 w-11 h-11 rounded-tl-2xl rounded-br-2xl bg-[#006891] flex items-center justify-center text-white shadow-xs">
+              <Icon name="QrCode" size={20} strokeWidth={2.2} />
+            </div>
+            <div className="pl-10">
+              <span className="text-[13px] font-bold text-slate-900 tracking-tight leading-snug line-clamp-2 block">
+                Total Scans
+              </span>
+            </div>
+            <span className="text-2xl font-extrabold leading-none text-slate-900 self-end">
+              838
+            </span>
           </div>
 
           {/* Top-Right: Card Clicks */}
-          <div className="bg-[#3e946f] text-white rounded-2xl p-3.5 flex flex-col justify-between h-[96px] shadow-sm relative overflow-hidden">
-            <span className="text-[26px] font-black tracking-tight leading-none">35</span>
-            <span className="text-[11px] font-bold text-white/90 text-right leading-none">Card Clicks</span>
+          <div className="relative bg-[#e1eae6] rounded-2xl h-[106px] p-3.5 flex flex-col justify-between overflow-hidden shadow-xs">
+            <div className="absolute top-0 right-0 w-11 h-11 rounded-tr-2xl rounded-bl-2xl bg-[#166050] flex items-center justify-center text-white shadow-xs">
+              <Icon name="MousePointer" size={20} strokeWidth={2.2} />
+            </div>
+            <div className="pr-10">
+              <span className="text-[13px] font-bold text-slate-900 tracking-tight leading-snug line-clamp-2 block">
+                Card Clicks
+              </span>
+            </div>
+            <span className="text-2xl font-extrabold leading-none text-slate-900 self-start">
+              35
+            </span>
           </div>
 
           {/* Bottom-Left: Android */}
-          <div className="bg-[#164e3f] text-white rounded-2xl p-3.5 flex flex-col justify-between h-[96px] shadow-sm relative overflow-hidden">
-            <span className="text-[26px] font-black tracking-tight leading-none">815</span>
-            <span className="text-[11px] font-bold text-white/90 text-right leading-none">Android</span>
+          <div className="relative bg-[#e1eae6] rounded-2xl h-[106px] p-3.5 flex flex-col justify-between overflow-hidden shadow-xs">
+            <div className="absolute top-0 left-0 w-11 h-11 rounded-tl-2xl rounded-br-2xl bg-[#006891] flex items-center justify-center text-white shadow-xs">
+              <Icon name="Smartphone" size={20} strokeWidth={2.2} />
+            </div>
+            <div className="pl-10">
+              <span className="text-[13px] font-bold text-slate-900 tracking-tight leading-snug line-clamp-2 block">
+                Android
+              </span>
+            </div>
+            <span className="text-2xl font-extrabold leading-none text-slate-900 self-end">
+              815
+            </span>
           </div>
 
           {/* Bottom-Right: Apple */}
-          <div className="bg-[#52ad83] text-white rounded-2xl p-3.5 flex flex-col justify-between h-[96px] shadow-sm relative overflow-hidden">
-            <span className="text-[26px] font-black tracking-tight leading-none">23</span>
-            <span className="text-[11px] font-bold text-white/90 text-right leading-none">Apple</span>
+          <div className="relative bg-[#e1eae6] rounded-2xl h-[106px] p-3.5 flex flex-col justify-between overflow-hidden shadow-xs">
+            <div className="absolute top-0 right-0 w-11 h-11 rounded-tr-2xl rounded-bl-2xl bg-[#166050] flex items-center justify-center text-white shadow-xs">
+              <Icon name="Apple" size={20} strokeWidth={2.2} />
+            </div>
+            <div className="pr-10">
+              <span className="text-[13px] font-bold text-slate-900 tracking-tight leading-snug line-clamp-2 block">
+                Apple
+              </span>
+            </div>
+            <span className="text-2xl font-extrabold leading-none text-slate-900 self-start">
+              23
+            </span>
           </div>
         </div>
 

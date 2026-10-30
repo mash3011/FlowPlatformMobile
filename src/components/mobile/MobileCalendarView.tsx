@@ -257,59 +257,73 @@ export const MobileCalendarView: React.FC<MobileCalendarViewProps> = ({
           </div>
         </div>
 
-        {/* 2x2 Summary Metric Cards (Delivered, Collected, Collection Request, Unverified) */}
+        {/* 2x2 Summary Metric Cards (Consistent Card Design) */}
         <div className="grid grid-cols-2 gap-3">
           {/* Card 1: Delivered */}
-          <div className="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/90 flex items-center justify-between">
-            <div>
-              <span className="text-[20px] font-black text-slate-900 block leading-none mb-1">
+          <div className="relative bg-[#e1eae6] rounded-2xl h-[106px] overflow-hidden p-3.5 flex flex-col justify-between shadow-xs">
+            <div className="absolute top-0 left-0 w-11 h-11 bg-[#006891] rounded-tl-2xl rounded-br-2xl flex items-center justify-center text-white shadow-xs">
+              <Icon name="Truck" size={20} strokeWidth={2.2} />
+            </div>
+            <div className="pl-10">
+              <h3 className="text-[13px] font-bold text-slate-900 tracking-tight leading-snug">
+                Delivered
+              </h3>
+            </div>
+            <div className="self-end">
+              <span className="text-2xl font-extrabold leading-none text-slate-900">
                 0
               </span>
-              <span className="text-[11px] font-semibold text-slate-500">
-                Delivered
-              </span>
             </div>
-            <Icon name="Truck" size={24} className="text-[#2e7d5b]" strokeWidth={2.2} />
           </div>
 
           {/* Card 2: Collected */}
-          <div className="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/90 flex items-center justify-between">
-            <div>
-              <span className="text-[20px] font-black text-slate-900 block leading-none mb-1">
+          <div className="relative bg-[#e1eae6] rounded-2xl h-[106px] overflow-hidden p-3.5 flex flex-col justify-between shadow-xs">
+            <div className="absolute top-0 right-0 w-11 h-11 bg-[#166050] rounded-tr-2xl rounded-bl-2xl flex items-center justify-center text-white shadow-xs">
+              <Icon name="Truck" size={20} strokeWidth={2.2} />
+            </div>
+            <div className="pr-10">
+              <h3 className="text-[13px] font-bold text-slate-900 tracking-tight leading-snug">
+                Collected
+              </h3>
+            </div>
+            <div className="self-start">
+              <span className="text-2xl font-extrabold leading-none text-slate-900">
                 0
               </span>
-              <span className="text-[11px] font-semibold text-slate-500">
-                Collected
-              </span>
             </div>
-            <Icon name="Truck" size={24} className="text-[#2e7d5b]" strokeWidth={2.2} />
           </div>
 
           {/* Card 3: Collection Request */}
-          <div className="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/90 flex items-center justify-between">
-            <div>
-              <span className="text-[20px] font-black text-slate-900 block leading-none mb-1">
+          <div className="relative bg-[#e1eae6] rounded-2xl h-[106px] overflow-hidden p-3.5 flex flex-col justify-between shadow-xs">
+            <div className="absolute top-0 left-0 w-11 h-11 bg-[#006891] rounded-tl-2xl rounded-br-2xl flex items-center justify-center text-white shadow-xs">
+              <Icon name="Truck" size={20} strokeWidth={2.2} />
+            </div>
+            <div className="pl-10">
+              <h3 className="text-[13px] font-bold text-slate-900 tracking-tight leading-snug">
+                Collection Request
+              </h3>
+            </div>
+            <div className="self-end">
+              <span className="text-2xl font-extrabold leading-none text-slate-900">
                 0
               </span>
-              <span className="text-[11px] font-semibold text-slate-500">
-                Collection Request
-              </span>
             </div>
-            <Icon name="Truck" size={24} className="text-[#2e7d5b]" strokeWidth={2.2} />
           </div>
 
           {/* Card 4: Unverified */}
-          <div className="bg-white rounded-2xl p-3 shadow-sm border border-slate-200/90 flex items-center justify-between">
-            <div>
-              <span className="text-[20px] font-black text-slate-900 block leading-none mb-1">
+          <div className="relative bg-[#e1eae6] rounded-2xl h-[106px] overflow-hidden p-3.5 flex flex-col justify-between shadow-xs">
+            <div className="absolute top-0 right-0 w-11 h-11 bg-[#166050] rounded-tr-2xl rounded-bl-2xl flex items-center justify-center text-white shadow-xs">
+              <Icon name="HelpCircle" size={20} strokeWidth={2.2} />
+            </div>
+            <div className="pr-10">
+              <h3 className="text-[13px] font-bold text-slate-900 tracking-tight leading-snug">
+                Unverified
+              </h3>
+            </div>
+            <div className="self-start">
+              <span className="text-2xl font-extrabold leading-none text-slate-900">
                 0
               </span>
-              <span className="text-[11px] font-semibold text-slate-500">
-                Unverified
-              </span>
-            </div>
-            <div className="w-6 h-6 rotate-45 border-2 border-[#2e7d5b] rounded flex items-center justify-center shrink-0">
-              <span className="-rotate-45 text-[11px] font-black text-[#2e7d5b]">?</span>
             </div>
           </div>
         </div>

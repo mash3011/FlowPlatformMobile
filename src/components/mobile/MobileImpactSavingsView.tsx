@@ -161,37 +161,39 @@ export const MobileImpactSavingsView: React.FC<MobileImpactSavingsViewProps> = (
           </div>
         </div>
 
-        {/* 2-Column Metric Cards Grid */}
+        {/* 2-Column Metric Cards Grid (Consistent Card Design) */}
         <div className="grid grid-cols-2 gap-3">
           {impactCards.map((item) => {
             const isLeft = item.side === 'left';
+            const isFullWidth = item.id === 7;
             return (
               <div
                 key={item.id}
-                className="bg-[#f0fbf5] border border-[#d3ece0] rounded-2xl p-2.5 min-h-[92px] flex flex-col justify-between shadow-2xs relative"
+                className={`relative bg-[#e1eae6] rounded-2xl h-[106px] overflow-hidden p-3.5 flex flex-col justify-between shadow-xs ${
+                  isFullWidth ? 'col-span-2' : ''
+                }`}
               >
-                {/* Top Row: Corner Badge + Label */}
+                {/* Corner Badge */}
                 <div
-                  className={`flex items-start justify-between gap-1.5 ${
-                    isLeft ? 'flex-row' : 'flex-row-reverse'
+                  className={`absolute top-0 w-11 h-11 flex items-center justify-center text-white shadow-xs ${
+                    isLeft
+                      ? 'left-0 rounded-tl-2xl rounded-br-2xl bg-[#006891]'
+                      : 'right-0 rounded-tr-2xl rounded-bl-2xl bg-[#166050]'
                   }`}
                 >
-                  <div className="w-8 h-8 rounded-xl bg-[#2e7d5b] text-white flex items-center justify-center shrink-0 shadow-xs">
-                    <Icon name={item.icon} size={16} strokeWidth={2.2} />
-                  </div>
-
-                  <span
-                    className={`text-[11.5px] font-bold text-slate-700 leading-tight ${
-                      isLeft ? 'text-right' : 'text-left'
-                    }`}
-                  >
-                    {item.label}
-                  </span>
+                  <Icon name={item.icon} size={20} strokeWidth={2.2} />
                 </div>
 
-                {/* Bottom Row: Number Value */}
-                <div className={`mt-2 ${isLeft ? 'text-right' : 'text-left'}`}>
-                  <span className="text-[18px] font-extrabold text-[#2e7d5b] tracking-tight">
+                {/* Title */}
+                <div className={isLeft ? 'pl-10' : 'pr-10'}>
+                  <h3 className="text-[13px] font-bold text-slate-900 tracking-tight leading-snug line-clamp-2">
+                    {item.label}
+                  </h3>
+                </div>
+
+                {/* Value */}
+                <div className={isLeft ? 'self-end' : 'self-start'}>
+                  <span className="text-2xl font-extrabold leading-none text-slate-900">
                     {item.value}
                   </span>
                 </div>
