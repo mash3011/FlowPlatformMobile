@@ -2558,6 +2558,29 @@
       if (thumb) thumb.style.left = `calc(${pct}% - 7px)`;
     }
 
+    let isPrefDark = false;
+    let isPrefApparent = false;
+
+    function togglePrefDark() {
+      isPrefDark = !isPrefDark;
+      const toggle = document.getElementById('pref-toggle-dark');
+      const knob = document.getElementById('pref-knob-dark');
+      if (toggle && knob) {
+        toggle.style.background = isPrefDark ? '#2e7d5b' : '#dde3ea';
+        knob.style.transform = isPrefDark ? 'translateX(20px)' : 'translateX(0)';
+      }
+    }
+
+    function togglePrefApparent() {
+      isPrefApparent = !isPrefApparent;
+      const toggle = document.getElementById('pref-toggle-apparent');
+      const knob = document.getElementById('pref-knob-apparent');
+      if (toggle && knob) {
+        toggle.style.background = isPrefApparent ? '#2e7d5b' : '#dde3ea';
+        knob.style.transform = isPrefApparent ? 'translateX(20px)' : 'translateX(0)';
+      }
+    }
+
     // Close 3-dot menu if clicked outside
     window.addEventListener('click', function(e) {
       const menu = document.getElementById('three-dot-menu');
@@ -2583,7 +2606,7 @@
       <div style="flex: 1; overflow-y: auto; padding: 16px 18px;">
         <!-- 1. Color Themes Grid -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-          <div onclick="selectPrefTheme('green', this)" class="pref-theme-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; border-radius: 14px; border: 1px solid #e2e8f0; cursor: pointer;">
+          <div onclick="selectPrefTheme('green', this)" class="pref-theme-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; border-radius: 14px; border: 2px solid #0f172a; cursor: pointer;">
             <div style="width: 54px; height: 22px; border-radius: 6px; background: #2e7d5b; margin-bottom: 6px;"></div>
             <span style="font-size: 11px; font-weight: 600; color: #334155;">Green</span>
           </div>
@@ -2595,7 +2618,7 @@
             <div style="width: 54px; height: 22px; border-radius: 6px; background: #b85d68; margin-bottom: 6px;"></div>
             <span style="font-size: 11px; font-weight: 600; color: #334155;">Red</span>
           </div>
-          <div onclick="selectPrefTheme('mastercard', this)" class="pref-theme-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; border-radius: 14px; border: 2px solid #0f172a; cursor: pointer;">
+          <div onclick="selectPrefTheme('mastercard', this)" class="pref-theme-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; border-radius: 14px; border: 1px solid #e2e8f0; cursor: pointer;">
             <div style="width: 54px; height: 22px; border-radius: 6px; background: #ff671b; margin-bottom: 6px;"></div>
             <span style="font-size: 11px; font-weight: 600; color: #334155;">Mastercard</span>
           </div>
@@ -2654,20 +2677,47 @@
           <div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
               <span style="font-size: 11px; font-weight: 600; color: #64748b;">Font Size</span>
-              <span id="pref-size-label" style="font-size: 11px; font-weight: 800; color: #ff671b;">M</span>
+              <span id="pref-size-label" style="font-size: 11px; font-weight: 800; color: #2e7d5b;">M</span>
             </div>
             <div style="position: relative; padding: 4px 0 10px 0;">
               <div style="height: 6px; background: #1e293b; border-radius: 9999px; position: relative;">
-                <div id="pref-track-fill" style="width: 50%; height: 100%; background: #ff671b; border-radius: 9999px;"></div>
-                <div id="pref-track-thumb" style="position: absolute; left: calc(50% - 7px); top: -4px; width: 14px; height: 14px; border-radius: 50%; background: #ff671b; border: 2px solid #ffffff;"></div>
+                <div id="pref-track-fill" style="width: 50%; height: 100%; background: #2e7d5b; border-radius: 9999px;"></div>
+                <div id="pref-track-thumb" style="position: absolute; left: calc(50% - 7px); top: -4px; width: 14px; height: 14px; border-radius: 50%; background: #2e7d5b; border: 2px solid #ffffff;"></div>
               </div>
               <div style="display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; font-weight: 600; margin-top: 8px;">
                 <span onclick="setPrefFontSize('XS', 0)" style="cursor: pointer;">XS</span>
                 <span onclick="setPrefFontSize('S', 25)" style="cursor: pointer;">S</span>
-                <span onclick="setPrefFontSize('M', 50)" style="cursor: pointer; color: #ff671b; font-weight: 800;">M</span>
+                <span onclick="setPrefFontSize('M', 50)" style="cursor: pointer; color: #2e7d5b; font-weight: 800;">M</span>
                 <span onclick="setPrefFontSize('L', 75)" style="cursor: pointer;">L</span>
                 <span onclick="setPrefFontSize('XL', 100)" style="cursor: pointer;">XL</span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. APPEARANCE (Exact Match to Screenshot) -->
+        <div style="margin-top: 18px; margin-bottom: 10px;">
+          <div style="font-size: 10px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">APPEARANCE</div>
+          
+          <!-- Dark Theme -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" style="width: 17px; height: 17px;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+              <span style="font-size: 13.5px; font-weight: 600; color: #1e293b;">Dark Theme</span>
+            </div>
+            <div id="pref-toggle-dark" onclick="togglePrefDark()" style="width: 44px; height: 24px; border-radius: 9999px; background: #dde3ea; position: relative; cursor: pointer; transition: background 0.2s;">
+              <div id="pref-knob-dark" style="position: absolute; left: 2px; top: 2px; width: 20px; height: 20px; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform 0.2s;"></div>
+            </div>
+          </div>
+
+          <!-- Apparent Theme -->
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" style="width: 17px; height: 17px;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+              <span style="font-size: 13.5px; font-weight: 600; color: #1e293b;">Apparent Theme</span>
+            </div>
+            <div id="pref-toggle-apparent" onclick="togglePrefApparent()" style="width: 44px; height: 24px; border-radius: 9999px; background: #dde3ea; position: relative; cursor: pointer; transition: background 0.2s;">
+              <div id="pref-knob-apparent" style="position: absolute; left: 2px; top: 2px; width: 20px; height: 20px; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform 0.2s;"></div>
             </div>
           </div>
         </div>

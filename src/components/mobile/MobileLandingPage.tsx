@@ -42,6 +42,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
   const [timeFilter, setTimeFilter] = useState<'D' | 'W' | 'M' | 'Y'>('Y');
   const [isThreeDotMenuOpen, setIsThreeDotMenuOpen] = useState(false);
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState('green');
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-white dark:bg-[#0c0f17] text-slate-900 dark:text-white font-sans relative">
@@ -133,6 +134,8 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
       <MobilePreferencesModal
         isOpen={isPreferencesOpen}
         onClose={() => setIsPreferencesOpen(false)}
+        currentTheme={currentTheme}
+        onThemeChange={(th) => setCurrentTheme(th)}
       />
 
       {/* ========================================================================= */}

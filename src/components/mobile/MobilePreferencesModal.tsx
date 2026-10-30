@@ -19,6 +19,8 @@ export const MobilePreferencesModal: React.FC<MobilePreferencesModalProps> = ({
   const [selectedPlusColor, setSelectedPlusColor] = useState<string>('primary');
   const [fontFamily, setFontFamily] = useState<string>('Source Sans');
   const [fontSize, setFontSize] = useState<'XS' | 'S' | 'M' | 'L' | 'XL'>('M');
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [isApparentTheme, setIsApparentTheme] = useState(false);
 
   if (!isOpen) return null;
 
@@ -30,6 +32,8 @@ export const MobilePreferencesModal: React.FC<MobilePreferencesModalProps> = ({
     { id: 'neutral', label: 'Neutral', color: '#5b7086' },
     { id: 'custom', label: 'Custom', color: '#ff671b', isCustom: true },
   ];
+
+  const themeAccentColor = themes.find((t) => t.id === selectedTheme)?.color || '#2e7d5b';
 
   const plusColors = [
     { id: 'primary', label: 'Primary', bg: 'bg-[#ff671b]', text: 'text-white', border: 'border-2 border-slate-900' },
@@ -56,6 +60,8 @@ export const MobilePreferencesModal: React.FC<MobilePreferencesModalProps> = ({
     setSelectedPlusColor('primary');
     setFontFamily('Source Sans');
     setFontSize('M');
+    setIsDarkTheme(false);
+    setIsApparentTheme(false);
     toast.info('Preferences reset to default');
   };
 
@@ -185,22 +191,28 @@ export const MobilePreferencesModal: React.FC<MobilePreferencesModalProps> = ({
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-[11px] font-medium text-slate-500">Font Size</span>
-                <span className="text-[11.5px] font-bold text-[#ff671b]">{fontSize}</span>
+                <span style={{ color: themeAccentColor }} className="text-[11.5px] font-bold">{fontSize}</span>
               </div>
 
               {/* Slider Track with Interactive Ticks */}
               <div className="relative px-1 pt-1 pb-2">
                 <div className="relative h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                   <div
-                    style={{ width: `${(fontSizeIndex / (fontSizes.length - 1)) * 100}%` }}
-                    className="h-full bg-[#ff671b] rounded-full transition-all duration-150"
+                    style={{
+                      width: `${(fontSizeIndex / (fontSizes.length - 1)) * 100}%`,
+                      backgroundColor: themeAccentColor,
+                    }}
+                    className="h-full rounded-full transition-all duration-150"
                   />
                 </div>
 
                 {/* Thumb Dot */}
                 <div
-                  style={{ left: `calc(${(fontSizeIndex / (fontSizes.length - 1)) * 100}% - 7px)` }}
-                  className="absolute top-0 w-3.5 h-3.5 rounded-full bg-[#ff671b] border-2 border-white shadow-sm pointer-events-none transition-all duration-150"
+                  style={{
+                    left: `calc(${(fontSizeIndex / (fontSizes.length - 1)) * 100}% - 7px)`,
+                    backgroundColor: themeAccentColor,
+                  }}
+                  className="absolute top-0 w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm pointer-events-none transition-all duration-150"
                 />
 
                 {/* Tick Labels */}
@@ -210,8 +222,9 @@ export const MobilePreferencesModal: React.FC<MobilePreferencesModalProps> = ({
                       key={sz}
                       type="button"
                       onClick={() => setFontSize(sz)}
+                      style={{ color: fontSize === sz ? themeAccentColor : undefined }}
                       className={`cursor-pointer transition-colors ${
-                        fontSize === sz ? 'text-[#ff671b] font-bold' : 'hover:text-slate-600'
+                        fontSize === sz ? 'font-bold' : 'hover:text-slate-600'
                       }`}
                     >
                       {sz}
@@ -219,6 +232,59 @@ export const MobilePreferencesModal: React.FC<MobilePreferencesModalProps> = ({
                   ))}
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Section 4: Appearance (Exact Match to Screenshot) */}
+          <div className="space-y-3.5 pt-2">
+            <h3 className="text-[10px] font-bold text-slate-800 tracking-wider uppercase">
+              APPEARANCE
+            </h3>
+
+            {/* Dark Theme Row */}
+            <div className="flex items-center justify-between py-1">
+              <div className="flex items-center gap-3">
+                <Icon name="Sun" size={17} className="text-slate-500 shrink-0" strokeWidth={1.8} />
+                <span className="text-[13.5px] font-semibold text-slate-800">Dark Theme</span>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={isDarkTheme}
+                onClick={() => setIsDarkTheme(!isDarkTheme)}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out p-0.5 ${
+                  isDarkTheme ? 'bg-[#2e7d5b]' : 'bg-[#dde3ea]'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                    isDarkTheme ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Apparent Theme Row */}
+            <div className="flex items-center justify-between py-1">
+              <div className="flex items-center gap-3">
+                <Icon name="Sun" size={17} className="text-slate-500 shrink-0" strokeWidth={1.8} />
+                <span className="text-[13.5px] font-semibold text-slate-800">Apparent Theme</span>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={isApparentTheme}
+                onClick={() => setIsApparentTheme(!isApparentTheme)}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out p-0.5 ${
+                  isApparentTheme ? 'bg-[#2e7d5b]' : 'bg-[#dde3ea]'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                    isApparentTheme ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
             </div>
           </div>
         </div>
