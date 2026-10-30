@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flow Platform - Navigation Drawer (Circulayo Theme)</title>
+  <title>Flow Platform - Navigation Drawer (Green Scene Theme)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -113,7 +113,7 @@
     }
     .drawer-body::-webkit-scrollbar { display: none; }
 
-    /* Section Header with Accent Line */
+    /* Section Header with Green Accent Line */
     .section-header {
       display: flex;
       align-items: center;
@@ -130,19 +130,21 @@
     }
     .section-divider {
       flex: 1;
-      height: 1px;
-      background-color: rgba(255, 103, 27, 0.5);
+      height: 1.5px;
+      background-color: rgba(22, 78, 63, 0.35);
+      border-radius: 9999px;
     }
 
     /* Nav Item Row */
     .nav-item-row {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 6px 4px;
-      border-radius: 8px;
+      padding: 6px 8px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.15s, color 0.15s;
     }
     .nav-item-row:hover {
       background: #f8fafc;
@@ -172,16 +174,35 @@
       text-align: center;
     }
 
-    /* Active / Report Item */
+    /* Active / Report Item - Green Scene Theme */
+    .nav-item-row.active {
+      background: #e7eee9;
+      color: #164e3f;
+    }
     .nav-item-row.active .nav-icon {
-      stroke: #FF671B;
+      stroke: #164e3f;
+      stroke-width: 2.4;
     }
     .nav-item-row.active .nav-label {
-      color: #FF671B;
+      color: #164e3f;
       font-weight: 700;
     }
     .nav-item-row.active .nav-toggle {
-      color: #FF671B;
+      color: #164e3f;
+    }
+    .active-bar {
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 3.5px;
+      background: #164e3f;
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+      display: none;
+    }
+    .nav-item-row.active .active-bar {
+      display: block;
     }
 
     /* Sub-items Tree Structure */
@@ -225,11 +246,14 @@
       color: #0f172a;
     }
     .tree-label.active {
-      color: #FF671B;
+      color: #164e3f;
       font-weight: 700;
     }
+    .tree-branch.active-branch {
+      background-color: #164e3f;
+    }
 
-    /* User Profile Card */
+    /* User Profile Card (Green Scene Theme) */
     .drawer-footer {
       padding: 12px 14px;
       border-top: 1px solid #f1f5f9;
@@ -250,11 +274,14 @@
     .user-card:hover {
       background: #f1f5f9;
     }
+    .avatar-wrap {
+      position: relative;
+    }
     .avatar-circle {
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      background: #FF671B;
+      background: #164e3f;
       color: #ffffff;
       font-size: 12px;
       font-weight: 800;
@@ -262,6 +289,16 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+    }
+    .avatar-dot {
+      position: absolute;
+      top: -1px;
+      right: -1px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #10b981;
+      border: 1.5px solid #ffffff;
     }
     .user-content {
       flex: 1;
@@ -281,7 +318,7 @@
       text-overflow: ellipsis;
     }
     .user-badge {
-      background: #FF671B;
+      background: #164e3f;
       color: #ffffff;
       font-size: 8.5px;
       font-weight: 900;
@@ -329,15 +366,15 @@
     <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer(event)">
       <div class="drawer-panel" onclick="event.stopPropagation()">
         
-        <!-- Header -->
+        <!-- Header: Flow Platform ring logo in green theme -->
         <div class="drawer-header">
           <div class="brand-wrap">
             <svg style="width: 24px; height: 24px; flex-shrink: 0;" viewBox="0 0 28 28" fill="none">
               <circle cx="14" cy="14" r="9.5" stroke="url(#flow-logo-grad)" stroke-width="3.5" stroke-linecap="round"/>
               <defs>
                 <linearGradient id="flow-logo-grad" x1="2" y1="4" x2="26" y2="24" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#38bdf8" />
-                  <stop offset="1" stop-color="#2563eb" />
+                  <stop stop-color="#10b981" />
+                  <stop offset="1" stop-color="#164e3f" />
                 </linearGradient>
               </defs>
             </svg>
@@ -352,10 +389,10 @@
           </button>
         </div>
 
-        <!-- Scrollable Navigation Menu -->
+        <!-- Scrollable Navigation Menu (Whole Expanded Side Nav in Green Theme) -->
         <div class="drawer-body">
 
-          <!-- MAIN SECTION -->
+          <!-- 1. MAIN SECTION -->
           <div class="section-header">
             <span class="section-title">MAIN</span>
             <div class="section-divider"></div>
@@ -367,7 +404,15 @@
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
               <span class="nav-label">Dashboard</span>
             </div>
-            <span class="nav-toggle">+</span>
+            <span class="nav-toggle">—</span>
+          </div>
+          <!-- Tree: Dashboard -->
+          <div class="tree-subitems" id="dashboard-tree">
+            <div class="tree-stem"></div>
+            <div class="tree-item"><div class="tree-branch"></div><span class="tree-label">Impact Savings</span></div>
+            <div class="tree-item"><div class="tree-branch"></div><span class="tree-label">Performance Metrics</span></div>
+            <div class="tree-item"><div class="tree-branch"></div><span class="tree-label">Tech Bin Dashboard</span></div>
+            <div class="tree-item"><div class="tree-branch corner"></div><span class="tree-label">Circulayo App Dashboard</span></div>
           </div>
 
           <!-- Calendar -->
@@ -376,139 +421,200 @@
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
               <span class="nav-label">Calendar</span>
             </div>
-            <span class="nav-toggle">+</span>
+            <span class="nav-toggle">—</span>
+          </div>
+          <!-- Tree: Calendar -->
+          <div class="tree-subitems" id="calendar-tree">
+            <div class="tree-stem"></div>
+            <div class="tree-item"><div class="tree-branch corner"></div><span class="tree-label">Calendar</span></div>
           </div>
 
-          <!-- Report (Active with Tree expanded) -->
+          <!-- Report (Active with Green Scene Theme) -->
           <div class="nav-item-row active" onclick="toggleTree('report-tree', this)">
+            <div class="active-bar"></div>
             <div class="nav-left">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
               <span class="nav-label">Report</span>
             </div>
             <span class="nav-toggle">—</span>
           </div>
-
-          <!-- Tree View for Report -->
+          <!-- Tree: Report -->
           <div class="tree-subitems" id="report-tree">
             <div class="tree-stem"></div>
             <div class="tree-item" onclick="window.location.href='mobile-stock-check.html'">
-              <div class="tree-branch"></div>
+              <div class="tree-branch active-branch"></div>
               <span class="tree-label active">Stock Info</span>
             </div>
-            <div class="tree-item">
-              <div class="tree-branch"></div>
-              <span class="tree-label">Reuse Stats</span>
-            </div>
-            <div class="tree-item">
-              <div class="tree-branch"></div>
-              <span class="tree-label">Container Return Rate</span>
-            </div>
-            <div class="tree-item">
-              <div class="tree-branch"></div>
-              <span class="tree-label">Impact Reports</span>
-            </div>
-            <div class="tree-item">
-              <div class="tree-branch corner"></div>
-              <span class="tree-label">Golden Winner Reports</span>
-            </div>
+            <div class="tree-item"><div class="tree-branch"></div><span class="tree-label">Reuse Stats</span></div>
+            <div class="tree-item"><div class="tree-branch"></div><span class="tree-label">Container Return Rate</span></div>
+            <div class="tree-item"><div class="tree-branch"></div><span class="tree-label">Impact Reports</span></div>
+            <div class="tree-item"><div class="tree-branch corner"></div><span class="tree-label">Golden Winner Reports</span></div>
           </div>
 
-          <!-- MANAGEMENT SECTION -->
+          <!-- 2. MANAGEMENT SECTION -->
           <div class="section-header">
             <span class="section-title">MANAGEMENT</span>
             <div class="section-divider"></div>
           </div>
 
           <!-- Client/Location -->
-          <div class="nav-item-row">
+          <div class="nav-item-row" onclick="toggleTree('client-tree', this)">
             <div class="nav-left">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="6" height="6" x="9" y="2" rx="1"/><rect width="6" height="6" x="2" y="16" rx="1"/><rect width="6" height="6" x="16" y="16" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg>
               <span class="nav-label">Client/Location</span>
             </div>
-            <span class="nav-toggle">+</span>
+            <span class="nav-toggle">—</span>
+          </div>
+          <!-- Tree: Client/Location -->
+          <div class="tree-subitems" id="client-tree">
+            <div class="tree-stem"></div>
+            <div class="tree-item"><div class="tree-branch"></div><span class="tree-label">Location</span></div>
+            <div class="tree-item"><div class="tree-branch"></div><span class="tree-label">Client</span></div>
+            <div class="tree-item"><div class="tree-branch corner"></div><span class="tree-label">Users</span></div>
           </div>
 
           <!-- Stock Check -->
-          <div class="nav-item-row" onclick="window.location.href='mobile-stock-check.html'">
+          <div class="nav-item-row" onclick="toggleTree('stockcheck-tree', this)">
             <div class="nav-left">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
               <span class="nav-label">Stock Check</span>
             </div>
-            <span class="nav-toggle">+</span>
+            <span class="nav-toggle">—</span>
+          </div>
+          <!-- Tree: Stock Check -->
+          <div class="tree-subitems" id="stockcheck-tree">
+            <div class="tree-stem"></div>
+            <div class="tree-item" onclick="window.location.href='mobile-stock-check.html'"><div class="tree-branch corner"></div><span class="tree-label">Stock</span></div>
           </div>
 
           <!-- Endpoint -->
-          <div class="nav-item-row">
+          <div class="nav-item-row" onclick="toggleTree('endpoint-tree', this)">
             <div class="nav-left">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               <span class="nav-label">Endpoint</span>
             </div>
-            <span class="nav-toggle">+</span>
+            <span class="nav-toggle">—</span>
+          </div>
+          <!-- Tree: Endpoint -->
+          <div class="tree-subitems" id="endpoint-tree">
+            <div class="tree-stem"></div>
+            <div class="tree-item"><div class="tree-branch"></div><span class="tree-label">MICRO EDGE</span></div>
+            <div class="tree-item"><div class="tree-branch corner"></div><span class="tree-label">Endpoint Type</span></div>
           </div>
 
-          <!-- OPERATIONS SECTION -->
+          <!-- 3. OPERATIONS SECTION -->
           <div class="section-header">
             <span class="section-title">OPERATIONS</span>
             <div class="section-divider"></div>
           </div>
 
           <!-- Wash -->
-          <div class="nav-item-row">
+          <div class="nav-item-row" onclick="toggleTree('wash-tree', this)">
             <div class="nav-left">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
               <span class="nav-label">Wash</span>
             </div>
-            <span class="nav-toggle">+</span>
+            <span class="nav-toggle">—</span>
+          </div>
+          <!-- Tree: Wash -->
+          <div class="tree-subitems" id="wash-tree">
+            <div class="tree-stem"></div>
+            <div class="tree-item"><div class="tree-branch corner"></div><span class="tree-label">Wash</span></div>
           </div>
 
           <!-- Batch -->
-          <div class="nav-item-row">
+          <div class="nav-item-row" onclick="toggleTree('batch-tree', this)">
             <div class="nav-left">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
               <span class="nav-label">Batch</span>
             </div>
-            <span class="nav-toggle">+</span>
+            <span class="nav-toggle">—</span>
+          </div>
+          <!-- Tree: Batch -->
+          <div class="tree-subitems" id="batch-tree">
+            <div class="tree-stem"></div>
+            <div class="tree-item"><div class="tree-branch corner"></div><span class="tree-label">Dashboard</span></div>
           </div>
 
           <!-- Event -->
-          <div class="nav-item-row">
+          <div class="nav-item-row" onclick="toggleTree('event-tree', this)">
             <div class="nav-left">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/></svg>
               <span class="nav-label">Event</span>
             </div>
-            <span class="nav-toggle">+</span>
+            <span class="nav-toggle">—</span>
+          </div>
+          <!-- Tree: Event -->
+          <div class="tree-subitems" id="event-tree">
+            <div class="tree-stem"></div>
+            <div class="tree-item"><div class="tree-branch corner"></div><span class="tree-label">Event</span></div>
           </div>
 
-          <!-- ORDERS & FINANCE SECTION -->
+          <!-- 4. ORDERS & FINANCE SECTION -->
           <div class="section-header">
             <span class="section-title">ORDERS &amp; FINANCE</span>
             <div class="section-divider"></div>
           </div>
 
           <!-- Order -->
-          <div class="nav-item-row">
+          <div class="nav-item-row" onclick="toggleTree('order-tree', this)">
             <div class="nav-left">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
               <span class="nav-label">Order</span>
             </div>
-            <span class="nav-toggle">+</span>
+            <span class="nav-toggle">—</span>
+          </div>
+          <!-- Tree: Order -->
+          <div class="tree-subitems" id="order-tree">
+            <div class="tree-stem"></div>
+            <div class="tree-item"><div class="tree-branch corner"></div><span class="tree-label">Order</span></div>
           </div>
 
           <!-- Collection -->
-          <div class="nav-item-row">
+          <div class="nav-item-row" onclick="toggleTree('collection-tree', this)">
             <div class="nav-left">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18.5" r="2.5"/><circle cx="7" cy="18.5" r="2.5"/></svg>
               <span class="nav-label">Collection</span>
             </div>
-            <span class="nav-toggle">+</span>
+            <span class="nav-toggle">—</span>
+          </div>
+          <!-- Tree: Collection -->
+          <div class="tree-subitems" id="collection-tree">
+            <div class="tree-stem"></div>
+            <div class="tree-item"><div class="tree-branch corner"></div><span class="tree-label">Collection</span></div>
+          </div>
+
+          <!-- 5. SETTINGS SECTION -->
+          <div class="section-header">
+            <span class="section-title">SETTINGS</span>
+            <div class="section-divider"></div>
+          </div>
+
+          <!-- User -->
+          <div class="nav-item-row" onclick="toggleTree('user-tree', this)">
+            <div class="nav-left">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span class="nav-label">User</span>
+            </div>
+            <span class="nav-toggle">—</span>
+          </div>
+          <!-- Tree: User -->
+          <div class="tree-subitems" id="user-tree">
+            <div class="tree-stem"></div>
+            <div class="tree-item"><div class="tree-branch"></div><span class="tree-label">user</span></div>
+            <div class="tree-item"><div class="tree-branch"></div><span class="tree-label">Profiles</span></div>
+            <div class="tree-item"><div class="tree-branch corner"></div><span class="tree-label">Roles</span></div>
           </div>
 
         </div>
 
-        <!-- Footer User Profile Card -->
+        <!-- Footer User Profile Card (Green Theme) -->
         <div class="drawer-footer">
           <div class="user-card" onclick="alert('User profile clicked')">
-            <div class="avatar-circle">CA</div>
+            <div class="avatar-wrap">
+              <div class="avatar-circle">CA</div>
+              <div class="avatar-dot"></div>
+            </div>
             <div class="user-content">
               <div class="user-row-1">
                 <span class="user-app-name">Circulayo Admin App</span>
@@ -539,11 +645,9 @@
       const toggle = rowEl.querySelector('.nav-toggle');
       if (tree.style.display === 'none') {
         tree.style.display = 'block';
-        rowEl.classList.add('active');
         if (toggle) toggle.textContent = '—';
       } else {
         tree.style.display = 'none';
-        rowEl.classList.remove('active');
         if (toggle) toggle.textContent = '+';
       }
     }
