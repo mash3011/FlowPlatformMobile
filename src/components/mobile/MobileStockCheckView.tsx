@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from '../ui/Icon';
+import { MobilePreferencesModal } from './MobilePreferencesModal';
+import { toast } from 'sonner';
 
 interface MobileStockCheckViewProps {
   onOpenSidebar: () => void;
@@ -504,12 +506,18 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
   const [activeCustomerOrgId, setActiveCustomerOrgId] = useState<string>('derby-fc');
   const [isCustomerOrgPickerOpen, setIsCustomerOrgPickerOpen] = useState(false);
 
+  // 3-Dot More Menu & Preferences Modal state
+  const [isThreeDotMenuOpen, setIsThreeDotMenuOpen] = useState(false);
+  const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState('green');
+
   // Close all open popovers
   const closeAllPopovers = () => {
     setIsCtClientOpen(false);
     setIsCtLocationOpen(false);
     setIsClientLocationOpen(false);
     setIsCustomerOrgPickerOpen(false);
+    setIsThreeDotMenuOpen(false);
   };
 
     // Filters
@@ -579,9 +587,9 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#f4f7f6] text-slate-900 font-sans relative select-none">
       {/* ========================================================================= */}
-      {/* TOP HEADER BAR: Hamburger Menu | "Flow Platform" | Bell with red dot */}
+      {/* TOP HEADER BAR: Hamburger Menu | "Flow Platform" | 3-Dot More Menu */}
       {/* ========================================================================= */}
-      <header className="h-14 bg-[#1f2937] text-white flex items-center justify-between px-4 shrink-0 z-30 shadow-md rounded-b-2xl">
+      <header className="h-14 bg-[#1f2937] text-white flex items-center justify-between px-4 shrink-0 z-30 shadow-md rounded-b-2xl relative">
         <button
           onClick={onOpenSidebar}
           className="p-1 rounded-lg text-white hover:text-slate-300 transition-colors cursor-pointer"
@@ -594,14 +602,80 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
           Flow Platform
         </h1>
 
-        <button
-          className="relative p-1 rounded-lg text-white hover:text-slate-300 transition-colors cursor-pointer"
-          title="Notifications"
-        >
-          <Icon name="Bell" size={20} strokeWidth={2.2} />
-          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#ef4444] border border-[#1f2937]" />
-        </button>
+        {/* 3-Dot More Menu Button & Dropdown matching Screenshot 1 */}
+        <div className="relative">
+          <button
+            onClick={() => setIsThreeDotMenuOpen(!isThreeDotMenuOpen)}
+            className="w-8 h-8 rounded-lg bg-black/20 hover:bg-black/40 border border-white/10 text-white flex items-center justify-center transition-all cursor-pointer"
+            title="More Options"
+          >
+            <Icon name="MoreVertical" size={19} strokeWidth={2.2} />
+          </button>
+
+          {/* 3-Dot Dropdown Menu */}
+          {isThreeDotMenuOpen && (
+            <div className="absolute top-[42px] right-0 w-44 bg-white rounded-2xl shadow-2xl border border-slate-100 p-1.5 z-50 text-slate-800 animate-in fade-in zoom-in-95 duration-100 font-sans">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsThreeDotMenuOpen(false);
+                  setIsPreferencesOpen(true);
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left hover:bg-slate-50 transition-colors cursor-pointer text-xs font-semibold text-slate-700"
+              >
+                <Icon name="Settings" size={15} className="text-slate-400" />
+                <span>Preferences</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsThreeDotMenuOpen(false);
+                  toast.info('No new notifications');
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left hover:bg-slate-50 transition-colors cursor-pointer text-xs font-semibold text-slate-700"
+              >
+                <Icon name="Bell" size={15} className="text-slate-400" />
+                <span>Notifications</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsThreeDotMenuOpen(false);
+                  toast.info('Help center: support@flowplatform.com');
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left hover:bg-slate-50 transition-colors cursor-pointer text-xs font-semibold text-slate-700"
+              >
+                <Icon name="HelpCircle" size={15} className="text-slate-400" />
+                <span>Help</span>
+              </button>
+
+              <div className="my-1 border-t border-slate-100" />
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsThreeDotMenuOpen(false);
+                  toast.success('Logged out successfully');
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left hover:bg-red-50 transition-colors cursor-pointer text-xs font-semibold text-red-600"
+              >
+                <Icon name="LogOut" size={15} className="text-red-500" />
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
+        </div>
       </header>
+
+      {/* Preferences Modal matching Screenshot 2 */}
+      <MobilePreferencesModal
+        isOpen={isPreferencesOpen}
+        onClose={() => setIsPreferencesOpen(false)}
+        currentTheme={currentTheme}
+        onThemeChange={(th) => setCurrentTheme(th)}
+      />
 
       {/* ========================================================================= */}
       {/* DYNAMIC VARIATION CONTENT BODY */}
