@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MobileDeviceFrame, MobileOSType } from './MobileDeviceFrame';
 import { MobileLandingPage } from './MobileLandingPage';
+import { MobileImpactSavingsView } from './MobileImpactSavingsView';
+import { MobilePerformanceMetricsView } from './MobilePerformanceMetricsView';
+import { MobileTechBinView } from './MobileTechBinView';
+import { MobileCirculayoAppView } from './MobileCirculayoAppView';
+import { MobileCalendarView } from './MobileCalendarView';
 import { MobileSidebarDrawer } from './MobileSidebarDrawer';
 import { MobileInvoiceListView } from './MobileInvoiceListView';
 import { MobileStockCheckView } from './MobileStockCheckView';
@@ -161,42 +166,65 @@ export const MobileInvoicePrototype: React.FC = () => {
             className="shrink-0"
           >
             <MobileDeviceFrame os={selectedOS}>
-              {/* Main Screen Router */}
-              {activeTab === 'impact-savings' || activeTab === 'home' ? (
-                /* EXACT FIGMA 1123-8536 LANDING PAGE */
-                <MobileLandingPage
+              {/* Main Screen Router for All Dashboard Pages */}
+              {activeTab === 'performance-metrics' ? (
+                /* EXACT IMAGE 1: Performance Metrics in Green Theme */
+                <MobilePerformanceMetricsView
                   onOpenSidebar={() => setIsSidebarOpen(true)}
-                  activeNavTab="home"
-                  onSelectNavTab={(tab) => {
-                    if (tab === 'calendar') setActiveTab('calendar');
-                    else if (tab === 'batch') setActiveTab('batch');
-                    else if (tab === 'stock-check') setActiveTab('stock-check');
-                    else if (tab === 'add') setIsSidebarOpen(true);
-                  }}
+                  activeNavTab="performance-metrics"
+                  onSelectNavTab={(tab) => setActiveTab(tab)}
                 />
-              ) : activeTab === 'stock-check' ? (
+              ) : activeTab === 'impact-savings' || activeTab === 'home' ? (
+                /* EXACT IMAGE 2: Impact Savings in Green Theme */
+                <MobileImpactSavingsView
+                  onOpenSidebar={() => setIsSidebarOpen(true)}
+                  activeNavTab="impact-savings"
+                  onSelectNavTab={(tab) => setActiveTab(tab)}
+                />
+              ) : activeTab === 'tech-bin-dashboard' || activeTab === 'batch' ? (
+                /* EXACT IMAGE 3: Tech Bin in Green Theme */
+                <MobileTechBinView
+                  onOpenSidebar={() => setIsSidebarOpen(true)}
+                  activeNavTab="tech-bin-dashboard"
+                  onSelectNavTab={(tab) => setActiveTab(tab)}
+                />
+              ) : activeTab === 'circulayo-app-dashboard' ? (
+                /* EXACT IMAGE 4: Circulayo App in Green Theme */
+                <MobileCirculayoAppView
+                  onOpenSidebar={() => setIsSidebarOpen(true)}
+                  activeNavTab="circulayo-app-dashboard"
+                  onSelectNavTab={(tab) => setActiveTab(tab)}
+                />
+              ) : activeTab === 'calendar' || activeTab === 'calendar-view' ? (
+                /* EXACT IMAGE 5: Calendar in Green Theme */
+                <MobileCalendarView
+                  onOpenSidebar={() => setIsSidebarOpen(true)}
+                  activeNavTab="calendar"
+                  onSelectNavTab={(tab) => setActiveTab(tab)}
+                />
+              ) : activeTab === 'stock-check' || activeTab === 'stock' ? (
                 /* EXACT FIGMA 526:8085 STOCK CHECK VIEW */
                 <MobileStockCheckView
                   onOpenSidebar={() => setIsSidebarOpen(true)}
                   persona={stockCheckPersona}
                   onPersonaChange={setStockCheckPersona}
                   onSelectNavTab={(tab) => {
-                    if (tab === 'home') setActiveTab('home');
+                    if (tab === 'home') setActiveTab('impact-savings');
                     else if (tab === 'calendar') setActiveTab('calendar');
-                    else if (tab === 'batch') setActiveTab('batch');
+                    else if (tab === 'batch') setActiveTab('tech-bin-dashboard');
                     else if (tab === 'stock-check') setActiveTab('stock-check');
                     else if (tab === 'add') setIsSidebarOpen(true);
                   }}
                 />
               ) : (
-                /* Invoice Module matching Impact Savings design language */
+                /* Invoices / Reports View */
                 <MobileInvoiceListView
                   currentTab={activeTab}
                   onOpenSidebar={() => setIsSidebarOpen(true)}
                   onSelectNavTab={(tab) => {
                     if (tab === 'home') setActiveTab('impact-savings');
                     else if (tab === 'calendar') setActiveTab('calendar');
-                    else if (tab === 'batch') setActiveTab('batch');
+                    else if (tab === 'batch') setActiveTab('tech-bin-dashboard');
                     else if (tab === 'stock-check') setActiveTab('stock-check');
                   }}
                 />

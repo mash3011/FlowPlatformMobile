@@ -67,10 +67,10 @@ export const MobileSidebarDrawer: React.FC<MobileSidebarDrawerProps> = ({
           label: 'Dashboard',
           icon: 'LayoutGrid',
           subItems: [
-            { id: 'impact-savings', label: 'Impact Savings', routeTab: 'home' },
-            { id: 'performance-metrics', label: 'Performance Metrics', routeTab: 'home' },
-            { id: 'tech-bin-dashboard', label: 'Tech Bin Dashboard', routeTab: 'home' },
-            { id: 'circulayo-app-dashboard', label: 'Circulayo App Dashboard', routeTab: 'home' },
+            { id: 'impact-savings', label: 'Impact Savings', routeTab: 'impact-savings' },
+            { id: 'performance-metrics', label: 'Performance Metrics', routeTab: 'performance-metrics' },
+            { id: 'tech-bin-dashboard', label: 'Tech Bin Dashboard', routeTab: 'tech-bin-dashboard' },
+            { id: 'circulayo-app-dashboard', label: 'Circulayo App Dashboard', routeTab: 'circulayo-app-dashboard' },
           ],
         },
         {
