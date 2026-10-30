@@ -60,27 +60,27 @@ export const MobilePreferencesModal: React.FC<MobilePreferencesModalProps> = ({
   };
 
   return (
-    <div className="absolute inset-0 z-50 overflow-hidden flex items-center justify-center p-3 animate-in fade-in duration-150">
+    <div className="absolute inset-0 z-50 overflow-hidden flex justify-end animate-in fade-in duration-200">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-[2px] transition-opacity"
+        className="absolute inset-0 bg-black/50 backdrop-blur-[1.5px] transition-opacity duration-200 cursor-pointer"
         onClick={onClose}
       />
 
-      {/* Modal Card matching Azure DevFlow screenshot */}
-      <div className="relative w-full max-w-[345px] max-h-[92%] bg-white rounded-3xl shadow-2xl border border-slate-200/90 z-10 flex flex-col overflow-hidden animate-in zoom-in-95 duration-150 font-sans">
+      {/* Side Drawer popping from right to left */}
+      <div className="relative w-[320px] sm:w-[335px] max-w-[88%] h-full bg-white shadow-2xl z-10 flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-250 font-sans border-l border-slate-100">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 shrink-0">
-          <div className="flex items-center gap-2">
-            <Icon name="Settings" size={17} className="text-slate-600" />
-            <h2 className="text-[14px] font-bold text-slate-800 tracking-tight">Preferences</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 shrink-0">
+          <div className="flex items-center gap-2.5">
+            <Icon name="Settings" size={18} className="text-slate-600" />
+            <h2 className="text-[15px] font-bold text-slate-800 tracking-tight">Preferences</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer rounded-md"
+            className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer rounded-md"
             title="Close"
           >
-            <Icon name="X" size={16} strokeWidth={2.4} />
+            <Icon name="X" size={17} strokeWidth={2.4} />
           </button>
         </div>
 
