@@ -23,6 +23,9 @@ export const MobileInvoicePrototype: React.FC = () => {
             <h1 className="text-sm font-extrabold tracking-tight text-slate-900">
               Flow Platform Mobile
             </h1>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
+              393 × 852 px
+            </span>
           </div>
         </div>
 
@@ -85,8 +88,8 @@ export const MobileInvoicePrototype: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Interactive Mobile Simulator - CENTERED */}
-      <main className="flex-1 flex items-center justify-center py-1 overflow-hidden">
+      {/* Main Interactive Mobile Simulator - CENTERED (393w x 852h Figma Standard) */}
+      <main className="flex-1 flex items-center justify-center py-4 overflow-y-auto min-h-0">
         <MobileDeviceFrame os={selectedOS}>
           {/* Main Screen Router */}
           {activeTab === 'impact-savings' || activeTab === 'home' ? (
@@ -143,8 +146,9 @@ export const MobileInvoicePrototype: React.FC = () => {
       </main>
 
       {/* Bottom Hint Bar */}
-      <footer className="text-left pl-2 sm:pl-8 text-[11px] text-slate-500 py-0.5 shrink-0">
-        Tap hamburger menu (☰) to open sidebar • Toggle iOS / Android above
+      <footer className="text-left pl-2 sm:pl-8 text-[11px] text-slate-500 py-0.5 shrink-0 flex items-center justify-between pr-4">
+        <span>Tap hamburger menu (☰) to open sidebar • Toggle iOS / Android above</span>
+        <span className="text-[10px] text-slate-400 font-mono">Figma Standard (393 × 852 px)</span>
       </footer>
     </div>
   );

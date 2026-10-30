@@ -15,20 +15,21 @@ export const MobileDeviceFrame: React.FC<MobileDeviceFrameProps> = ({
   theme = 'light',
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center p-1 select-none h-full max-h-full">
-      {/* Phone Outer Shell - Responsive height that adapts to browser viewport */}
+    <div className="flex flex-col items-center justify-center p-2 select-none shrink-0 my-auto">
+      {/* Phone Outer Shell - Exact 393w x 852h Figma Standard Design Size */}
       <div
-        className={`relative transition-all duration-300 ease-in-out ${
+        style={{ width: '393px', height: '852px' }}
+        className={`relative transition-all duration-300 ease-in-out shrink-0 w-[393px] h-[852px] ${
           os === 'ios'
-            ? 'w-[375px] sm:w-[385px] h-full max-h-[820px] min-h-[540px] rounded-[44px] sm:rounded-[48px] border-[7px] sm:border-[9px] border-[#1f242d] ring-1 ring-slate-700/60 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)]'
-            : 'w-[375px] sm:w-[390px] h-full max-h-[820px] min-h-[540px] rounded-[36px] sm:rounded-[40px] border-[7px] sm:border-[9px] border-[#22252a] ring-1 ring-slate-800/80 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)]'
+            ? 'rounded-[48px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6),0_0_0_10px_#1e1e24,0_0_0_12px_#334155]'
+            : 'rounded-[40px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6),0_0_0_10px_#22252a,0_0_0_12px_#334155]'
         } bg-[#000000] overflow-hidden flex flex-col`}
       >
         {/* Hardware side buttons - purely cosmetic */}
-        <div className="absolute -left-[13px] top-[115px] w-[3px] h-[28px] bg-slate-600 rounded-l-xs" />
-        <div className="absolute -left-[13px] top-[160px] w-[3px] h-[48px] bg-slate-600 rounded-l-xs" />
-        <div className="absolute -left-[13px] top-[220px] w-[3px] h-[48px] bg-slate-600 rounded-l-xs" />
-        <div className="absolute -right-[13px] top-[170px] w-[3px] h-[72px] bg-slate-600 rounded-r-xs" />
+        <div className="absolute -left-[15px] top-[115px] w-[3px] h-[28px] bg-slate-600 rounded-l-xs" />
+        <div className="absolute -left-[15px] top-[160px] w-[3px] h-[48px] bg-slate-600 rounded-l-xs" />
+        <div className="absolute -left-[15px] top-[220px] w-[3px] h-[48px] bg-slate-600 rounded-l-xs" />
+        <div className="absolute -right-[15px] top-[170px] w-[3px] h-[72px] bg-slate-600 rounded-r-xs" />
 
         {/* Top Status Bar & Camera Area */}
         {os === 'ios' ? (
