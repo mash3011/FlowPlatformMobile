@@ -3483,7 +3483,7 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
         </button>
 
         <button
-          onClick={() => onSelectNavTab && onSelectNavTab('stock-check')}
+          onClick={() => onSelectNavTab && onSelectNavTab('stock-info')}
           className="flex flex-col items-center justify-center gap-0.5 text-[#10b981] cursor-pointer flex-1"
         >
           <svg

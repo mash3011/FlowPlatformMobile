@@ -260,7 +260,7 @@ export const MobileImpactSavingsView: React.FC<MobileImpactSavingsViewProps> = (
         </button>
 
         <button
-          onClick={() => onSelectNavTab?.('stock-check')}
+          onClick={() => onSelectNavTab?.('stock-info')}
           className="flex flex-col items-center justify-center gap-0.5 text-slate-400 hover:text-white transition-colors cursor-pointer py-1"
         >
           <Icon name="ClipboardCheck" size={18} />

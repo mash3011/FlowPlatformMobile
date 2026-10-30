@@ -9,12 +9,13 @@ import { MobileCalendarView } from './MobileCalendarView';
 import { MobileSidebarDrawer } from './MobileSidebarDrawer';
 import { MobileInvoiceListView } from './MobileInvoiceListView';
 import { MobileStockCheckView } from './MobileStockCheckView';
+import { MobileStockCheckAuditView } from './MobileStockCheckAuditView';
 import { Icon } from '../ui/Icon';
 
 export const MobileInvoicePrototype: React.FC = () => {
   const [selectedOS, setSelectedOS] = useState<MobileOSType>('ios');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('stock-check');
+  const [activeTab, setActiveTab] = useState('stock-info');
   const [stockCheckPersona, setStockCheckPersona] = useState<'circulayo-teams' | 'clients-view'>('circulayo-teams');
   const [scaleMode, setScaleMode] = useState<'fit' | '100'>('fit');
   const [scale, setScale] = useState(1);
@@ -88,10 +89,10 @@ export const MobileInvoicePrototype: React.FC = () => {
           <button
             onClick={() => {
               setStockCheckPersona('circulayo-teams');
-              if (activeTab !== 'stock-check') setActiveTab('stock-check');
+              if (activeTab !== 'stock-info') setActiveTab('stock-info');
             }}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-              activeTab === 'stock-check' && stockCheckPersona === 'circulayo-teams'
+              activeTab === 'stock-info' && stockCheckPersona === 'circulayo-teams'
                 ? 'bg-[#164e3f] text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
@@ -102,10 +103,10 @@ export const MobileInvoicePrototype: React.FC = () => {
           <button
             onClick={() => {
               setStockCheckPersona('clients-view');
-              if (activeTab !== 'stock-check') setActiveTab('stock-check');
+              if (activeTab !== 'stock-info') setActiveTab('stock-info');
             }}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-              activeTab === 'stock-check' && stockCheckPersona === 'clients-view'
+              activeTab === 'stock-info' && stockCheckPersona === 'clients-view'
                 ? 'bg-[#164e3f] text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
@@ -202,8 +203,8 @@ export const MobileInvoicePrototype: React.FC = () => {
                   activeNavTab="calendar"
                   onSelectNavTab={(tab) => setActiveTab(tab)}
                 />
-              ) : activeTab === 'stock-check' || activeTab === 'stock' ? (
-                /* EXACT FIGMA 526:8085 STOCK CHECK VIEW */
+              ) : activeTab === 'stock-info' ? (
+                /* EXACT IMAGE FROM USER: Stock Info (under Reports) */
                 <MobileStockCheckView
                   onOpenSidebar={() => setIsSidebarOpen(true)}
                   persona={stockCheckPersona}
@@ -212,8 +213,22 @@ export const MobileInvoicePrototype: React.FC = () => {
                     if (tab === 'home') setActiveTab('impact-savings');
                     else if (tab === 'calendar') setActiveTab('calendar');
                     else if (tab === 'batch') setActiveTab('tech-bin-dashboard');
-                    else if (tab === 'stock-check') setActiveTab('stock-check');
+                    else if (tab === 'stock' || tab === 'stock-info') setActiveTab('stock-info');
                     else if (tab === 'add') setIsSidebarOpen(true);
+                    else setActiveTab(tab);
+                  }}
+                />
+              ) : activeTab === 'stock-check-mgmt' || activeTab === 'stock-check' ? (
+                /* Stock Check under MANAGEMENT */
+                <MobileStockCheckAuditView
+                  onOpenSidebar={() => setIsSidebarOpen(true)}
+                  activeNavTab="stock-check-mgmt"
+                  onSelectNavTab={(tab) => {
+                    if (tab === 'home') setActiveTab('impact-savings');
+                    else if (tab === 'calendar') setActiveTab('calendar');
+                    else if (tab === 'batch') setActiveTab('tech-bin-dashboard');
+                    else if (tab === 'stock' || tab === 'stock-info') setActiveTab('stock-info');
+                    else setActiveTab(tab);
                   }}
                 />
               ) : (
@@ -225,7 +240,8 @@ export const MobileInvoicePrototype: React.FC = () => {
                     if (tab === 'home') setActiveTab('impact-savings');
                     else if (tab === 'calendar') setActiveTab('calendar');
                     else if (tab === 'batch') setActiveTab('tech-bin-dashboard');
-                    else if (tab === 'stock-check') setActiveTab('stock-check');
+                    else if (tab === 'stock' || tab === 'stock-info') setActiveTab('stock-info');
+                    else setActiveTab(tab);
                   }}
                 />
               )}

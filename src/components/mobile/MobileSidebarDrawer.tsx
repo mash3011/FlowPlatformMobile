@@ -86,11 +86,11 @@ export const MobileSidebarDrawer: React.FC<MobileSidebarDrawerProps> = ({
           label: 'Report',
           icon: 'PieChart',
           subItems: [
-            { id: 'stock-info', label: 'Stock Info', routeTab: 'stock-check' },
-            { id: 'reuse-stats', label: 'Reuse Stats', routeTab: 'stock-check' },
-            { id: 'container-return-rate', label: 'Container Return Rate', routeTab: 'stock-check' },
-            { id: 'impact-reports', label: 'Impact Reports', routeTab: 'stock-check' },
-            { id: 'golden-winner-reports', label: 'Golden Winner Reports', routeTab: 'stock-check' },
+            { id: 'stock-info', label: 'Stock Info', routeTab: 'stock-info' },
+            { id: 'reuse-stats', label: 'Reuse Stats', routeTab: 'stock-info' },
+            { id: 'container-return-rate', label: 'Container Return Rate', routeTab: 'stock-info' },
+            { id: 'impact-reports', label: 'Impact Reports', routeTab: 'stock-info' },
+            { id: 'golden-winner-reports', label: 'Golden Winner Reports', routeTab: 'stock-info' },
           ],
         },
       ],
@@ -113,7 +113,7 @@ export const MobileSidebarDrawer: React.FC<MobileSidebarDrawerProps> = ({
           label: 'Stock Check',
           icon: 'ClipboardCheck',
           subItems: [
-            { id: 'stock', label: 'Stock', routeTab: 'stock-check' },
+            { id: 'stock', label: 'Stock', routeTab: 'stock-check-mgmt' },
           ],
         },
         {
@@ -256,9 +256,11 @@ export const MobileSidebarDrawer: React.FC<MobileSidebarDrawerProps> = ({
                   const hasSubs = (item.subItems?.length ?? 0) > 0;
                   const isExpanded = openGroups[item.id] ?? false;
                   const isReportItem = item.id === 'report';
+                  const isStockCheckMgmt = item.id === 'stock-check';
                   const isItemActive =
                     activeTab === item.id ||
-                    (isReportItem && (activeTab === 'stock-check' || activeTab === 'stock' || activeSubItem === 'stock-info'));
+                    (isReportItem && (activeTab === 'stock-info' || activeSubItem === 'stock-info')) ||
+                    (isStockCheckMgmt && (activeTab === 'stock-check-mgmt' || activeSubItem === 'stock'));
 
                   return (
                     <div key={item.id}>
@@ -334,7 +336,8 @@ export const MobileSidebarDrawer: React.FC<MobileSidebarDrawerProps> = ({
                           {item.subItems!.map((sub, idx) => {
                             const isSubActive =
                               activeSubItem === sub.id ||
-                              (sub.id === 'stock-info' && (activeTab === 'stock-check' || activeTab === 'stock'));
+                              (sub.id === 'stock-info' && activeTab === 'stock-info') ||
+                              (sub.id === 'stock' && activeTab === 'stock-check-mgmt');
                             const isLast = idx === item.subItems!.length - 1;
 
                             return (
