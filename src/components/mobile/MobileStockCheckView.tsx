@@ -60,6 +60,20 @@ export const CustomerLogo: React.FC<{
   size?: number;
   className?: string;
 }> = ({ clientId, size = 22, className = '' }) => {
+  if (clientId === 'all') {
+    return (
+      <div
+        style={{ width: size, height: size }}
+        className={`rounded-md bg-[#164e3f] flex items-center justify-center shrink-0 shadow-xs border border-emerald-900/30 overflow-hidden ${className}`}
+        title="All Clients"
+      >
+        <span className="text-[10px] font-black tracking-tight text-white flex items-center">
+          AC
+        </span>
+      </div>
+    );
+  }
+
   if (clientId === 'delaware-north') {
     return (
       <div
@@ -471,7 +485,7 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
   // 1. CIRCULAYO TEAMS VIEW STATE
   // Merged All & Location + Client Filter (No status / low stock)
   // =========================================================================
-  const [ctClient, setCtClient] = useState<string>('delaware-north');
+  const [ctClient, setCtClient] = useState<string>('all');
   const [isCtClientOpen, setIsCtClientOpen] = useState(false);
   const [isCtClientFocused, setIsCtClientFocused] = useState(false);
   const [ctClientSearchQuery, setCtClientSearchQuery] = useState('');
@@ -689,14 +703,17 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
         {/* 1. CIRCULAYO TEAMS VIEW */}
         {/* Merged All & Location + Client Filter (No low stock) */}
         {variation === 'circulayo-teams' && (() => {
-          const currentClientObj = CLIENT_ACCOUNTS.find((c) => c.id === ctClient) || CLIENT_ACCOUNTS[0];
-          const availableLocations = currentClientObj.locations;
+          const isAllClients = ctClient === 'all';
+          const currentClientObj = isAllClients ? null : (CLIENT_ACCOUNTS.find((c) => c.id === ctClient) || CLIENT_ACCOUNTS[0]);
+          const availableLocations = isAllClients
+            ? CLIENT_ACCOUNTS.flatMap((c) => c.locations)
+            : currentClientObj!.locations;
           const isAllLocations = ctLocation === 'all';
           const currentLocationObj = isAllLocations ? null : (availableLocations.find((l) => l.id === ctLocation) || availableLocations[0]);
 
           // Compute filtered products (no low stock or status filtering)
           const clientProducts = SAMPLE_PRODUCTS_CATALOG.filter((p) => {
-            if (p.clientId !== currentClientObj.id) return false;
+            if (!isAllClients && p.clientId !== currentClientObj?.id) return false;
             if (!isAllLocations && p.locationId !== currentLocationObj?.id) return false;
             if (ctSearchQuery) {
               const q = ctSearchQuery.toLowerCase();
@@ -720,12 +737,13 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                   </h2>
                 </div>
                 <div className="flex items-center gap-2">
-                  {(ctClient !== 'delaware-north' || ctLocation !== 'all' || ctSearchQuery) && (
+                  {(ctClient !== 'all' || ctLocation !== 'all' || ctSearchQuery) && (
                     <button
                       onClick={() => {
-                        setCtClient('delaware-north');
+                        setCtClient('all');
                         setCtLocation('all');
                         setCtSearchQuery('');
+                        setCtClientSearchQuery('');
                         closeAllPopovers();
                       }}
                       className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full hover:bg-emerald-100 transition-colors cursor-pointer"
@@ -778,10 +796,10 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                     }`}
                   >
                     <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                      <CustomerLogo clientId={currentClientObj.id} size={22} />
+                      <CustomerLogo clientId={isAllClients ? 'all' : (currentClientObj?.id || 'all')} size={22} />
                       <input
                         type="text"
-                        value={isCtClientFocused ? ctClientSearchQuery : (ctClientSearchQuery || currentClientObj.name)}
+                        value={isCtClientFocused ? ctClientSearchQuery : (ctClientSearchQuery || (isAllClients ? 'All Clients' : currentClientObj?.name))}
                         onChange={(e) => {
                           setCtClientSearchQuery(e.target.value);
                           if (!isCtClientOpen) setIsCtClientOpen(true);
@@ -793,22 +811,22 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                         onBlur={() => {
                           setTimeout(() => setIsCtClientFocused(false), 200);
                         }}
-                        placeholder={currentClientObj.name || 'Search clients...'}
+                        placeholder={isAllClients ? 'All Clients' : (currentClientObj?.name || 'Search clients...')}
                         className="w-full bg-transparent text-[13px] sm:text-[14px] font-bold text-[#244e3f] placeholder-[#244e3f]/70 outline-none truncate"
                       />
                     </div>
                     <div className="flex items-center gap-0.5 shrink-0">
-                      {(ctClientSearchQuery || ctClient !== 'delaware-north') && (
+                      {(ctClientSearchQuery || !isAllClients) && (
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setCtClient('delaware-north');
+                            setCtClient('all');
                             setCtLocation('all');
                             setCtClientSearchQuery('');
                           }}
                           className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[#164e3f] hover:bg-emerald-50 active:scale-95 transition-all cursor-pointer shrink-0"
-                          title="Reset Client"
+                          title="Reset to All Clients"
                         >
                           <Icon name="X" size={15} strokeWidth={2.4} />
                         </button>
@@ -853,6 +871,31 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
 
                       {/* Clients List */}
                       <div className="max-h-56 overflow-y-auto space-y-1 no-scrollbar">
+                        {/* Option 1: All Clients */}
+                        {('all clients'.includes(ctClientSearchQuery.toLowerCase()) || !ctClientSearchQuery) && (
+                          <button
+                            onClick={() => {
+                              setCtClient('all');
+                              setCtLocation('all');
+                              setIsCtClientOpen(false);
+                              setCtClientSearchQuery('');
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left cursor-pointer transition-all ${
+                              isAllClients
+                                ? 'bg-[#e7eee9] text-[#164e3f] font-bold shadow-xs'
+                                : 'hover:bg-slate-50 text-slate-700'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <CustomerLogo clientId="all" size={20} />
+                              <span className="text-xs">All Clients</span>
+                            </div>
+                            <span className={`text-[10px] ${isAllClients ? 'text-[#164e3f] font-bold' : 'text-slate-400 font-medium'}`}>
+                              {CLIENT_ACCOUNTS.length} clients
+                            </span>
+                          </button>
+                        )}
+
                         {CLIENT_ACCOUNTS.filter((c) =>
                           c.name.toLowerCase().includes(ctClientSearchQuery.toLowerCase()) ||
                           c.shortName.toLowerCase().includes(ctClientSearchQuery.toLowerCase())
@@ -887,7 +930,7 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                         {CLIENT_ACCOUNTS.filter((c) =>
                           c.name.toLowerCase().includes(ctClientSearchQuery.toLowerCase()) ||
                           c.shortName.toLowerCase().includes(ctClientSearchQuery.toLowerCase())
-                        ).length === 0 && (
+                        ).length === 0 && !('all clients'.includes(ctClientSearchQuery.toLowerCase())) && (
                           <div className="py-6 text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-1.5">
                             <span>No clients match search</span>
                           </div>
