@@ -473,8 +473,10 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
   // =========================================================================
   const [ctClient, setCtClient] = useState<string>('delaware-north');
   const [isCtClientOpen, setIsCtClientOpen] = useState(false);
+  const [ctClientSearchQuery, setCtClientSearchQuery] = useState('');
   const [ctLocation, setCtLocation] = useState<string>('all');
   const [isCtLocationOpen, setIsCtLocationOpen] = useState(false);
+  const [isCtLocationFocused, setIsCtLocationFocused] = useState(false);
   const [ctSearchQuery, setCtSearchQuery] = useState('');
 
   // Filter Bottom Sheet State (Opened via Filter icon beside Stock Check)
@@ -501,6 +503,7 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
   // =========================================================================
   const [clientLocation, setClientLocation] = useState<string>('All Locations');
   const [isClientLocationOpen, setIsClientLocationOpen] = useState(false);
+  const [isClientLocationFocused, setIsClientLocationFocused] = useState(false);
   const [clientSearchQuery, setClientSearchQuery] = useState('');
   // Customer Org Simulator (Allows previewing different client accounts)
   const [activeCustomerOrgId, setActiveCustomerOrgId] = useState<string>('derby-fc');
@@ -798,7 +801,7 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                         <button
                           onClick={() => {
                             setIsCtClientOpen(false);
-                            setCtSearchQuery('');
+                            setCtClientSearchQuery('');
                           }}
                           className="text-xs text-slate-400 hover:text-slate-600 font-semibold cursor-pointer"
                         >
@@ -812,15 +815,15 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                           <Icon name="Search" size={14} className="text-slate-400 shrink-0" />
                           <input
                             type="text"
-                            value={ctSearchQuery}
-                            onChange={(e) => setCtSearchQuery(e.target.value)}
+                            value={ctClientSearchQuery}
+                            onChange={(e) => setCtClientSearchQuery(e.target.value)}
                             placeholder="Search clients..."
                             className="w-full bg-transparent text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none"
                             autoFocus
                           />
-                          {ctSearchQuery && (
+                          {ctClientSearchQuery && (
                             <button
-                              onClick={() => setCtSearchQuery('')}
+                              onClick={() => setCtClientSearchQuery('')}
                               className="text-slate-400 hover:text-slate-600"
                             >
                               <Icon name="X" size={13} />
@@ -832,8 +835,8 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                       {/* Clients List */}
                       <div className="max-h-56 overflow-y-auto space-y-1 no-scrollbar">
                         {CLIENT_ACCOUNTS.filter((c) =>
-                          c.name.toLowerCase().includes(ctSearchQuery.toLowerCase()) ||
-                          c.shortName.toLowerCase().includes(ctSearchQuery.toLowerCase())
+                          c.name.toLowerCase().includes(ctClientSearchQuery.toLowerCase()) ||
+                          c.shortName.toLowerCase().includes(ctClientSearchQuery.toLowerCase())
                         ).map((c) => {
                           const isSelected = ctClient === c.id;
                           return (
@@ -843,7 +846,7 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                                 setCtClient(c.id);
                                 setCtLocation('all');
                                 setIsCtClientOpen(false);
-                                setCtSearchQuery('');
+                                setCtClientSearchQuery('');
                               }}
                               className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left cursor-pointer transition-all ${
                                 isSelected
@@ -866,23 +869,42 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                   )}
                 </div>
 
-                {/* Capsule 2: Location Selector */}
+                {/* Capsule 2: Location Selector (Typable Search Bar) */}
                 <div className="relative flex-1 min-w-0">
                   <div
                     onClick={() => {
-                      const next = !isCtLocationOpen;
-                      closeAllPopovers();
-                      setIsCtLocationOpen(next);
+                      if (!isCtLocationOpen) {
+                        closeAllPopovers();
+                        setIsCtLocationOpen(true);
+                      }
                     }}
-                    className="h-11 px-3 sm:px-4 rounded-full bg-white border border-[#c4dcce] flex items-center justify-between gap-1.5 sm:gap-2 shadow-xs cursor-pointer hover:border-emerald-600 transition-all"
+                    className={`h-11 px-2.5 sm:px-3 rounded-full bg-white border flex items-center justify-between gap-1 shadow-xs transition-all ${
+                      isCtLocationOpen
+                        ? 'border-emerald-600 ring-2 ring-emerald-600/20'
+                        : 'border-[#c4dcce] hover:border-emerald-600'
+                    }`}
                   >
-                    <div className="flex items-center gap-1.5 truncate">
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
                       <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#164e3f] text-white font-extrabold text-[10px] flex items-center justify-center shrink-0 tracking-tight shadow-xs">
                         {getLocationInitials(isAllLocations ? 'All Locations' : (currentLocationObj?.name || 'Location 1'))}
                       </div>
-                      <span className="text-[13px] sm:text-[14px] font-bold text-[#244e3f] truncate">
-                        {isAllLocations ? 'All Locations' : (currentLocationObj?.name || 'Location 1')}
-                      </span>
+                      <input
+                        type="text"
+                        value={isCtLocationFocused ? ctSearchQuery : (ctSearchQuery || (isAllLocations ? 'All Locations' : (currentLocationObj?.name || 'Location 1')))}
+                        onChange={(e) => {
+                          setCtSearchQuery(e.target.value);
+                          if (!isCtLocationOpen) setIsCtLocationOpen(true);
+                        }}
+                        onFocus={() => {
+                          setIsCtLocationFocused(true);
+                          setIsCtLocationOpen(true);
+                        }}
+                        onBlur={() => {
+                          setTimeout(() => setIsCtLocationFocused(false), 200);
+                        }}
+                        placeholder={isAllLocations ? 'All Locations' : (currentLocationObj?.name || 'Search venues...')}
+                        className="w-full bg-transparent text-[13px] sm:text-[14px] font-bold text-[#244e3f] placeholder-[#244e3f]/70 outline-none truncate"
+                      />
                       <button
                         type="button"
                         onClick={(e) => {
@@ -908,26 +930,40 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                         />
                       </button>
                     </div>
-                    {!isAllLocations ? (
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      {(ctSearchQuery || !isAllLocations) && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCtSearchQuery('');
+                            setCtLocation('all');
+                          }}
+                          className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[#164e3f] hover:bg-emerald-50 active:scale-95 transition-all cursor-pointer shrink-0"
+                          title="Reset to All Locations"
+                        >
+                          <Icon name="X" size={15} strokeWidth={2.4} />
+                        </button>
+                      )}
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setCtLocation('all');
+                          const next = !isCtLocationOpen;
                           closeAllPopovers();
+                          setIsCtLocationOpen(next);
                         }}
-                        className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[#164e3f] hover:bg-emerald-50 active:scale-95 transition-all cursor-pointer shrink-0"
-                        title="Reset to All Locations"
+                        className="p-1 text-[#164e3f] hover:text-emerald-800 transition-colors cursor-pointer flex items-center justify-center"
+                        title={isCtLocationOpen ? 'Close Venue Dropdown' : 'Open Venue Dropdown'}
                       >
-                        <Icon name="X" size={15} strokeWidth={2.4} />
+                        <Icon
+                          name={isCtLocationOpen ? 'ChevronUp' : 'ChevronDown'}
+                          size={15}
+                          strokeWidth={2.6}
+                          className="text-[#164e3f] shrink-0"
+                        />
                       </button>
-                    ) : (
-                      <Icon
-                        name={isCtLocationOpen ? 'ChevronUp' : 'ChevronDown'}
-                        size={15}
-                        strokeWidth={2.6}
-                        className="text-[#164e3f] shrink-0"
-                      />
-                    )}
+                    </div>
                   </div>
 
                   {/* Location Picker Dropdown Popover */}
@@ -958,35 +994,11 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                           <button
                             onClick={() => {
                               setIsCtLocationOpen(false);
-                              setCtSearchQuery('');
                             }}
                             className="text-xs text-slate-400 hover:text-slate-600 font-semibold cursor-pointer"
                           >
                             Close
                           </button>
-                        </div>
-                      </div>
-
-                      {/* Integrated Venue Search Bar */}
-                      <div className="mb-2">
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-[#f4f7f6] rounded-xl border border-emerald-600 bg-white ring-2 ring-emerald-600/10 transition-all">
-                          <Icon name="Search" size={14} className="text-slate-400 shrink-0" />
-                          <input
-                            type="text"
-                            value={ctSearchQuery}
-                            onChange={(e) => setCtSearchQuery(e.target.value)}
-                            placeholder="Search venues..."
-                            className="w-full bg-transparent text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none"
-                            autoFocus
-                          />
-                          {ctSearchQuery && (
-                            <button
-                              onClick={() => setCtSearchQuery('')}
-                              className="text-slate-400 hover:text-slate-600"
-                            >
-                              <Icon name="X" size={13} />
-                            </button>
-                          )}
                         </div>
                       </div>
 
@@ -1326,19 +1338,38 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
               <div className="relative">
                 <div
                   onClick={() => {
-                    const next = !isClientLocationOpen;
-                    closeAllPopovers();
-                    setIsClientLocationOpen(next);
+                    if (!isClientLocationOpen) {
+                      closeAllPopovers();
+                      setIsClientLocationOpen(true);
+                    }
                   }}
-                  className="h-11 px-4 rounded-full bg-white border border-[#c4dcce] flex items-center justify-between gap-2 shadow-xs cursor-pointer hover:border-emerald-600 transition-all"
+                  className={`h-11 px-3 sm:px-4 rounded-full bg-white border flex items-center justify-between gap-1.5 shadow-xs transition-all ${
+                    isClientLocationOpen
+                      ? 'border-emerald-600 ring-2 ring-emerald-600/20'
+                      : 'border-[#c4dcce] hover:border-emerald-600'
+                  }`}
                 >
-                  <div className="flex items-center gap-1.5 truncate">
+                  <div className="flex items-center gap-1.5 flex-1 min-w-0">
                     <div className="w-6 h-6 rounded-full bg-[#164e3f] text-white font-extrabold text-[10px] flex items-center justify-center shrink-0 tracking-tight shadow-xs">
                       {getLocationInitials(clientLocation || 'All Locations')}
                     </div>
-                    <span className="text-[14px] font-bold text-[#244e3f] truncate">
-                      {clientLocation || 'All Locations'}
-                    </span>
+                    <input
+                      type="text"
+                      value={isClientLocationFocused ? clientSearchQuery : (clientSearchQuery || clientLocation || 'All Locations')}
+                      onChange={(e) => {
+                        setClientSearchQuery(e.target.value);
+                        if (!isClientLocationOpen) setIsClientLocationOpen(true);
+                      }}
+                      onFocus={() => {
+                        setIsClientLocationFocused(true);
+                        setIsClientLocationOpen(true);
+                      }}
+                      onBlur={() => {
+                        setTimeout(() => setIsClientLocationFocused(false), 200);
+                      }}
+                      placeholder={clientLocation || 'Search venues...'}
+                      className="w-full bg-transparent text-[14px] font-bold text-[#244e3f] placeholder-[#244e3f]/70 outline-none truncate"
+                    />
                     <button
                       type="button"
                       onClick={(e) => {
@@ -1364,26 +1395,40 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                       />
                     </button>
                   </div>
-                  {!isAll ? (
+                  <div className="flex items-center gap-0.5 shrink-0">
+                    {(clientSearchQuery || !isAll) && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setClientSearchQuery('');
+                          setClientLocation('All Locations');
+                        }}
+                        className="w-6 h-6 rounded-full flex items-center justify-center text-[#164e3f] hover:bg-emerald-50 active:scale-95 transition-all cursor-pointer shrink-0"
+                        title="Reset to All Locations"
+                      >
+                        <Icon name="X" size={17} strokeWidth={2.4} />
+                      </button>
+                    )}
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setClientLocation('All Locations');
+                        const next = !isClientLocationOpen;
                         closeAllPopovers();
+                        setIsClientLocationOpen(next);
                       }}
-                      className="w-6 h-6 rounded-full flex items-center justify-center text-[#164e3f] hover:bg-emerald-50 active:scale-95 transition-all cursor-pointer shrink-0"
-                      title="Reset to All Locations"
+                      className="p-1 text-[#164e3f] hover:text-emerald-800 transition-colors cursor-pointer flex items-center justify-center"
+                      title={isClientLocationOpen ? 'Close Venue Dropdown' : 'Open Venue Dropdown'}
                     >
-                      <Icon name="X" size={17} strokeWidth={2.4} />
+                      <Icon
+                        name={isClientLocationOpen ? 'ChevronUp' : 'ChevronDown'}
+                        size={16}
+                        strokeWidth={2.6}
+                        className="text-[#164e3f] shrink-0"
+                      />
                     </button>
-                  ) : (
-                    <Icon
-                      name={isClientLocationOpen ? 'ChevronUp' : 'ChevronDown'}
-                      size={16}
-                      strokeWidth={2.6}
-                      className="text-[#164e3f] shrink-0"
-                    />
-                  )}
+                  </div>
                 </div>
 
                 {/* Location Picker Dropdown (EXACT SCREENSHOT MATCH) */}
@@ -1414,7 +1459,6 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                         <button
                           onClick={() => {
                             setIsClientLocationOpen(false);
-                            setClientSearchQuery('');
                           }}
                           className="text-xs text-slate-400 hover:text-slate-600 font-semibold cursor-pointer"
                         >
@@ -1423,28 +1467,7 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                       </div>
                     </div>
 
-                    {/* Integrated Venue Search Bar with emerald border ring */}
-                    <div className="mb-2">
-                      <div className="flex items-center gap-2 px-3 py-1.5 bg-[#f4f7f6] rounded-xl border border-emerald-600 bg-white ring-2 ring-emerald-600/10 transition-all">
-                        <Icon name="Search" size={14} className="text-slate-400 shrink-0" />
-                        <input
-                          type="text"
-                          value={clientSearchQuery}
-                          onChange={(e) => setClientSearchQuery(e.target.value)}
-                          placeholder="Search venues..."
-                          className="w-full bg-transparent text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none"
-                          autoFocus
-                        />
-                        {clientSearchQuery && (
-                          <button
-                            onClick={() => setClientSearchQuery('')}
-                            className="text-slate-400 hover:text-slate-600"
-                          >
-                            <Icon name="X" size={13} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
+                    {/* Venue Options */}
 
                     {/* Venue Options */}
                     <div className="max-h-56 overflow-y-auto space-y-1 no-scrollbar">
@@ -2633,32 +2656,6 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                       </button>
                     </div>
 
-                    {/* Integrated Venue Search Bar */}
-                    <div className="mb-2">
-                      <div className="flex items-center gap-2 px-3 py-1.5 bg-[#f4f7f6] rounded-xl border border-slate-200/80 focus-within:border-emerald-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-600/10 transition-all">
-                        <Icon name="Search" size={14} className="text-slate-400 shrink-0" />
-                        <input
-                          type="text"
-                          value={venueSearchQuery}
-                          onChange={(e) => setVenueSearchQuery(e.target.value)}
-                          placeholder="Search venues..."
-                          className="w-full bg-transparent text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none"
-                          autoFocus
-                        />
-                        {venueSearchQuery && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setVenueSearchQuery('');
-                            }}
-                            className="text-slate-400 hover:text-slate-600 cursor-pointer"
-                          >
-                            <Icon name="X" size={13} strokeWidth={2.4} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
                     {/* Venue Options List */}
                     <div className="max-h-56 overflow-y-auto space-y-0.5 no-scrollbar">
                       {[
@@ -2669,7 +2666,7 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                         { name: 'Venue 5', count: '1 category • 18 items' },
                       ]
                         .filter((loc) =>
-                          loc.name.toLowerCase().includes(venueSearchQuery.toLowerCase())
+                          loc.name.toLowerCase().includes((capsuleLocationSearch || venueSearchQuery).toLowerCase())
                         )
                         .map((loc) => {
                           const isSelected =
