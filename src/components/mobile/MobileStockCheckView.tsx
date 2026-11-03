@@ -473,6 +473,7 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
   // =========================================================================
   const [ctClient, setCtClient] = useState<string>('delaware-north');
   const [isCtClientOpen, setIsCtClientOpen] = useState(false);
+  const [isCtClientFocused, setIsCtClientFocused] = useState(false);
   const [ctClientSearchQuery, setCtClientSearchQuery] = useState('');
   const [ctLocation, setCtLocation] = useState<string>('all');
   const [isCtLocationOpen, setIsCtLocationOpen] = useState(false);
@@ -761,34 +762,76 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
               {/* CAPSULE CONTROLS: Side by Side (Client Selector + Merged Location & All) */}
               {/* ========================================================================= */}
               <div className="flex items-center gap-2 relative">
-                {/* Capsule 1: Client Selector */}
+                {/* Capsule 1: Client Selector (Typable Search Bar) */}
                 <div className="relative flex-1 min-w-0">
                   <div
                     onClick={() => {
-                      const next = !isCtClientOpen;
-                      closeAllPopovers();
-                      setIsCtClientOpen(next);
-                    }}
-                    className="h-11 px-3 sm:px-4 rounded-full bg-white border border-[#c4dcce] flex items-center justify-between gap-1.5 sm:gap-2 shadow-xs cursor-pointer hover:border-emerald-600 transition-all"
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      <CustomerLogo clientId={currentClientObj.id} size={22} />
-                      <span className="text-[13px] sm:text-[14px] font-bold text-[#244e3f] truncate">
-                        {currentClientObj.name}
-                      </span>
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCtClient('delaware-north');
-                        setCtLocation('all');
+                      if (!isCtClientOpen) {
                         closeAllPopovers();
-                      }}
-                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[#164e3f] hover:bg-emerald-50 active:scale-95 transition-all cursor-pointer shrink-0"
-                      title="Reset Client"
-                    >
-                      <Icon name="X" size={15} strokeWidth={2.4} />
-                    </button>
+                        setIsCtClientOpen(true);
+                      }
+                    }}
+                    className={`h-11 px-2.5 sm:px-3 rounded-full bg-white border flex items-center justify-between gap-1 shadow-xs transition-all ${
+                      isCtClientOpen
+                        ? 'border-emerald-600 ring-2 ring-emerald-600/20'
+                        : 'border-[#c4dcce] hover:border-emerald-600'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                      <CustomerLogo clientId={currentClientObj.id} size={22} />
+                      <input
+                        type="text"
+                        value={isCtClientFocused ? ctClientSearchQuery : (ctClientSearchQuery || currentClientObj.name)}
+                        onChange={(e) => {
+                          setCtClientSearchQuery(e.target.value);
+                          if (!isCtClientOpen) setIsCtClientOpen(true);
+                        }}
+                        onFocus={() => {
+                          setIsCtClientFocused(true);
+                          setIsCtClientOpen(true);
+                        }}
+                        onBlur={() => {
+                          setTimeout(() => setIsCtClientFocused(false), 200);
+                        }}
+                        placeholder={currentClientObj.name || 'Search clients...'}
+                        className="w-full bg-transparent text-[13px] sm:text-[14px] font-bold text-[#244e3f] placeholder-[#244e3f]/70 outline-none truncate"
+                      />
+                    </div>
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      {(ctClientSearchQuery || ctClient !== 'delaware-north') && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCtClient('delaware-north');
+                            setCtLocation('all');
+                            setCtClientSearchQuery('');
+                          }}
+                          className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[#164e3f] hover:bg-emerald-50 active:scale-95 transition-all cursor-pointer shrink-0"
+                          title="Reset Client"
+                        >
+                          <Icon name="X" size={15} strokeWidth={2.4} />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const next = !isCtClientOpen;
+                          closeAllPopovers();
+                          setIsCtClientOpen(next);
+                        }}
+                        className="p-1 text-[#164e3f] hover:text-emerald-800 transition-colors cursor-pointer flex items-center justify-center"
+                        title={isCtClientOpen ? 'Close Client Dropdown' : 'Open Client Dropdown'}
+                      >
+                        <Icon
+                          name={isCtClientOpen ? 'ChevronUp' : 'ChevronDown'}
+                          size={15}
+                          strokeWidth={2.6}
+                          className="text-[#164e3f] shrink-0"
+                        />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Client Picker Dropdown Popover */}
@@ -801,35 +844,11 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                         <button
                           onClick={() => {
                             setIsCtClientOpen(false);
-                            setCtClientSearchQuery('');
                           }}
                           className="text-xs text-slate-400 hover:text-slate-600 font-semibold cursor-pointer"
                         >
                           Close
                         </button>
-                      </div>
-
-                      {/* Integrated Client Search Bar */}
-                      <div className="mb-2">
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-[#f4f7f6] rounded-xl border border-slate-200/80 focus-within:border-emerald-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-emerald-600/10 transition-all">
-                          <Icon name="Search" size={14} className="text-slate-400 shrink-0" />
-                          <input
-                            type="text"
-                            value={ctClientSearchQuery}
-                            onChange={(e) => setCtClientSearchQuery(e.target.value)}
-                            placeholder="Search clients..."
-                            className="w-full bg-transparent text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none"
-                            autoFocus
-                          />
-                          {ctClientSearchQuery && (
-                            <button
-                              onClick={() => setCtClientSearchQuery('')}
-                              className="text-slate-400 hover:text-slate-600"
-                            >
-                              <Icon name="X" size={13} />
-                            </button>
-                          )}
-                        </div>
                       </div>
 
                       {/* Clients List */}
@@ -864,6 +883,15 @@ export const MobileStockCheckView: React.FC<MobileStockCheckViewProps> = ({
                             </button>
                           );
                         })}
+
+                        {CLIENT_ACCOUNTS.filter((c) =>
+                          c.name.toLowerCase().includes(ctClientSearchQuery.toLowerCase()) ||
+                          c.shortName.toLowerCase().includes(ctClientSearchQuery.toLowerCase())
+                        ).length === 0 && (
+                          <div className="py-6 text-center text-xs text-slate-400 flex flex-col items-center justify-center gap-1.5">
+                            <span>No clients match search</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
